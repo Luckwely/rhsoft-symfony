@@ -1,0 +1,314 @@
+{% extends 'layouts/base_manager.html.twig' %}
+
+{% block title %}Valider les Pointages de l'équipe{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4 py-3">
+    <!-- HEADER -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">
+                <i class="bi bi-clock-history text-primary me-2"></i>Valider les Pointages de l'équipe
+            </h3>
+            <p class="text-muted mb-0">
+                <i class="bi bi-check2-circle me-1"></i>Vérifiez et validez les pointages de votre équipe
+            </p>
+        </div>
+        <div class="d-flex gap-2 mt-3 mt-md-0">
+            <input type="date" class="form-control form-control-sm" value="2025-10-21" style="max-width: 160px;">
+            <button class="btn btn-outline-dark btn-sm">
+                <i class="bi bi-download me-1"></i>Exporter
+            </button>
+        </div>
+    </div>
+
+    <!-- ALERTE ANOMALIES -->
+    <div class="alert alert-warning border-0 rounded-4 shadow-sm d-flex align-items-center justify-content-between" role="alert">
+        <div class="d-flex align-items-center gap-3">
+            <div class="bg-warning-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                <i class="bi bi-exclamation-triangle text-warning fs-4"></i>
+            </div>
+            <div>
+                <h5 class="alert-heading fw-bold mb-0">3 anomalies à vérifier</h5>
+                <p class="mb-0 small text-muted">Des pointages nécessitent votre attention</p>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
+                <i class="bi bi-clock me-1"></i>2 retards
+            </span>
+            <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
+                <i class="bi bi-x-circle me-1"></i>1 oubli
+            </span>
+        </div>
+    </div>
+
+    <!-- TABLEAU DES POINTAGES -->
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h5 class="fw-bold mb-0">
+                <i class="bi bi-calendar3 text-primary me-2"></i>Pointages du 21/10/2025
+            </h5>
+            <button class="btn btn-primary btn-sm">
+                <i class="bi bi-check2-all me-1"></i>Valider tous les pointages
+            </button>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle table-borderless mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-3 py-3" style="width: 50px;">#</th>
+                            <th class="py-3">Employé</th>
+                            <th class="py-3 text-center">Entrée</th>
+                            <th class="py-3 text-center">Sortie</th>
+                            <th class="py-3 text-center">Heures</th>
+                            <th class="py-3 text-center">Anomalie</th>
+                            <th class="py-3 text-center pe-3" style="width: 120px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Ligne 1 - OK -->
+                        <tr>
+                            <td class="ps-3"><span class="text-muted small">1</span></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px; font-size: 14px;">JD</div>
+                                    <div>
+                                        <div class="fw-semibold">Jean Dupont</div>
+                                        <div class="text-muted small">Développeur</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center"><span class="fw-semibold">08:02</span></td>
+                            <td class="text-center"><span class="fw-semibold">17:05</span></td>
+                            <td class="text-center"><span class="fw-semibold">9h 03min</span></td>
+                            <td class="text-center">
+                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Aucune
+                                </span>
+                            </td>
+                            <td class="text-center pe-3">
+                                <button class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-check2 me-1"></i>Valider
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 2 - Retard -->
+                        <tr class="table-warning">
+                            <td class="ps-3"><span class="text-muted small">2</span></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px; font-size: 14px;">MM</div>
+                                    <div>
+                                        <div class="fw-semibold">Marie Martin</div>
+                                        <div class="text-muted small">Designer</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center"><span class="fw-semibold text-warning">08:15</span></td>
+                            <td class="text-center"><span class="fw-semibold">17:00</span></td>
+                            <td class="text-center"><span class="fw-semibold">8h 45min</span></td>
+                            <td class="text-center">
+                                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
+                                    <i class="bi bi-clock-history me-1"></i>Retard
+                                </span>
+                            </td>
+                            <td class="text-center pe-3">
+                                <button class="btn btn-sm btn-outline-warning">
+                                    <i class="bi bi-pencil me-1"></i>Corriger
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 3 - Oubli pointage -->
+                        <tr class="table-danger">
+                            <td class="ps-3"><span class="text-muted small">3</span></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-warning-subtle text-warning rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px; font-size: 14px;">PD</div>
+                                    <div>
+                                        <div class="fw-semibold">Paul Dubois</div>
+                                        <div class="text-muted small">Manager</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center"><span class="fw-semibold">08:00</span></td>
+                            <td class="text-center"><span class="text-danger">--:--</span></td>
+                            <td class="text-center"><span class="fw-semibold">--</span></td>
+                            <td class="text-center">
+                                <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
+                                    <i class="bi bi-x-circle-fill me-1"></i>Sortie manquante
+                                </span>
+                            </td>
+                            <td class="text-center pe-3">
+                                <button class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-pencil me-1"></i>Corriger
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 4 - OK -->
+                        <tr>
+                            <td class="ps-3"><span class="text-muted small">4</span></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-info-subtle text-info rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px; font-size: 14px;">JL</div>
+                                    <div>
+                                        <div class="fw-semibold">Julie Lefèvre</div>
+                                        <div class="text-muted small">Commercial</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center"><span class="fw-semibold">07:58</span></td>
+                            <td class="text-center"><span class="fw-semibold">16:55</span></td>
+                            <td class="text-center"><span class="fw-semibold">8h 57min</span></td>
+                            <td class="text-center">
+                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Aucune
+                                </span>
+                            </td>
+                            <td class="text-center pe-3">
+                                <button class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-check2 me-1"></i>Valider
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 5 - Heures supplémentaires -->
+                        <tr>
+                            <td class="ps-3"><span class="text-muted small">5</span></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-danger-subtle text-danger rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px; font-size: 14px;">TB</div>
+                                    <div>
+                                        <div class="fw-semibold">Thomas Bernard</div>
+                                        <div class="text-muted small">Développeur</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center"><span class="fw-semibold">09:00</span></td>
+                            <td class="text-center"><span class="fw-semibold">18:30</span></td>
+                            <td class="text-center"><span class="fw-semibold">9h 30min</span></td>
+                            <td class="text-center">
+                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
+                                    <i class="bi bi-clock me-1"></i>Heures sup
+                                </span>
+                            </td>
+                            <td class="text-center pe-3">
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-check2 me-1"></i>Valider
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 6 - OK -->
+                        <tr>
+                            <td class="ps-3"><span class="text-muted small">6</span></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-secondary-subtle text-secondary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px; font-size: 14px;">SR</div>
+                                    <div>
+                                        <div class="fw-semibold">Sarah Rakoto</div>
+                                        <div class="text-muted small">RH</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center"><span class="fw-semibold">08:00</span></td>
+                            <td class="text-center"><span class="fw-semibold">17:00</span></td>
+                            <td class="text-center"><span class="fw-semibold">9h 00min</span></td>
+                            <td class="text-center">
+                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Aucune
+                                </span>
+                            </td>
+                            <td class="text-center pe-3">
+                                <button class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-check2 me-1"></i>Valider
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Footer Table -->
+        <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center py-3">
+            <small class="text-muted">
+                <i class="bi bi-info-circle me-1"></i>6 pointages pour le 21/10/2025
+            </small>
+            <div class="d-flex gap-2">
+                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                    <i class="bi bi-check-circle me-1"></i>3 validés
+                </span>
+                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
+                    <i class="bi bi-clock me-1"></i>1 retard
+                </span>
+                <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
+                    <i class="bi bi-x-circle me-1"></i>1 sortie manquante
+                </span>
+                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
+                    <i class="bi bi-clock me-1"></i>1 heure sup
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- RÉSUMÉ STATS -->
+    <div class="row g-3 mt-3">
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body text-center p-3">
+                    <div class="text-success fw-bold fs-4">3</div>
+                    <small class="text-muted">Présents</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body text-center p-3">
+                    <div class="text-warning fw-bold fs-4">2</div>
+                    <small class="text-muted">En retard</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body text-center p-3">
+                    <div class="text-danger fw-bold fs-4">1</div>
+                    <small class="text-muted">Oubli</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body text-center p-3">
+                    <div class="text-info fw-bold fs-4">2</div>
+                    <small class="text-muted">En congé</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .nav-tabs .nav-link {
+        color: #6c757d;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .nav-tabs .nav-link:hover {
+        background-color: #f8f9fa;
+        color: #0d6efd;
+    }
+    .nav-tabs .nav-link.active {
+        background-color: #0d6efd;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    .table-bordered td, .table-bordered th {
+        border-color: #e9ecef;
+    }
+</style>
+{% endblock %}

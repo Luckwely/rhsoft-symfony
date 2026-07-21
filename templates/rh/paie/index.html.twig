@@ -1,0 +1,435 @@
+{% extends 'layouts/base_rh.html.twig' %}
+
+{% block title %}Gestion de la Paie{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4 py-3">
+    <!-- HEADER -->
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">
+                <i class="bi bi-wallet2 text-primary me-2"></i>Gestion de la Paie
+            </h3>
+            <p class="text-muted mb-0">
+                <i class="bi bi-file-earmark-text me-1"></i>Préparez et générez les fiches de paie
+            </p>
+        </div>
+        <button class="btn btn-outline-dark btn-sm mt-3 mt-lg-0">
+            <i class="bi bi-file-earmark-arrow-down me-1"></i>Exporter
+        </button>
+    </div>
+
+    <!-- NAVIGATION ONGLETS BOOTSTRAP -->
+    <ul class="nav nav-tabs border-0 gap-2 mb-4" id="paieTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active border-0 rounded-3 px-4"
+                    id="tab-preparer-btn"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-preparer"
+                    type="button"
+                    role="tab"
+                    aria-controls="tab-preparer"
+                    aria-selected="true">
+                <i class="bi bi-calculator text-primary me-2"></i>Préparer la paie
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link border-0 rounded-3 px-4"
+                    id="tab-generer-btn"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-generer"
+                    type="button"
+                    role="tab"
+                    aria-controls="tab-generer"
+                    aria-selected="false">
+                <i class="bi bi-file-earmark-text text-success me-2"></i>Générer fiches de paie
+                <span class="badge bg-primary ms-1">5</span>
+            </button>
+        </li>
+    </ul>
+
+    <!-- CONTENU ONGLETS -->
+    <div class="tab-content" id="paieTabsContent">
+
+        <!-- ONGLET 1: PREPARER LA PAIE -->
+        <div class="tab-pane fade show active" id="tab-preparer" role="tabpanel" aria-labelledby="tab-preparer-btn">
+            <div class="row g-4">
+
+                <!-- COLONNE GAUCHE: CALCUL -->
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-header bg-transparent border-0">
+                            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                                <div class="d-flex gap-2">
+                                    <select class="form-select form-select-sm" style="width: 150px;">
+                                        <option value="octobre">Octobre 2025</option>
+                                        <option value="septembre">Septembre 2025</option>
+                                        <option value="aout">Août 2025</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="bi bi-calculator me-1"></i>Lancer le calcul
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle table-borderless mb-0">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="ps-3 py-3">Service</th>
+                                            <th class="py-3 text-center">Nb Employés</th>
+                                            <th class="py-3 text-end">Masse Salariale Estimée</th>
+                                            <th class="py-3 text-center pe-3">Statut</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="ps-3">
+                                                <i class="bi bi-laptop text-primary me-2"></i>Tech
+                                            </td>
+                                            <td class="text-center">45</td>
+                                            <td class="text-end fw-bold">67 500 €</td>
+                                            <td class="text-center pe-3">
+                                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                                                    <i class="bi bi-check-circle-fill me-1"></i>Calculé
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="ps-3">
+                                                <i class="bi bi-people text-primary me-2"></i>RH
+                                            </td>
+                                            <td class="text-center">8</td>
+                                            <td class="text-end fw-bold">18 400 €</td>
+                                            <td class="text-center pe-3">
+                                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                                                    <i class="bi bi-check-circle-fill me-1"></i>Calculé
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="ps-3">
+                                                <i class="bi bi-graph-up text-primary me-2"></i>Commercial
+                                            </td>
+                                            <td class="text-center">22</td>
+                                            <td class="text-end fw-bold">41 800 €</td>
+                                            <td class="text-center pe-3">
+                                                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
+                                                    <i class="bi bi-clock-history me-1"></i>En attente
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="ps-3">
+                                                <i class="bi bi-calculator text-primary me-2"></i>Compta
+                                            </td>
+                                            <td class="text-center">6</td>
+                                            <td class="text-end fw-bold">16 200 €</td>
+                                            <td class="text-center pe-3">
+                                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                                                    <i class="bi bi-check-circle-fill me-1"></i>Calculé
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr class="table-light fw-bold">
+                                            <td class="ps-3">Total</td>
+                                            <td class="text-center">81</td>
+                                            <td class="text-end">143 900 €</td>
+                                            <td class="text-center pe-3"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLONNE DROITE: ETAPES -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-header bg-transparent border-0">
+                            <h5 class="fw-bold mb-0">
+                                <i class="bi bi-list-check text-primary me-2"></i>Étapes de préparation
+                            </h5>
+                            <small class="text-muted">Suivez le processus</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 32px; height: 32px; font-size: 14px; font-weight: 600;">1</div>
+                                <div>
+                                    <div class="fw-semibold">Vérifier pointages</div>
+                                    <small class="text-muted">Valider les heures du mois</small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 32px; height: 32px; font-size: 14px; font-weight: 600;">2</div>
+                                <div>
+                                    <div class="fw-semibold">Calculer</div>
+                                    <small class="text-muted">Lancer le calcul des salaires</small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 32px; height: 32px; font-size: 14px; font-weight: 600;">3</div>
+                                <div>
+                                    <div class="fw-semibold">Générer</div>
+                                    <small class="text-muted">Créer les fiches de paie</small>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="alert alert-info border-0 rounded-3 small mb-0">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Assurez-vous que tous les pointages sont validés avant de lancer le calcul.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ONGLET 2: GENERER FICHES DE PAIE -->
+        <div class="tab-pane fade" id="tab-generer" role="tabpanel" aria-labelledby="tab-generer-btn">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-file-earmark-text text-primary me-2"></i>Fiches de paie - Octobre 2025
+                    </h5>
+                    <button class="btn btn-success btn-sm">
+                        <i class="bi bi-file-earmark-zip me-1"></i>Générer toutes les fiches
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle table-borderless mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-3 py-3" style="width: 50px;">
+                                        <input type="checkbox" class="form-check-input">
+                                    </th>
+                                    <th class="py-3">Employé</th>
+                                    <th class="py-3">Poste</th>
+                                    <th class="py-3 text-end">Salaire Brut</th>
+                                    <th class="py-3 text-end">Cotisations</th>
+                                    <th class="py-3 text-end">Salaire Net</th>
+                                    <th class="py-3 text-center">Statut</th>
+                                    <th class="py-3 text-center pe-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Ligne 1 -->
+                                <tr>
+                                    <td class="ps-3">
+                                        <input type="checkbox" class="form-check-input">
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px;">JD</div>
+                                            <div>
+                                                <div class="fw-semibold">Jean Dupont</div>
+                                                <small class="text-muted">Tech</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Développeur</td>
+                                    <td class="text-end">2 800 €</td>
+                                    <td class="text-end text-danger">-840 €</td>
+                                    <td class="text-end fw-bold text-success">1 960 €</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Générée
+                                        </span>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-light border-0" title="Voir">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" title="Télécharger PDF">
+                                            <i class="bi bi-download me-1"></i>PDF
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Ligne 2 -->
+                                <tr>
+                                    <td class="ps-3">
+                                        <input type="checkbox" class="form-check-input">
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-info-subtle text-info rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px;">MM</div>
+                                            <div>
+                                                <div class="fw-semibold">Marie Martin</div>
+                                                <small class="text-muted">RH</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>RH Manager</td>
+                                    <td class="text-end">3 200 €</td>
+                                    <td class="text-end text-danger">-960 €</td>
+                                    <td class="text-end fw-bold text-success">2 240 €</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Générée
+                                        </span>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-light border-0" title="Voir">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" title="Télécharger PDF">
+                                            <i class="bi bi-download me-1"></i>PDF
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Ligne 3 -->
+                                <tr>
+                                    <td class="ps-3">
+                                        <input type="checkbox" class="form-check-input">
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-warning-subtle text-warning rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px;">PD</div>
+                                            <div>
+                                                <div class="fw-semibold">Paul Dubois</div>
+                                                <small class="text-muted">Commercial</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Commercial</td>
+                                    <td class="text-end">2 500 €</td>
+                                    <td class="text-end text-danger">-750 €</td>
+                                    <td class="text-end fw-bold text-success">1 750 €</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
+                                            <i class="bi bi-clock-history me-1"></i>En attente
+                                        </span>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-light border-0" title="Voir">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" title="Télécharger PDF" disabled>
+                                            <i class="bi bi-download me-1"></i>PDF
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Ligne 4 -->
+                                <tr>
+                                    <td class="ps-3">
+                                        <input type="checkbox" class="form-check-input">
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px;">JL</div>
+                                            <div>
+                                                <div class="fw-semibold">Julie Leroy</div>
+                                                <small class="text-muted">Compta</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Comptable</td>
+                                    <td class="text-end">2 700 €</td>
+                                    <td class="text-end text-danger">-810 €</td>
+                                    <td class="text-end fw-bold text-success">1 890 €</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Générée
+                                        </span>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-light border-0" title="Voir">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" title="Télécharger PDF">
+                                            <i class="bi bi-download me-1"></i>PDF
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Ligne 5 -->
+                                <tr>
+                                    <td class="ps-3">
+                                        <input type="checkbox" class="form-check-input">
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-secondary-subtle text-secondary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px;">AL</div>
+                                            <div>
+                                                <div class="fw-semibold">Antoine Lefevre</div>
+                                                <small class="text-muted">Tech</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>DevOps</td>
+                                    <td class="text-end">3 000 €</td>
+                                    <td class="text-end text-danger">-900 €</td>
+                                    <td class="text-end fw-bold text-success">2 100 €</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
+                                            <i class="bi bi-clock-history me-1"></i>En attente
+                                        </span>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-light border-0" title="Voir">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" title="Télécharger PDF" disabled>
+                                            <i class="bi bi-download me-1"></i>PDF
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center py-3">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>5 fiches de paie pour octobre 2025
+                    </small>
+                    <nav aria-label="Pagination">
+                        <ul class="pagination mb-0">
+                            <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Style pour les onglets modernes -->
+<style>
+    .nav-tabs .nav-link {
+        color: #6c757d;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .nav-tabs .nav-link:hover {
+        background-color: #f8f9fa;
+        color: #0d6efd;
+    }
+    .nav-tabs .nav-link.active {
+        background-color: #0d6efd;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    .nav-tabs .nav-link.active .badge {
+        background-color: rgba(255,255,255,0.25) !important;
+        color: #ffffff !important;
+    }
+    .tab-pane {
+        animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}

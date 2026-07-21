@@ -1,0 +1,91 @@
+{% extends 'layouts/base_admin.html.twig' %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="mb-0">Ajouter un Employé</h3>
+        </div>
+        <div class="card-body">
+
+            {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'novalidate': 'novalidate'}}) }}
+
+            <div class="row">
+                {# PRÉNOM #}
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.prenom, 'Prénom *', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.prenom, {'attr': {'class': 'form-control' ~ (form.prenom.vars.errors|length > 0 ? ' is-invalid' : '')}}) }}
+                    {{ form_errors(form.prenom) }}
+                </div>
+
+                {# NOM #}
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.nom, 'Nom *', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.nom, {'attr': {'class': 'form-control' ~ (form.nom.vars.errors|length > 0 ? ' is-invalid' : '')}}) }}
+                    {{ form_errors(form.nom) }}
+                </div>
+
+                {# EMAIL #}
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.email, 'Email *', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.email, {'attr': {'class': 'form-control' ~ (form.email.vars.errors|length > 0 ? ' is-invalid' : '')}}) }}
+                    {{ form_errors(form.email) }}
+                </div>
+
+                {# TELEPHONE #}
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.telephone, 'Téléphone', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.telephone, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.telephone) }}
+                </div>
+
+                {# ADRESSE #}
+                <div class="col-12 mb-3">
+                    {{ form_label(form.adresse, 'Adresse', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.adresse, {'attr': {'class': 'form-control', 'rows': 2}}) }}
+                    {{ form_errors(form.adresse) }}
+                </div>
+
+                {# PHOTO #}
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.photo, 'Photo Profil', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.photo, {'attr': {'class': 'form-control'}}) }}
+                    <small class="form-text text-muted">JPG, PNG. Max 2M</small>
+                    {{ form_errors(form.photo) }}
+                </div>
+
+                {# CV #}
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.cv, 'CV PDF', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.cv, {'attr': {'class': 'form-control'}}) }}
+                    <small class="form-text text-muted">PDF. Max 5M</small>
+                    {{ form_errors(form.cv) }}
+                </div>
+
+                {# DATE EMBAUCHE #}
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.dateEmbauche, 'Date Embauche', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.dateEmbauche, {'attr': {'class': 'form-control', 'type': 'date'}}) }}
+                </div>
+
+                {# SOLDE CONGE #}
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.soldeConge, 'Solde Congé', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.soldeConge, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+
+            {{ form_rest(form) }} {# Important pour le token CSRF #}
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-person-plus"></i> Créer et Envoyer Invitation
+                </button>
+                <a href="{{ path('app_employee_list') }}" class="btn btn-secondary">Annuler</a>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

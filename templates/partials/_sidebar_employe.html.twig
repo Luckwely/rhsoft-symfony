@@ -1,0 +1,50 @@
+<!-- Logo -->
+<div class="d-flex align-items-center mb-4 pb-3 border-bottom border-secondary">
+    <a href="{{ path('app_admin_dashboard') }}" class="sidebar-logo d-flex align-items-center">
+        <i class="bi bi-building me-2"></i>
+        <span>RH Soft Pro</span>
+    </a>
+    <span class="sidebar-badge ms-2">{{ app.user.entreprise.nom ?? 'Demo' }}</span>
+</div>
+
+<!-- Navigation Menu -->
+<nav class="nav nav-pills flex-column mb-auto gap-1">
+    <a href="{{ path('app_employe_profile') }}"
+        class="nav-link {% if app.request.attributes.get('_route') == 'app_employe_profile' %}active{% endif %}">
+        <i class="bi bi-person-circle me-2"></i>
+        Mon Profil
+    </a>
+    <a href="{{ path('app_employe_planning') }}"
+        class="nav-link {% if app.request.attributes.get('_route') == 'app_employe_planning' %}active{% endif %}">
+        <i class="bi bi-clock-history me-2"></i>
+        Planning & Pointage
+    </a>
+    <a href="{{ path('app_employe_demandes') }}"
+        class="nav-link {% if app.request.attributes.get('_route') == 'app_employe_demandes' %}active{% endif %}">
+        <i class="bi bi-clipboard2 me-2"></i>
+        Demandes
+    </a>
+    <a href="{{ path('app_employe_conge') }}"
+        class="nav-link {% if app.request.attributes.get('_route') == 'app_employe_conge' %}active{% endif %}">
+        <i class="bi bi-umbrella me-2"></i>
+        Mes Congés
+    </a>
+    <a href="{{ path('app_employe_paie') }}"
+        class="nav-link {% if app.request.attributes.get('_route') == 'app_employe_paie' %}active{% endif %}">
+        <i class="bi bi-wallet2 me-2"></i>
+        Mes Fiches de Paie
+    </a>
+</nav>
+
+<!-- Sidebar Footer - User Info -->
+<div class="sidebar-user">
+    <div class="d-flex align-items-center">
+        <div class="avatar-circle bg-primary">
+            {{ app.user.prenom ? app.user.prenom|slice(0, 1)|upper : 'U' }}
+        </div>
+        <div class="ms-2">
+            <div class="user-name">{{ app.user.prenom ? app.user.prenom ~ ' ' ~ app.user.nom : app.user.email }}</div>
+            <div class="user-company">{{ app.user.entreprise.nom ?? 'Entreprise' }}</div>
+        </div>
+    </div>
+</div>

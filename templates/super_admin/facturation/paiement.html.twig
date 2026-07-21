@@ -1,0 +1,538 @@
+{% extends "layouts/base_super_admin.html.twig" %}
+
+{% block title %}Historique des Paiements{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4">
+    <!-- En-tête -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h1 class="h2 fw-bold mb-0">
+                <i class="bi bi-credit-card-2-front text-primary me-2"></i>Historique des Paiements
+            </h1>
+            <p class="text-muted small mb-0">Suivez tous les paiements effectués sur la plateforme</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary">
+                <i class="bi bi-calendar3 me-2"></i>Période
+            </button>
+            <button class="btn btn-outline-dark">
+                <i class="bi bi-download me-2"></i>Exporter CSV
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistiques des paiements -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-3 text-center">
+                    <span class="badge bg-primary mb-1">Total</span>
+                    <h5 class="fw-bold mb-0">18 430 €</h5>
+                    <small class="text-muted">Paiements</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-3 text-center">
+                    <span class="badge bg-success mb-1">Ce mois</span>
+                    <h5 class="fw-bold mb-0 text-success">4 560 €</h5>
+                    <small class="text-muted">+12.5% vs mois dernier</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-3 text-center">
+                    <span class="badge bg-info mb-1">Transactions</span>
+                    <h5 class="fw-bold mb-0 text-info">156</h5>
+                    <small class="text-muted">Paiements</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-3 text-center">
+                    <span class="badge bg-warning mb-1">Taux de réussite</span>
+                    <h5 class="fw-bold mb-0 text-warning">98.7%</h5>
+                    <small class="text-muted">Paiements</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-3">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-3">
+                    <div class="position-relative">
+                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        <input type="text" class="form-control ps-5" placeholder="Rechercher..." aria-label="Rechercher">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select">
+                        <option value="">Tous les statuts</option>
+                        <option value="completed">Réussi</option>
+                        <option value="pending">En attente</option>
+                        <option value="failed">Échoué</option>
+                        <option value="refunded">Remboursé</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select">
+                        <option value="">Toutes les méthodes</option>
+                        <option value="stripe">Stripe</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="bank">Virement</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary w-100">
+                        <i class="bi bi-funnel me-1"></i>Filtrer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau des paiements -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-3 py-3">Date</th>
+                            <th class="py-3">Entreprise</th>
+                            <th class="py-3 text-end">Montant</th>
+                            <th class="py-3 text-center">Méthode</th>
+                            <th class="py-3 text-center">ID Transaction</th>
+                            <th class="py-3 text-center">Statut</th>
+                            <th class="py-3 text-center pe-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Ligne 1 -->
+                        <tr>
+                            <td class="ps-3">
+                                <span class="fw-semibold">15/07/2026</span>
+                                <span class="text-muted small d-block">14:32</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold" style="width: 32px; height: 32px; font-size: 12px;">TI</div>
+                                    <div>
+                                        <div class="fw-semibold small">TechInnovate</div>
+                                        <div class="text-muted small">contact@techinnovate.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold">99 €</td>
+                            <td class="text-center">
+                                <span class="badge bg-primary bg-opacity-10 text-primary">
+                                    <i class="bi bi-stripe me-1"></i>Stripe
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <code class="small">txn_1N2o3P4Q5R6S7T8U</code>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-success bg-opacity-10 text-success">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Réussi
+                                </span>
+                            </td>
+                            <td class="text-center pe-3">
+                                <button class="btn btn-sm btn-outline-secondary" title="Voir détails">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary" title="Télécharger reçu">
+                                    <i class="bi bi-download"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 2 -->
+                        <tr>
+                            <td class="ps-3">
+                                <span class="fw-semibold">14/07/2026</span>
+                                <span class="text-muted small d-block">09:15</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-success fw-bold" style="width: 32px; height: 32px; font-size: 12px;">GH</div>
+                                    <div>
+                                        <div class="fw-semibold small">Global HR Tech</div>
+                                        <div class="text-muted small">contact@globalhr.tech</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold">299 €</td>
+                            <td class="text-center">
+                                <span class="badge bg-info bg-opacity-10 text-info">
+                                    <i class="bi bi-paypal me-1"></i>PayPal
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <code class="small">PP-9X8Y7Z6W5V4U3T2</code>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-success bg-opacity-10 text-success">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Réussi
+                                </span>
+                            </td>
+                            <td class="text-center pe-3">
+                                <button class="btn btn-sm btn-outline-secondary" title="Voir détails">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary" title="Télécharger reçu">
+                                    <i class="bi bi-download"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 3 -->
+                        <tr>
+                            <td class="ps-3">
+                                <span class="fw-semibold">13/07/2026</span>
+                                <span class="text-muted small d-block">16:45</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-warning fw-bold" style="width: 32px; height: 32px; font-size: 12px;">CP</div>
+                                    <div>
+                                        <div class="fw-semibold small">Consulting Pro</div>
+                                        <div class="text-muted small">admin@consultingpro.fr</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold">29 €</td>
+                            <td class="text-center">
+                                <span class="badge bg-primary bg-opacity-10 text-primary">
+                                    <i class="bi bi-stripe me-1"></i>Stripe
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <code class="small">txn_2O3p4Q5R6S7T8U9V</code>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-warning bg-opacity-10 text-warning">
+                                    <i class="bi bi-clock-history me-1"></i>En attente
+                                </span>
+                            </td>
+                            <td class="text-center pe-3">
+                                <button class="btn btn-sm btn-outline-secondary" title="Voir détails">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" title="Télécharger reçu" disabled>
+                                    <i class="bi bi-download"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 4 -->
+                        <tr>
+                            <td class="ps-3">
+                                <span class="fw-semibold">12/07/2026</span>
+                                <span class="text-muted small d-block">11:20</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-danger fw-bold" style="width: 32px; height: 32px; font-size: 12px;">DR</div>
+                                    <div>
+                                        <div class="fw-semibold small">Digital RH</div>
+                                        <div class="text-muted small">contact@digitalrh.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold">99 €</td>
+                            <td class="text-center">
+                                <span class="badge bg-info bg-opacity-10 text-info">
+                                    <i class="bi bi-paypal me-1"></i>PayPal
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <code class="small">PP-8W7V6U5T4S3R2Q1</code>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-danger bg-opacity-10 text-danger">
+                                    <i class="bi bi-x-circle-fill me-1"></i>Échoué
+                                </span>
+                            </td>
+                            <td class="text-center pe-3">
+                                <button class="btn btn-sm btn-outline-secondary" title="Voir détails">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-warning" title="Réessayer">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 5 -->
+                        <tr>
+                            <td class="ps-3">
+                                <span class="fw-semibold">11/07/2026</span>
+                                <span class="text-muted small d-block">08:30</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-secondary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-secondary fw-bold" style="width: 32px; height: 32px; font-size: 12px;">HS</div>
+                                    <div>
+                                        <div class="fw-semibold small">HR Solutions</div>
+                                        <div class="text-muted small">info@hrsolutions.fr</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold">99 €</td>
+                            <td class="text-center">
+                                <span class="badge bg-primary bg-opacity-10 text-primary">
+                                    <i class="bi bi-stripe me-1"></i>Stripe
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <code class="small">txn_3P4q5R6s7T8u9V0W</code>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-success bg-opacity-10 text-success">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Réussi
+                                </span>
+                            </td>
+                            <td class="text-center pe-3">
+                                <button class="btn btn-sm btn-outline-secondary" title="Voir détails">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary" title="Télécharger reçu">
+                                    <i class="bi bi-download"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 6 -->
+                        <tr>
+                            <td class="ps-3">
+                                <span class="fw-semibold">10/07/2026</span>
+                                <span class="text-muted small d-block">14:55</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-info fw-bold" style="width: 32px; height: 32px; font-size: 12px;">TP</div>
+                                    <div>
+                                        <div class="fw-semibold small">Talent Pro</div>
+                                        <div class="text-muted small">contact@talentpro.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold">299 €</td>
+                            <td class="text-center">
+                                <span class="badge bg-primary bg-opacity-10 text-primary">
+                                    <i class="bi bi-stripe me-1"></i>Stripe
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <code class="small">txn_4Q5r6S7t8U9v0W1X</code>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-success bg-opacity-10 text-success">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Réussi
+                                </span>
+                            </td>
+                            <td class="text-center pe-3">
+                                <button class="btn btn-sm btn-outline-secondary" title="Voir détails">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary" title="Télécharger reçu">
+                                    <i class="bi bi-download"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 7 -->
+                        <tr>
+                            <td class="ps-3">
+                                <span class="fw-semibold">09/07/2026</span>
+                                <span class="text-muted small d-block">10:10</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-success fw-bold" style="width: 32px; height: 32px; font-size: 12px;">AI</div>
+                                    <div>
+                                        <div class="fw-semibold small">AI Recruit</div>
+                                        <div class="text-muted small">hello@airecruit.io</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold">0 €</td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                                    <i class="bi bi-bank me-1"></i>Virement
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <code class="small">VIR-2026-0042</code>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-warning bg-opacity-10 text-warning">
+                                    <i class="bi bi-clock-history me-1"></i>En attente
+                                </span>
+                            </td>
+                            <td class="text-center pe-3">
+                                <button class="btn btn-sm btn-outline-secondary" title="Voir détails">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" title="Télécharger reçu" disabled>
+                                    <i class="bi bi-download"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 8 -->
+                        <tr>
+                            <td class="ps-3">
+                                <span class="fw-semibold">08/07/2026</span>
+                                <span class="text-muted small d-block">16:30</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-warning fw-bold" style="width: 32px; height: 32px; font-size: 12px;">RA</div>
+                                    <div>
+                                        <div class="fw-semibold small">RH Advisory</div>
+                                        <div class="text-muted small">contact@rhadvisory.fr</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold">29 €</td>
+                            <td class="text-center">
+                                <span class="badge bg-info bg-opacity-10 text-info">
+                                    <i class="bi bi-paypal me-1"></i>PayPal
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <code class="small">PP-6V5U4T3S2R1Q0P9</code>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-danger bg-opacity-10 text-danger">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i>Remboursé
+                                </span>
+                            </td>
+                            <td class="text-center pe-3">
+                                <button class="btn btn-sm btn-outline-secondary" title="Voir détails">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary" title="Télécharger reçu">
+                                    <i class="bi bi-download"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 9 -->
+                        <tr>
+                            <td class="ps-3">
+                                <span class="fw-semibold">07/07/2026</span>
+                                <span class="text-muted small d-block">09:45</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold" style="width: 32px; height: 32px; font-size: 12px;">PM</div>
+                                    <div>
+                                        <div class="fw-semibold small">People Manager</div>
+                                        <div class="text-muted small">info@peoplemanager.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold">99 €</td>
+                            <td class="text-center">
+                                <span class="badge bg-primary bg-opacity-10 text-primary">
+                                    <i class="bi bi-stripe me-1"></i>Stripe
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <code class="small">txn_5R6s7T8u9V0w1X2Y</code>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-success bg-opacity-10 text-success">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Réussi
+                                </span>
+                            </td>
+                            <td class="text-center pe-3">
+                                <button class="btn btn-sm btn-outline-secondary" title="Voir détails">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary" title="Télécharger reçu">
+                                    <i class="bi bi-download"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 10 -->
+                        <tr>
+                            <td class="ps-3">
+                                <span class="fw-semibold">06/07/2026</span>
+                                <span class="text-muted small d-block">13:20</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-success fw-bold" style="width: 32px; height: 32px; font-size: 12px;">SR</div>
+                                    <div>
+                                        <div class="fw-semibold small">SmartRH Solutions</div>
+                                        <div class="text-muted small">info@smartrh.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold">0 €</td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                                    <i class="bi bi-bank me-1"></i>Virement
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <code class="small">VIR-2026-0038</code>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-success bg-opacity-10 text-success">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Réussi
+                                </span>
+                            </td>
+                            <td class="text-center pe-3">
+                                <button class="btn btn-sm btn-outline-secondary" title="Voir détails">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary" title="Télécharger reçu">
+                                    <i class="bi bi-download"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Pagination -->
+        <div class="card-footer bg-transparent border-0 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+            <small class="text-muted">
+                <i class="bi bi-info-circle me-1"></i>Affichage de 1 à 10 sur 156 paiements
+            </small>
+            <nav aria-label="Pagination des paiements">
+                <ul class="pagination mb-0">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">4</a></li>
+                    <li class="page-item"><a class="page-link" href="#">5</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %}

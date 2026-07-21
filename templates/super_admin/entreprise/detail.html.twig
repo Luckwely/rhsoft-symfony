@@ -1,0 +1,527 @@
+{% extends "layouts/base_super_admin.html.twig" %}
+
+{% block title %}Détails Entreprise - RH Soft SARL{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4">
+    <!-- En-tête -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="#" class="text-decoration-none">Tableau de bord</a></li>
+                    <li class="breadcrumb-item"><a href="#" class="text-decoration-none">Entreprises</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">RH Soft SARL</li>
+                </ol>
+            </nav>
+            <h1 class="h2 fw-bold mb-0">
+                <i class="bi bi-building text-primary me-2"></i>RH Soft SARL
+                <span class="badge bg-success ms-2">
+                    <i class="bi bi-check-circle-fill me-1"></i>Actif
+                </span>
+            </h1>
+            <p class="text-muted small mb-0">ID: ENT-2024-0042 • Créée le 15/03/2024</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-warning">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Se connecter en tant que
+            </button>
+            <button class="btn btn-outline-secondary">
+                <i class="bi bi-pencil me-2"></i>Éditer
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs border-0 gap-2 mb-4" id="entrepriseTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active border-0 rounded-3 px-4"
+                    id="info-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#info"
+                    type="button"
+                    role="tab"
+                    aria-controls="info"
+                    aria-selected="true">
+                <i class="bi bi-info-circle me-2"></i>Infos
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link border-0 rounded-3 px-4"
+                    id="users-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#users"
+                    type="button"
+                    role="tab"
+                    aria-controls="users"
+                    aria-selected="false">
+                <i class="bi bi-people me-2"></i>Utilisateurs
+                <span class="badge bg-primary ms-2">12</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link border-0 rounded-3 px-4"
+                    id="conso-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#conso"
+                    type="button"
+                    role="tab"
+                    aria-controls="conso"
+                    aria-selected="false">
+                <i class="bi bi-bar-chart me-2"></i>Consommation
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link border-0 rounded-3 px-4"
+                    id="factures-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#factures"
+                    type="button"
+                    role="tab"
+                    aria-controls="factures"
+                    aria-selected="false">
+                <i class="bi bi-receipt me-2"></i>Factures
+                <span class="badge bg-danger ms-2">2</span>
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tabs Content -->
+    <div class="tab-content" id="entrepriseTabsContent">
+
+        <!-- TAB 1: Infos -->
+        <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-transparent border-0">
+                            <h5 class="fw-bold mb-0">
+                                <i class="bi bi-building text-primary me-2"></i>Informations Générales
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4 fw-semibold">Raison Sociale</dt>
+                                <dd class="col-sm-8">RH Soft SARL</dd>
+
+                                <dt class="col-sm-4 fw-semibold">SIRET</dt>
+                                <dd class="col-sm-8">123 456 789 00012</dd>
+
+                                <dt class="col-sm-4 fw-semibold">Email</dt>
+                                <dd class="col-sm-8">contact@rhsoft-sarl.com</dd>
+
+                                <dt class="col-sm-4 fw-semibold">Téléphone</dt>
+                                <dd class="col-sm-8">+33 (0)1 23 45 67 89</dd>
+
+                                <dt class="col-sm-4 fw-semibold">Adresse</dt>
+                                <dd class="col-sm-8">12 Rue des Innovations, 75001 Paris, France</dd>
+
+                                <dt class="col-sm-4 fw-semibold">Plan</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary">Pro</span>
+                                </dd>
+
+                                <dt class="col-sm-4 fw-semibold">Date d'inscription</dt>
+                                <dd class="col-sm-8">15/03/2024</dd>
+
+                                <dt class="col-sm-4 fw-semibold">Utilisateurs</dt>
+                                <dd class="col-sm-8">12 / 50</dd>
+
+                                <dt class="col-sm-4 fw-semibold">Statut</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle-fill me-1"></i>Actif
+                                    </span>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-transparent border-0">
+                            <h5 class="fw-bold mb-0">
+                                <i class="bi bi-person-circle text-primary me-2"></i>Administrateur
+                            </h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto text-white fw-bold"
+                                 style="width: 80px; height: 80px; font-size: 28px;">
+                                JD
+                            </div>
+                            <h5 class="fw-bold mt-3 mb-1">Jean Dupont</h5>
+                            <p class="text-muted small">jean.dupont@rhsoft-sarl.com</p>
+                            <span class="badge bg-primary">Administrateur</span>
+                            <div class="mt-3 pt-3 border-top">
+                                <small class="text-muted">Dernière connexion</small>
+                                <div class="fw-semibold">15/07/2026 14:32</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Utilisateurs -->
+        <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-people text-primary me-2"></i>Liste des Utilisateurs
+                    </h5>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="bi bi-person-plus me-1"></i>Ajouter
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-3 py-3">Nom</th>
+                                    <th class="py-3">Email</th>
+                                    <th class="py-3 text-center">Rôle</th>
+                                    <th class="py-3 text-center">Dernière connexion</th>
+                                    <th class="py-3 text-center pe-3">Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 32px; height: 32px; font-size: 12px;">JD</div>
+                                            <span class="fw-semibold">Jean Dupont</span>
+                                        </div>
+                                    </td>
+                                    <td>jean.dupont@rhsoft-sarl.com</td>
+                                    <td class="text-center"><span class="badge bg-primary">Admin</span></td>
+                                    <td class="text-center">15/07/2026 14:32</td>
+                                    <td class="text-center pe-3">
+                                        <span class="badge bg-success bg-opacity-10 text-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Actif
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-success rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 32px; height: 32px; font-size: 12px;">ML</div>
+                                            <span class="fw-semibold">Marie Laurent</span>
+                                        </div>
+                                    </td>
+                                    <td>marie.laurent@rhsoft-sarl.com</td>
+                                    <td class="text-center"><span class="badge bg-warning text-dark">Manager</span></td>
+                                    <td class="text-center">14/07/2026 09:15</td>
+                                    <td class="text-center pe-3">
+                                        <span class="badge bg-success bg-opacity-10 text-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Actif
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-info rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 32px; height: 32px; font-size: 12px;">PC</div>
+                                            <span class="fw-semibold">Pierre Chen</span>
+                                        </div>
+                                    </td>
+                                    <td>pierre.chen@rhsoft-sarl.com</td>
+                                    <td class="text-center"><span class="badge bg-secondary">Employé</span></td>
+                                    <td class="text-center">13/07/2026 11:45</td>
+                                    <td class="text-center pe-3">
+                                        <span class="badge bg-success bg-opacity-10 text-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Actif
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 32px; height: 32px; font-size: 12px;">SB</div>
+                                            <span class="fw-semibold">Sophie Bernard</span>
+                                        </div>
+                                    </td>
+                                    <td>sophie.bernard@rhsoft-sarl.com</td>
+                                    <td class="text-center"><span class="badge bg-secondary">Employé</span></td>
+                                    <td class="text-center">12/07/2026 16:20</td>
+                                    <td class="text-center pe-3">
+                                        <span class="badge bg-danger bg-opacity-10 text-danger">
+                                            <i class="bi bi-x-circle-fill me-1"></i>Inactif
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-danger rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 32px; height: 32px; font-size: 12px;">TG</div>
+                                            <span class="fw-semibold">Thomas Girard</span>
+                                        </div>
+                                    </td>
+                                    <td>thomas.girard@rhsoft-sarl.com</td>
+                                    <td class="text-center"><span class="badge bg-secondary">Employé</span></td>
+                                    <td class="text-center">11/07/2026 08:00</td>
+                                    <td class="text-center pe-3">
+                                        <span class="badge bg-success bg-opacity-10 text-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Actif
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>Affichage de 5 utilisateurs sur 12
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Consommation -->
+        <div class="tab-pane fade" id="conso" role="tabpanel" aria-labelledby="conso-tab">
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm text-center p-3">
+                        <div class="card-body">
+                            <div class="bg-primary bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="bi bi-qr-code text-primary fs-1"></i>
+                            </div>
+                            <h3 class="fw-bold mb-0">1 240</h3>
+                            <p class="text-muted mb-0">Pointages</p>
+                            <small class="text-success">+12% ce mois</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm text-center p-3">
+                        <div class="card-body">
+                            <div class="bg-success bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="bi bi-file-earmark-text text-success fs-1"></i>
+                            </div>
+                            <h3 class="fw-bold mb-0">42</h3>
+                            <p class="text-muted mb-0">Fiches Paie</p>
+                            <small class="text-success">+5 ce mois</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm text-center p-3">
+                        <div class="card-body">
+                            <div class="bg-info bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="bi bi-hdd-stack text-info fs-1"></i>
+                            </div>
+                            <h3 class="fw-bold mb-0">2.4 GB</h3>
+                            <p class="text-muted mb-0">Stockage utilisé</p>
+                            <small class="text-warning">48% du quota</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphique de consommation -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-bar-chart-line text-primary me-2"></i>Évolution de la consommation
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Mois</th>
+                                    <th class="text-end">Pointages</th>
+                                    <th class="text-end">Fiches Paie</th>
+                                    <th class="text-end">Stockage (GB)</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Juillet 2026</td>
+                                    <td class="text-end">1 240</td>
+                                    <td class="text-end">42</td>
+                                    <td class="text-end">2.4</td>
+                                    <td class="text-end"><span class="fw-bold">1 282</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Juin 2026</td>
+                                    <td class="text-end">1 108</td>
+                                    <td class="text-end">37</td>
+                                    <td class="text-end">2.1</td>
+                                    <td class="text-end"><span class="fw-bold">1 145</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Mai 2026</td>
+                                    <td class="text-end">987</td>
+                                    <td class="text-end">35</td>
+                                    <td class="text-end">1.8</td>
+                                    <td class="text-end"><span class="fw-bold">1 022</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: Factures -->
+        <div class="tab-pane fade" id="factures" role="tabpanel" aria-labelledby="factures-tab">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-receipt text-primary me-2"></i>Historique des Factures
+                    </h5>
+                    <div>
+                        <span class="badge bg-success me-2">Total: 4 560 €</span>
+                        <span class="badge bg-warning text-dark">2 impayées</span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-3 py-3">N° Facture</th>
+                                    <th class="py-3">Date</th>
+                                    <th class="py-3">Période</th>
+                                    <th class="py-3 text-end">Montant</th>
+                                    <th class="py-3 text-center">Statut</th>
+                                    <th class="py-3 text-center pe-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="ps-3"><span class="fw-semibold">#FAC-2026-0042</span></td>
+                                    <td>15/07/2026</td>
+                                    <td>Juillet 2026</td>
+                                    <td class="text-end fw-semibold">890 €</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success bg-opacity-10 text-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Payée
+                                        </span>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-download"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3"><span class="fw-semibold">#FAC-2026-0038</span></td>
+                                    <td>15/06/2026</td>
+                                    <td>Juin 2026</td>
+                                    <td class="text-end fw-semibold">890 €</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success bg-opacity-10 text-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Payée
+                                        </span>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-download"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3"><span class="fw-semibold">#FAC-2026-0034</span></td>
+                                    <td>15/05/2026</td>
+                                    <td>Mai 2026</td>
+                                    <td class="text-end fw-semibold">890 €</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-danger bg-opacity-10 text-danger">
+                                            <i class="bi bi-x-circle-fill me-1"></i>Impayée
+                                        </span>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-download"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-warning">
+                                            <i class="bi bi-clock"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3"><span class="fw-semibold">#FAC-2026-0030</span></td>
+                                    <td>15/04/2026</td>
+                                    <td>Avril 2026</td>
+                                    <td class="text-end fw-semibold">890 €</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-danger bg-opacity-10 text-danger">
+                                            <i class="bi bi-x-circle-fill me-1"></i>Impayée
+                                        </span>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-download"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-warning">
+                                            <i class="bi bi-clock"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3"><span class="fw-semibold">#FAC-2026-0026</span></td>
+                                    <td>15/03/2026</td>
+                                    <td>Mars 2026</td>
+                                    <td class="text-end fw-semibold">1 000 €</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success bg-opacity-10 text-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Payée
+                                        </span>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-download"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>Affichage de 5 factures sur 12
+                    </small>
+                    <nav aria-label="Pagination des factures">
+                        <ul class="pagination mb-0">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

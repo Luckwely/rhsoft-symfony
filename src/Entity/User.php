@@ -1,0 +1,494 @@
+<?php
+
+namespace App\Entity;
+use App\Entity\Planning;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use App\Repository\UserRepository;
+use Doctrine\ORM\Mapping as ORM;
+use Doctrine\DBAL\Types\Types;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+
+#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    /** * @var Collection<int, Planning> */
+    #[ORM\OneToMany(targetEntity: Planning::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $plannings;
+
+    #[ORM\Column(length: 180)]
+    private ?string $email = null;
+
+    /**
+     * @var list<string> The user roles
+     */
+    #[ORM\Column]
+    private array $roles = [];
+
+    /**
+     * @var string The hashed password
+     */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $password = null;
+
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Entreprise $entreprise = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $nom = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $prenom = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $adresse = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $telephone = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $photo = null; // on stocke juste le nom du fichier
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $cv = null; // pdf
+
+    #[ORM\Column(type: 'string', length: 50)]
+    private string $statut = 'inactif'; // actif, inactif, suspendu
+
+    #[ORM\Column(type: 'string', length: 50)]
+    private string $statutTravail = 'hors_service'; // en_service, pause_dej, pause_courte, toilette, fin_shift
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $debutShiftAt = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $finShiftAt = null;
+
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $createdAt;
+
+    #[ORM\Column]
+    private ?bool $is_active = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTime $email_verified_at = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTime $last_login_at = null;
+
+    #[ORM\Column]
+    private bool $isVerified = false;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $invitationToken = null;
+
+    //#[ORM\Column(nullable: true)]
+    //private ?\DateTimeInterface $invitationExpiresAt = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $invitationExpiresAt = null;
+
+    #[ORM\Column]
+    private bool $firstLogin = true;
+
+    // --- BANQUE ---
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $banqueNom = null;
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $banqueIban = null;
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $banqueRib = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dateEmbauche = null;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $soldeConge = 25;
+
+    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $heureDebut = null;
+
+    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $heureFin = null;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $pause = '1h';
+
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->plannings = new ArrayCollection();
+    }
+
+    public function getPlannings(): Collection
+    {
+        return $this->plannings;
+    }
+
+    public function addPlanning(Planning $planning): static
+    {
+        if (!$this->plannings->contains($planning)) {
+            $this->plannings->add($planning);
+            $planning->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removePlanning(Planning $planning): static
+    {
+        if ($this->plannings->removeElement($planning)) {
+            if ($planning->getUser() === $this) {
+                $planning->setUser(null);
+            }
+        }
+        return $this;
+    }
+
+    public function getDateEmbauche(): ?\DateTimeInterface {
+        return $this->dateEmbauche;
+    }
+
+    public function setDateEmbauche(?\DateTimeInterface $dateEmbauche): self {
+        $this->dateEmbauche = $dateEmbauche; return $this;
+    }
+
+    public function getSoldeConge(): ?float {
+        return $this->soldeConge;
+    }
+
+    public function setSoldeConge(?float $soldeConge): self {
+        $this->soldeConge = $soldeConge; return $this;
+    }
+
+    public function getHeureDebut(): ?\DateTimeInterface {
+        return $this->heureDebut;
+    }
+
+    public function setHeureDebut(?\DateTimeInterface $heureDebut): self {
+        $this->heureDebut = $heureDebut; return $this;
+    }
+
+    public function getHeureFin(): ?\DateTimeInterface {
+        return $this->heureFin;
+    }
+
+    public function setHeureFin(?\DateTimeInterface $heureFin): self {
+        $this->heureFin = $heureFin; return $this;
+    }
+
+    public function getPause(): ?string {
+        return $this->pause;
+    }
+
+    public function setPause(?string $pause): self {
+        $this->pause = $pause; return $this;
+    }
+
+
+    public function isFirstLogin(): bool
+    {
+        return $this->firstLogin;
+    }
+
+    public function setFirstLogin(bool $firstLogin): static
+    {
+        $this->firstLogin = $firstLogin;
+        return $this;
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    /**
+     * @param list<string> $roles
+     */
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(?string $password): static
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
+     */
+    public function __serialize(): array
+    {
+        $data = (array) $this;
+        $data["\0".self::class."\0password"] = $this->password ? hash('crc32c', $this->password) : null;
+        return $data;
+    }
+
+    public function getEntreprise(): ?Entreprise
+    {
+        return $this->entreprise;
+    }
+
+    public function setEntreprise(?Entreprise $entreprise): static
+    {
+        $this->entreprise = $entreprise;
+
+        return $this;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): static
+    {
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getPrenom(): ?string
+    {
+        return $this->prenom;
+    }
+
+    public function setPrenom(string $prenom): static
+    {
+        $this->prenom = $prenom;
+
+        return $this;
+    }
+
+    public function getPhoto(): ?string
+    {
+        return $this->photo;
+    }
+
+    public function setPhoto(?string $photo): static
+    {
+        $this->photo = $photo;
+
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->is_active;
+    }
+
+    public function setIsActive(bool $is_active): static
+    {
+        $this->is_active = $is_active;
+
+        return $this;
+    }
+
+    public function getEmailVerifiedAt(): ?\DateTime
+    {
+        return $this->email_verified_at;
+    }
+
+    public function setEmailVerifiedAt(?\DateTime $email_verified_at): static
+    {
+        $this->email_verified_at = $email_verified_at;
+
+        return $this;
+    }
+
+    public function getLastLoginAt(): ?\DateTime
+    {
+        return $this->last_login_at;
+    }
+
+    public function setLastLoginAt(?\DateTime $last_login_at): static
+    {
+        $this->last_login_at = $last_login_at;
+
+        return $this;
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->is_active === true && $this->password !== null;
+    }
+
+    public function getInvitationToken(): ?string {
+        return $this->invitationToken;
+    }
+
+    public function setInvitationToken(?string $invitationToken): static {
+        $this->invitationToken = $invitationToken; return $this;
+    }
+
+
+    public function getInvitationExpiresAt(): ?\DateTimeImmutable {
+        return $this->invitationExpiresAt;
+        }
+
+    public function setInvitationExpiresAt(?\DateTimeImmutable $invitationExpiresAt): static {
+        $this->invitationExpiresAt = $invitationExpiresAt; return $this;
+    }
+
+    //public function getInvitationExpiresAt(): ?\DateTimeInterface {
+    //    return $this->invitationExpiresAt;
+    //}
+    //public function setInvitationExpiresAt(?\DateTimeInterface $invitationExpiresAt): static {
+    //    $this->invitationExpiresAt = $invitationExpiresAt; return $this;
+    //}
+
+    public function getAdresse(): ?string {
+        return $this->adresse;
+    }
+
+    public function setAdresse(?string $adresse): static {
+        $this->adresse = $adresse; return $this;
+    }
+
+    public function getTelephone(): ?string {
+        return $this->telephone;
+    }
+
+    public function setTelephone(?string $telephone): static {
+        $this->telephone = $telephone; return $this;
+    }
+
+    public function getCv(): ?string {
+        return $this->cv;
+    }
+
+    public function setCv(?string $cv): static {
+        $this->cv = $cv; return $this;
+    }
+
+    public function getStatut(): string {
+        return $this->statut;
+    }
+
+    public function setStatut(string $statut): static {
+        $this->statut = $statut; return $this;
+    }
+
+    public function getStatutTravail(): string {
+        return $this->statutTravail;
+    }
+
+    public function setStatutTravail(string $statutTravail): static {
+        $this->statutTravail = $statutTravail; return $this;
+    }
+
+    public function getDebutShiftAt(): ?\DateTimeImmutable {
+        return $this->debutShiftAt;
+    }
+
+    public function setDebutShiftAt(?\DateTimeImmutable $debutShiftAt): static {
+        $this->debutShiftAt = $debutShiftAt; return $this;
+    }
+
+    public function getFinShiftAt(): ?\DateTimeImmutable {
+        return $this->finShiftAt;
+    }
+
+    public function setFinShiftAt(?\DateTimeImmutable $finShiftAt): static {
+        $this->finShiftAt = $finShiftAt; return $this;
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable {
+        return $this->createdAt;
+    }
+
+    public function getBanqueNom(): ?string {
+        return $this->banqueNom;
+    }
+
+    public function setBanqueNom(?string $banqueNom): static {
+        $this->banqueNom = $banqueNom; return $this;
+    }
+
+    public function getBanqueIban(): ?string {
+        return $this->banqueIban;
+    }
+
+    public function setBanqueIban(?string $banqueIban): static {
+        $this->banqueIban = $banqueIban; return $this;
+    }
+
+    public function getBanqueRib(): ?string {
+        return $this->banqueRib;
+    }
+
+    public function setBanqueRib(?string $banqueRib): static {
+        $this->banqueRib = $banqueRib; return $this;
+    }
+
+
+}

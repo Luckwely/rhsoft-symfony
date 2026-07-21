@@ -1,0 +1,584 @@
+{% extends 'layouts/base_rh.html.twig' %}
+
+{% block title %}Gestion des Employés{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4 py-3">
+    <!-- HEADER -->
+    <div class="mb-4">
+        <h3 class="fw-bold mb-1">
+            <i class="bi bi-people text-primary me-2"></i>Gestion des Employés
+        </h3>
+        <p class="text-muted mb-0">
+            <i class="bi bi-list-check me-1"></i>Gérez vos collaborateurs, embauches et sorties
+        </p>
+    </div>
+
+    <!-- NAVIGATION ONGLETS BOOTSTRAP -->
+    <ul class="nav nav-tabs border-0 gap-2 mb-4" id="employeeTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active border-0 rounded-3 px-4"
+                    id="tab-liste-btn"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-liste"
+                    type="button"
+                    role="tab"
+                    aria-controls="tab-liste"
+                    aria-selected="true">
+                <i class="bi bi-list-ul me-2"></i>Liste des Employés
+                <span class="badge bg-primary ms-1">5</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link border-0 rounded-3 px-4"
+                    id="tab-embauche-btn"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-embauche"
+                    type="button"
+                    role="tab"
+                    aria-controls="tab-embauche"
+                    aria-selected="false">
+                <i class="bi bi-person-plus text-success me-2"></i>Embauches
+                <span class="badge bg-success ms-1">3</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link border-0 rounded-3 px-4"
+                    id="tab-sortie-btn"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-sortie"
+                    type="button"
+                    role="tab"
+                    aria-controls="tab-sortie"
+                    aria-selected="false">
+                <i class="bi bi-person-x text-danger me-2"></i>Sorties
+                <span class="badge bg-danger ms-1">3</span>
+            </button>
+        </li>
+    </ul>
+
+    <!-- CONTENU ONGLETS -->
+    <div class="tab-content" id="employeeTabsContent">
+
+        <!-- ONGLET 1: LISTE + FICHE + DOSSIER -->
+        <div class="tab-pane fade show active" id="tab-liste" role="tabpanel" aria-labelledby="tab-liste-btn">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0">
+                    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <div class="position-relative">
+                                <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                                <input type="text" id="searchEmployee" class="form-control form-control-sm ps-5" placeholder="Rechercher un employé..." style="width: 250px;">
+                            </div>
+                            <select id="filterService" class="form-select form-select-sm" style="width: 180px;">
+                                <option value="">Tous les services</option>
+                                <option value="RH">RH</option>
+                                <option value="Tech">Tech</option>
+                                <option value="Commercial">Commercial</option>
+                                <option value="Compta">Compta</option>
+                            </select>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-dark btn-sm">
+                                <i class="bi bi-download me-1"></i>Exporter
+                            </button>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#newEmployeeModal">
+                                <i class="bi bi-person-plus me-1"></i>Nouvel Employé
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="employeeTable">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-3 py-3">Employé</th>
+                                    <th class="py-3">Poste</th>
+                                    <th class="py-3">Service</th>
+                                    <th class="py-3 text-center">Statut</th>
+                                    <th class="py-3 text-center pe-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Ligne 1 -->
+                                <tr data-service="Tech">
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px;">JD</div>
+                                            <div>
+                                                <div class="fw-semibold">Jean Dupont</div>
+                                                <small class="text-muted">jean@rhsoft.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Développeur Frontend</td>
+                                    <td><span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">Tech</span></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Actif
+                                        </span>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-light border-0" title="Voir">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary" title="Éditer">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Ligne 2 -->
+                                <tr data-service="RH">
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-info-subtle text-info rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px;">MM</div>
+                                            <div>
+                                                <div class="fw-semibold">Marie Martin</div>
+                                                <small class="text-muted">marie@rhsoft.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>RH Manager</td>
+                                    <td><span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2">RH</span></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Actif
+                                        </span>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-light border-0" title="Voir">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary" title="Éditer">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Ligne 3 -->
+                                <tr data-service="Commercial">
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-warning-subtle text-warning rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px;">PD</div>
+                                            <div>
+                                                <div class="fw-semibold">Paul Dubois</div>
+                                                <small class="text-muted">paul@rhsoft.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Commercial</td>
+                                    <td><span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2">Commercial</span></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
+                                            <i class="bi bi-clock-history me-1"></i>En Congé
+                                        </span>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-light border-0" title="Voir">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary" title="Éditer">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Ligne 4 -->
+                                <tr data-service="Compta">
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px;">JL</div>
+                                            <div>
+                                                <div class="fw-semibold">Julie Leroy</div>
+                                                <small class="text-muted">julie@rhsoft.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Comptable</td>
+                                    <td><span class="badge bg-info bg-opacity-10 text-info rounded-pill px-3 py-2">Compta</span></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Actif
+                                        </span>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-light border-0" title="Voir">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary" title="Éditer">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Ligne 5 -->
+                                <tr data-service="Tech">
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-danger-subtle text-danger rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px;">AL</div>
+                                            <div>
+                                                <div class="fw-semibold">Antoine Lefevre</div>
+                                                <small class="text-muted">antoine@rhsoft.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>DevOps</td>
+                                    <td><span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">Tech</span></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
+                                            <i class="bi bi-x-circle-fill me-1"></i>Inactif
+                                        </span>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-light border-0" title="Voir">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary" title="Éditer">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center py-3">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>5 employés au total
+                    </small>
+                    <nav aria-label="Pagination">
+                        <ul class="pagination mb-0">
+                            <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- ONGLET 2: EMBAUCHE -->
+        <div class="tab-pane fade" id="tab-embauche" role="tabpanel" aria-labelledby="tab-embauche-btn">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-person-plus text-success me-2"></i>Nouvelle Embauche
+                    </h5>
+                    <small class="text-muted">Enregistrez un nouvel employé dans la plateforme</small>
+                </div>
+                <div class="card-body">
+                    <form class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Nom <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" placeholder="Dupont">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Prénom <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" placeholder="Jean">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" placeholder="jean.dupont@email.com">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Téléphone</label>
+                            <input type="tel" class="form-control" placeholder="+261 34 12 345 67">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Poste <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" placeholder="Développeur Frontend">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Service <span class="text-danger">*</span></label>
+                            <select class="form-select">
+                                <option value="">Sélectionner un service</option>
+                                <option value="tech">Tech</option>
+                                <option value="commercial">Commercial</option>
+                                <option value="rh">RH</option>
+                                <option value="compta">Compta</option>
+                                <option value="design">Design</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Date d'entrée <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" value="{{ "now"|date('Y-m-d') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Salaire Brut <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">€</span>
+                                <input type="number" class="form-control" placeholder="2500" step="100">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Type de contrat</label>
+                            <select class="form-select">
+                                <option value="cdi">CDI</option>
+                                <option value="cdd">CDD</option>
+                                <option value="stage">Stage</option>
+                                <option value="alternance">Alternance</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Période d'essai</label>
+                            <select class="form-select">
+                                <option value="1">1 mois</option>
+                                <option value="2">2 mois</option>
+                                <option value="3" selected>3 mois</option>
+                                <option value="4">4 mois</option>
+                                <option value="6">6 mois</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Notes</label>
+                            <textarea class="form-control" rows="3" placeholder="Informations complémentaires..."></textarea>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label fw-semibold">Envoyer un email de bienvenue</label>
+                                <br>
+                                <small class="text-muted">L'employé recevra ses identifiants de connexion</small>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-success">
+                                <i class="bi bi-check2 me-1"></i>Valider l'embauche
+                            </button>
+                            <button class="btn btn-outline-secondary ms-2">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i>Annuler
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ONGLET 3: SORTIE -->
+        <div class="tab-pane fade" id="tab-sortie" role="tabpanel" aria-labelledby="tab-sortie-btn">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-person-x text-danger me-2"></i>Sorties d'employés
+                        </h5>
+                        <small class="text-muted">Historique des départs</small>
+                    </div>
+                    <button class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-download me-1"></i>Exporter
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle table-borderless mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-3 py-3">Employé</th>
+                                    <th class="py-3">Poste</th>
+                                    <th class="py-3">Date Sortie</th>
+                                    <th class="py-3">Motif</th>
+                                    <th class="py-3 text-center pe-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-secondary-subtle text-secondary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 12px;">TP</div>
+                                            <div>
+                                                <div class="fw-semibold">Thomas Petit</div>
+                                                <small class="text-muted">thomas@rhsoft.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Commercial</td>
+                                    <td>15/09/2025</td>
+                                    <td><span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">Démission</span></td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-file-earmark-pdf me-1"></i>Générer certificat
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-info-subtle text-info rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 12px;">SM</div>
+                                            <div>
+                                                <div class="fw-semibold">Sophie Moreau</div>
+                                                <small class="text-muted">sophie@rhsoft.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>RH</td>
+                                    <td>02/09/2025</td>
+                                    <td><span class="badge bg-info-subtle text-info rounded-pill px-3 py-2">Fin de contrat</span></td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-file-earmark-pdf me-1"></i>Générer certificat
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-danger-subtle text-danger rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 12px;">LB</div>
+                                            <div>
+                                                <div class="fw-semibold">Lucas Bernard</div>
+                                                <small class="text-muted">lucas@rhsoft.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Tech</td>
+                                    <td>28/08/2025</td>
+                                    <td><span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">Licenciement</span></td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-file-earmark-pdf me-1"></i>Générer certificat
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center py-3">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>3 départs enregistrés
+                    </small>
+                    <nav aria-label="Pagination">
+                        <ul class="pagination mb-0">
+                            <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Stats Sorties -->
+            <div class="row g-3 mt-3">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-person-x text-danger fs-2 d-block mb-2"></i>
+                            <h5 class="fw-bold mb-0">3</h5>
+                            <small class="text-muted">Départs ce mois</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-file-earmark-text text-primary fs-2 d-block mb-2"></i>
+                            <h5 class="fw-bold mb-0">2</h5>
+                            <small class="text-muted">Certificats générés</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-clock-history text-warning fs-2 d-block mb-2"></i>
+                            <h5 class="fw-bold mb-0">1</h5>
+                            <small class="text-muted">En attente</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL NOUVEL EMPLOYÉ -->
+<div class="modal fade" id="newEmployeeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-person-plus text-primary me-2"></i>Inviter un nouvel employé
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" placeholder="employe@email.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Message d'invitation</label>
+                        <textarea class="form-control" rows="3" placeholder="Bonjour, nous vous invitons à rejoindre la plateforme..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 justify-content-center gap-2">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">
+                    <i class="bi bi-send me-1"></i>Envoyer invitation
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Style pour les onglets modernes -->
+<style>
+    .nav-tabs .nav-link {
+        color: #6c757d;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .nav-tabs .nav-link:hover {
+        background-color: #f8f9fa;
+        color: #0d6efd;
+    }
+    .nav-tabs .nav-link.active {
+        background-color: #0d6efd;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    .nav-tabs .nav-link.active .badge {
+        background-color: rgba(255,255,255,0.25) !important;
+        color: #ffffff !important;
+    }
+    .tab-pane {
+        animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+// FILTRE RECHERCHE + SERVICE POUR L'ONGLET LISTE
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchEmployee');
+    const filterSelect = document.getElementById('filterService');
+
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const serviceFilter = filterSelect.value;
+
+        document.querySelectorAll('#employeeTable tbody tr').forEach(row => {
+            const text = row.innerText.toLowerCase();
+            const service = row.dataset.service;
+
+            const matchSearch = text.includes(searchTerm);
+            const matchService = !serviceFilter || service === serviceFilter;
+
+            row.style.display = matchSearch && matchService ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('keyup', filterTable);
+    filterSelect.addEventListener('change', filterTable);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,902 @@
+{% extends "layouts/base_super_admin.html.twig" %}
+
+{% block title %}Administration - Paramètres Système{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4">
+    <!-- En-tête -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h1 class="h2 fw-bold mb-0">
+                <i class="bi bi-gear text-primary me-2"></i>Administration Système
+            </h1>
+            <p class="text-muted small mb-0">Gérez les paramètres, templates et logs de la plateforme</p>
+        </div>
+        <div class="d-flex gap-2">
+            <span class="badge bg-secondary bg-opacity-10 text-secondary d-flex align-items-center px-3">
+                <i class="bi bi-clock-history me-2"></i>Dernière mise à jour : {{ "now"|date("d/m/Y H:i") }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs border-0 gap-2 mb-4" id="adminTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active border-0 rounded-3 px-4"
+                    id="plans-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#plans"
+                    type="button"
+                    role="tab"
+                    aria-controls="plans"
+                    aria-selected="true">
+                <i class="bi bi-tags me-2"></i>Plans Tarifaires
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link border-0 rounded-3 px-4"
+                    id="emails-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#emails"
+                    type="button"
+                    role="tab"
+                    aria-controls="emails"
+                    aria-selected="false">
+                <i class="bi bi-envelope-paper me-2"></i>Emails Automatiques
+                <span class="badge bg-primary ms-2">5</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link border-0 rounded-3 px-4"
+                    id="cgu-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#cgu"
+                    type="button"
+                    role="tab"
+                    aria-controls="cgu"
+                    aria-selected="false">
+                <i class="bi bi-file-text me-2"></i>CGU
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link border-0 rounded-3 px-4"
+                    id="connexions-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#connexions"
+                    type="button"
+                    role="tab"
+                    aria-controls="connexions"
+                    aria-selected="false">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Connexions
+                <span class="badge bg-danger ms-2">156</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link border-0 rounded-3 px-4"
+                    id="erreurs-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#erreurs"
+                    type="button"
+                    role="tab"
+                    aria-controls="erreurs"
+                    aria-selected="false">
+                <i class="bi bi-exclamation-triangle me-2"></i>Logs Erreurs
+                <span class="badge bg-warning ms-2">342</span>
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tabs Content -->
+    <div class="tab-content" id="adminTabsContent">
+
+        <!-- TAB 1: PLANS TARIFAIRES -->
+        <div class="tab-pane fade show active" id="plans" role="tabpanel" aria-labelledby="plans-tab">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-tags text-primary me-2"></i>Offres disponibles
+                    </h5>
+                    <small class="text-muted">3 plans actifs</small>
+                </div>
+                <button class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-circle me-2"></i>Nouveau Plan
+                </button>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                <!-- Basic 29€ -->
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-lg rounded-4 h-100">
+                        <div class="card-body p-4 text-center">
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                                <i class="bi bi-rocket text-primary fs-1"></i>
+                            </div>
+                            <h3 class="fw-bold">Basic</h3>
+                            <div class="mb-3">
+                                <span class="display-4 fw-bold text-primary">29€</span>
+                                <span class="text-muted">/mois</span>
+                            </div>
+                            <ul class="list-unstyled text-start mb-4">
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Jusqu'à 10 employés</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Gestion des congés</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Planning de base</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Support email</li>
+                                <li class="mb-2 text-muted"><i class="bi bi-x-circle text-muted me-2"></i>Pointage QR Code</li>
+                            </ul>
+                            <button class="btn btn-outline-primary w-100">
+                                <i class="bi bi-pencil me-2"></i>Éditer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pro 99€ -->
+                <div class="col-md-4">
+                    <div class="card border-0 border-primary border-3 shadow-lg rounded-4 h-100 position-relative">
+                        <div class="position-absolute top-0 start-50 translate-middle">
+                            <span class="badge bg-primary px-3 py-2">
+                                <i class="bi bi-stars me-1"></i>Le plus populaire
+                            </span>
+                        </div>
+                        <div class="card-body p-4 text-center mt-3">
+                            <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                                <i class="bi bi-briefcase text-success fs-1"></i>
+                            </div>
+                            <h3 class="fw-bold">Pro</h3>
+                            <div class="mb-3">
+                                <span class="display-4 fw-bold text-primary">99€</span>
+                                <span class="text-muted">/mois</span>
+                            </div>
+                            <ul class="list-unstyled text-start mb-4">
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Jusqu'à 50 employés</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Toutes les fonctionnalités</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Pointage QR Code</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Reporting avancé</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Support prioritaire</li>
+                            </ul>
+                            <button class="btn btn-primary w-100">
+                                <i class="bi bi-pencil me-2"></i>Éditer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enterprise Sur devis -->
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-lg rounded-4 h-100">
+                        <div class="card-body p-4 text-center">
+                            <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                                <i class="bi bi-building text-warning fs-1"></i>
+                            </div>
+                            <h3 class="fw-bold">Enterprise</h3>
+                            <div class="mb-3">
+                                <span class="display-4 fw-bold text-primary">Sur Devis</span>
+                            </div>
+                            <ul class="list-unstyled text-start mb-4">
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Employés illimités</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Multi-entreprises</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Solutions sur mesure</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Support dédié 24/7</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>API personnalisée</li>
+                            </ul>
+                            <button class="btn btn-outline-primary w-100">
+                                <i class="bi bi-pencil me-2"></i>Éditer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: EMAILS AUTOMATIQUES -->
+        <div class="tab-pane fade" id="emails" role="tabpanel" aria-labelledby="emails-tab">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-envelope-paper text-primary me-2"></i>Templates d'emails
+                    </h5>
+                    <small class="text-muted">5 templates configurés</small>
+                </div>
+                <button class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-circle me-2"></i>Nouveau Template
+                </button>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-3 py-3">Événement</th>
+                                    <th class="py-3">Objet</th>
+                                    <th class="py-3 text-center">Statut</th>
+                                    <th class="py-3 text-center pe-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-person-plus text-primary fs-5"></i>
+                                            <span class="fw-semibold">Nouvel utilisateur</span>
+                                        </div>
+                                    </td>
+                                    <td>Bienvenue sur RH Soft Pro</td>
+                                    <td class="text-center">
+                                        <div class="form-check form-switch d-inline-block">
+                                            <input class="form-check-input" type="checkbox" id="email1" checked>
+                                            <label class="form-check-label visually-hidden" for="email1">Actif</label>
+                                        </div>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editEmailModal">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-check-circle text-success fs-5"></i>
+                                            <span class="fw-semibold">Confirmation d'inscription</span>
+                                        </div>
+                                    </td>
+                                    <td>Confirmez votre inscription</td>
+                                    <td class="text-center">
+                                        <div class="form-check form-switch d-inline-block">
+                                            <input class="form-check-input" type="checkbox" id="email2" checked>
+                                            <label class="form-check-label visually-hidden" for="email2">Actif</label>
+                                        </div>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editEmailModal">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-credit-card text-warning fs-5"></i>
+                                            <span class="fw-semibold">Facture générée</span>
+                                        </div>
+                                    </td>
+                                    <td>Votre facture RH Soft Pro</td>
+                                    <td class="text-center">
+                                        <div class="form-check form-switch d-inline-block">
+                                            <input class="form-check-input" type="checkbox" id="email3" checked>
+                                            <label class="form-check-label visually-hidden" for="email3">Actif</label>
+                                        </div>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editEmailModal">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-exclamation-triangle text-danger fs-5"></i>
+                                            <span class="fw-semibold">Paiement en retard</span>
+                                        </div>
+                                    </td>
+                                    <td>Rappel : paiement en retard</td>
+                                    <td class="text-center">
+                                        <div class="form-check form-switch d-inline-block">
+                                            <input class="form-check-input" type="checkbox" id="email4">
+                                            <label class="form-check-label visually-hidden" for="email4">Actif</label>
+                                        </div>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editEmailModal">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-arrow-repeat text-info fs-5"></i>
+                                            <span class="fw-semibold">Renouvellement abonnement</span>
+                                        </div>
+                                    </td>
+                                    <td>Renouvelez votre abonnement</td>
+                                    <td class="text-center">
+                                        <div class="form-check form-switch d-inline-block">
+                                            <input class="form-check-input" type="checkbox" id="email5" checked>
+                                            <label class="form-check-label visually-hidden" for="email5">Actif</label>
+                                        </div>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editEmailModal">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Éditer Email -->
+            <div class="modal fade" id="editEmailModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content border-0 rounded-4 shadow-lg">
+                        <div class="modal-header border-0">
+                            <h5 class="modal-title fw-bold">
+                                <i class="bi bi-envelope-paper text-primary me-2"></i>Éditer le template
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Événement</label>
+                                <input type="text" class="form-control" value="Nouvel utilisateur" disabled>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Objet</label>
+                                <input type="text" class="form-control" value="Bienvenue sur RH Soft Pro">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Corps du message</label>
+                                <textarea class="form-control" rows="6">Bonjour XXXX,
+
+Bienvenue sur RH Soft Pro ! Nous sommes ravis de vous compter parmi nos utilisateurs.
+
+Pour commencer, connectez-vous à votre espace avec vos identifiants :
+Email : XXXXX
+Mot de passe : [votre mot de passe]
+
+N'hésitez pas à nous contacter si vous avez des questions.
+
+L'équipe RH Soft Pro</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Variables disponibles</label>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary">&#123;&#123; prenom &#125;&#125;</span>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary">&#123;&#123; nom &#125;&#125;</span>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary">&#123;&#123; email &#125;&#125;</span>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary">&#123;&#123; entreprise &#125;&#125;</span>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary">&#123;&#123; lien &#125;&#125;</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                                <i class="bi bi-check2 me-2"></i>Enregistrer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: CGU -->
+        <div class="tab-pane fade" id="cgu" role="tabpanel" aria-labelledby="cgu-tab">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-file-text text-primary me-2"></i>Conditions Générales d'Utilisation
+                    </h5>
+                    <small class="text-muted">Version 2.3.1 - Dernière mise à jour : 15/07/2026</small>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-clock-history me-1"></i>Historique
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-file-pdf me-1"></i>Aperçu PDF
+                    </button>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-lg rounded-4">
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Titre</label>
+                            <input type="text" class="form-control" value="Conditions Générales d'Utilisation - RH Soft Pro">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Contenu</label>
+                            <div class="alert alert-info border-0 rounded-3">
+                                <i class="bi bi-info-circle me-2"></i>Utilisez les balises HTML pour formater le texte
+                            </div>
+                            <textarea class="form-control" rows="16">
+<h2>1. Introduction</h2>
+<p>Bienvenue sur RH Soft Pro. En utilisant notre plateforme, vous acceptez les présentes conditions générales d'utilisation.</p>
+
+<h2>2. Objet</h2>
+<p>Les présentes CGU ont pour objet de définir les conditions d'utilisation de la plateforme RH Soft Pro par les utilisateurs.</p>
+
+<h2>3. Accès à la plateforme</h2>
+<p>L'accès à la plateforme est réservé aux entreprises et utilisateurs autorisés. Chaque utilisateur doit créer un compte et fournir des informations exactes.</p>
+
+<h2>4. Utilisation des données</h2>
+<p>Les données saisies sur la plateforme sont la propriété exclusive de l'entreprise cliente. RH Soft Pro s'engage à ne pas les utiliser à des fins commerciales.</p>
+
+<h2>5. Sécurité et confidentialité</h2>
+<p>Nous mettons en œuvre des mesures de sécurité avancées pour protéger vos données conformément au RGPD.</p>
+
+<h2>6. Responsabilités</h2>
+<p>RH Soft Pro ne peut être tenu responsable des dommages indirects liés à l'utilisation de la plateforme.</p>
+
+<h2>7. Modifications des CGU</h2>
+<p>Nous nous réservons le droit de modifier les présentes CGU à tout moment. Les utilisateurs seront informés des modifications.</p>
+
+<h2>8. Contact</h2>
+<p>Pour toute question, contactez-nous à : contact@rhsoftpro.com</p>
+
+<hr>
+<p><em>Version 2.3.1 - Dernière mise à jour : 15 juillet 2026</em></p>
+                            </textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-end gap-2">
+                    <button class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-counterclockwise me-2"></i>Annuler
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="bi bi-check2 me-2"></i>Enregistrer
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistiques CGU -->
+            <div class="row g-3 mt-3">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-file-earmark-text text-primary fs-2 d-block mb-2"></i>
+                            <h6 class="fw-bold">2 547 mots</h6>
+                            <small class="text-muted">Longueur du document</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-clock-history text-success fs-2 d-block mb-2"></i>
+                            <h6 class="fw-bold">Dernière modification</h6>
+                            <small class="text-muted">15/07/2026 à 14:32</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-person-check text-info fs-2 d-block mb-2"></i>
+                            <h6 class="fw-bold">Approuvée par</h6>
+                            <small class="text-muted">Administrateur - Jean Dupont</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: CONNEXIONS -->
+        <div class="tab-pane fade" id="connexions" role="tabpanel" aria-labelledby="connexions-tab">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-box-arrow-in-right text-primary me-2"></i>Historique des Connexions
+                    </h5>
+                    <small class="text-muted">Suivez toutes les connexions des utilisateurs</small>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-download me-2"></i>Exporter
+                </button>
+            </div>
+
+            <!-- Filtres Connexions -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-3">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold small">Date de début</label>
+                            <input type="date" class="form-control" value="2026-07-01">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold small">Date de fin</label>
+                            <input type="date" class="form-control" value="2026-07-15">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold small">Statut</label>
+                            <select class="form-select">
+                                <option value="">Tous</option>
+                                <option value="success">Succès</option>
+                                <option value="failed">Échec</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary w-100 mt-2">
+                                <i class="bi bi-funnel me-1"></i>Filtrer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tableau des connexions -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-3 py-3">Date</th>
+                                    <th class="py-3">Email</th>
+                                    <th class="py-3">Entreprise</th>
+                                    <th class="py-3">IP</th>
+                                    <th class="py-3 text-center">Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="ps-3">
+                                        <span class="fw-semibold">15/07/2026</span>
+                                        <span class="text-muted small d-block">14:32:18</span>
+                                    </td>
+                                    <td>jean.dupont@techinnovate.com</td>
+                                    <td>TechInnovate</td>
+                                    <td><code>192.168.1.45</code></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success bg-opacity-10 text-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Succès
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <span class="fw-semibold">15/07/2026</span>
+                                        <span class="text-muted small d-block">11:20:05</span>
+                                    </td>
+                                    <td>marie.laurent@smartrh.com</td>
+                                    <td>SmartRH Solutions</td>
+                                    <td><code>192.168.1.67</code></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success bg-opacity-10 text-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Succès
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <span class="fw-semibold">15/07/2026</span>
+                                        <span class="text-muted small d-block">09:45:33</span>
+                                    </td>
+                                    <td>pierre.chen@globalhr.tech</td>
+                                    <td>Global HR Tech</td>
+                                    <td><code>192.168.1.89</code></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-danger bg-opacity-10 text-danger">
+                                            <i class="bi bi-x-circle-fill me-1"></i>Échec
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <span class="fw-semibold">14/07/2026</span>
+                                        <span class="text-muted small d-block">16:12:42</span>
+                                    </td>
+                                    <td>sophie.bernard@consultingpro.fr</td>
+                                    <td>Consulting Pro</td>
+                                    <td><code>192.168.1.23</code></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success bg-opacity-10 text-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Succès
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <span class="fw-semibold">14/07/2026</span>
+                                        <span class="text-muted small d-block">10:30:15</span>
+                                    </td>
+                                    <td>laura.richard@airecruit.io</td>
+                                    <td>AI Recruit</td>
+                                    <td><code>192.168.1.12</code></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-danger bg-opacity-10 text-danger">
+                                            <i class="bi bi-x-circle-fill me-1"></i>Échec
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <span class="fw-semibold">13/07/2026</span>
+                                        <span class="text-muted small d-block">15:45:09</span>
+                                    </td>
+                                    <td>nicolas.moreau@hrsolutions.fr</td>
+                                    <td>HR Solutions</td>
+                                    <td><code>192.168.1.78</code></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success bg-opacity-10 text-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Succès
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Pagination -->
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>Affichage de 1 à 6 sur 156 connexions
+                    </small>
+                    <nav aria-label="Pagination des connexions">
+                        <ul class="pagination mb-0">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: ERREURS -->
+        <div class="tab-pane fade" id="erreurs" role="tabpanel" aria-labelledby="erreurs-tab">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-exclamation-triangle text-warning me-2"></i>Logs Système
+                    </h5>
+                    <small class="text-muted">Suivez les erreurs et événements système</small>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-download me-2"></i>Exporter
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-arrow-repeat me-2"></i>Rafraîchir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Alerte dernière erreur critique -->
+            <div class="alert alert-danger border-0 shadow-sm rounded-4 d-flex align-items-center justify-content-between" role="alert">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-danger bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
+                        <i class="bi bi-bug text-danger fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="alert-heading fw-bold mb-0">Dernière erreur critique</h5>
+                        <p class="mb-0 small"><strong>Message :</strong> Database connection timeout on production server</p>
+                        <p class="mb-0 small text-muted">Fichier : /src/Repository/UserRepository.php • Ligne 42 • 15/07/2026 14:32:18</p>
+                    </div>
+                </div>
+                <div>
+                    <span class="badge bg-danger">Critique</span>
+                </div>
+            </div>
+
+            <!-- Filtres Erreurs -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-3">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-3">
+                            <div class="position-relative">
+                                <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                                <input type="text" class="form-control ps-5" placeholder="Rechercher..." aria-label="Rechercher">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select">
+                                <option value="">Tous les niveaux</option>
+                                <option value="critical">Critique</option>
+                                <option value="error">Erreur</option>
+                                <option value="warning">Avertissement</option>
+                                <option value="info">Info</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select">
+                                <option value="">Tous les fichiers</option>
+                                <option value="controller">Controller</option>
+                                <option value="repository">Repository</option>
+                                <option value="service">Service</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary w-100">
+                                <i class="bi bi-funnel me-1"></i>Filtrer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tableau des erreurs -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-3 py-3">Date</th>
+                                    <th class="py-3">Niveau</th>
+                                    <th class="py-3">Message</th>
+                                    <th class="py-3 pe-3">Fichier</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="table-danger">
+                                    <td class="ps-3">
+                                        <span class="fw-semibold">15/07/2026</span>
+                                        <span class="text-muted small d-block">14:32:18</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-exclamation-circle me-1"></i>Critique
+                                        </span>
+                                    </td>
+                                    <td>Database connection timeout on production server</td>
+                                    <td class="pe-3">
+                                        <code class="small">UserRepository.php:42</code>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <span class="fw-semibold">15/07/2026</span>
+                                        <span class="text-muted small d-block">13:15:42</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning">
+                                            <i class="bi bi-exclamation-triangle me-1"></i>Warning
+                                        </span>
+                                    </td>
+                                    <td>Cache miss for key: user_12345_session</td>
+                                    <td class="pe-3">
+                                        <code class="small">CacheService.php:78</code>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <span class="fw-semibold">15/07/2026</span>
+                                        <span class="text-muted small d-block">11:45:33</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-exclamation-circle me-1"></i>Erreur
+                                        </span>
+                                    </td>
+                                    <td>Failed to send email to contact@techinnovate.com - SMTP connection refused</td>
+                                    <td class="pe-3">
+                                        <code class="small">EmailService.php:156</code>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <span class="fw-semibold">15/07/2026</span>
+                                        <span class="text-muted small d-block">10:20:15</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">
+                                            <i class="bi bi-info-circle me-1"></i>Info
+                                        </span>
+                                    </td>
+                                    <td>User 45678 logged out successfully</td>
+                                    <td class="pe-3">
+                                        <code class="small">AuthController.php:89</code>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <span class="fw-semibold">14/07/2026</span>
+                                        <span class="text-muted small d-block">16:30:22</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-exclamation-circle me-1"></i>Erreur
+                                        </span>
+                                    </td>
+                                    <td>Payment processing failed for invoice FAC-2026-0038</td>
+                                    <td class="pe-3">
+                                        <code class="small">PaymentService.php:234</code>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-3">
+                                        <span class="fw-semibold">14/07/2026</span>
+                                        <span class="text-muted small d-block">11:45:33</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-exclamation-circle me-1"></i>Erreur
+                                        </span>
+                                    </td>
+                                    <td>Failed to parse JSON response from API endpoint /api/v2/stats</td>
+                                    <td class="pe-3">
+                                        <code class="small">ApiClientService.php:123</code>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Pagination -->
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>Affichage de 1 à 6 sur 342 logs
+                    </small>
+                    <nav aria-label="Pagination des logs">
+                        <ul class="pagination mb-0">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Style pour les onglets modernes -->
+<style>
+    .nav-tabs .nav-link {
+        color: #6c757d;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        padding: 10px 20px;
+    }
+
+    .nav-tabs .nav-link:hover {
+        background-color: #f8f9fa;
+        color: #0d6efd;
+    }
+
+    .nav-tabs .nav-link.active {
+        background-color: #0d6efd;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+
+    .nav-tabs .nav-link .badge {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+
+    .nav-tabs .nav-link.active .badge {
+        background-color: rgba(255,255,255,0.25) !important;
+        color: #ffffff !important;
+    }
+
+    .tab-pane {
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}

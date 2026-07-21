@@ -1,0 +1,213 @@
+{% extends 'layouts/base_employe.html.twig' %}
+
+{% block title %}Mon Profil{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4 py-3">
+    <!-- HEADER -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">
+                <i class="bi bi-person-circle text-primary me-2"></i>Mon Profil
+            </h3>
+            <p class="text-muted mb-0">
+                <i class="bi bi-gear me-1"></i>Consultez et gérez vos informations personnelles
+            </p>
+        </div>
+        <button class="btn btn-outline-secondary btn-sm mt-3 mt-md-0">
+            <i class="bi bi-arrow-counterclockwise me-1"></i>Actualiser
+        </button>
+    </div>
+
+    <!-- LAYOUT 2 COLONNES -->
+    <div class="row g-4">
+        <!-- COLONNE GAUCHE -->
+        <div class="col-lg-4">
+            <!-- CARD AVATAR -->
+            <div class="card border-0 shadow-sm rounded-4 text-center">
+                <div class="card-body p-4">
+                    <div class="position-relative d-inline-block">
+                        <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 120px; height: 120px; font-size: 48px; margin: 0 auto;">
+                            JD
+                        </div>
+                        <span class="position-absolute bottom-0 end-0 bg-success rounded-circle border border-2 border-white" style="width: 24px; height: 24px;"></span>
+                    </div>
+                    <h4 class="fw-bold mt-3 mb-1">Jean Dupont</h4>
+                    <p class="text-muted small mb-0">Développeur</p>
+                    <p class="text-muted small">Service Tech</p>
+
+                    <hr>
+
+                    <div class="text-start">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <i class="bi bi-envelope text-primary" style="width: 20px;"></i>
+                            <div>
+                                <small class="text-muted d-block">Email</small>
+                                <span class="fw-semibold">jean.dupont@rhsoft.com</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <i class="bi bi-telephone text-primary" style="width: 20px;"></i>
+                            <div>
+                                <small class="text-muted d-block">Téléphone</small>
+                                <span class="fw-semibold">+261 34 12 345 67</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-geo-alt text-primary" style="width: 20px;"></i>
+                            <div>
+                                <small class="text-muted d-block">Adresse</small>
+                                <span class="fw-semibold">Antananarivo, Madagascar</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <button class="btn btn-primary w-100">
+                        <i class="bi bi-pencil me-2"></i>Modifier mon profil
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLONNE DROITE -->
+        <div class="col-lg-8">
+            <!-- CARD INFORMATIONS -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-info-circle text-primary me-2"></i>Informations
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="bg-light rounded-3 p-3">
+                                <small class="text-muted d-block">Date d'embauche</small>
+                                <span class="fw-semibold">15/03/2024</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="bg-light rounded-3 p-3">
+                                <small class="text-muted d-block">Manager</small>
+                                <span class="fw-semibold">Paul Dubois</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="bg-light rounded-3 p-3">
+                                <small class="text-muted d-block">Type de contrat</small>
+                                <span class="fw-semibold">
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">CDI</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD URGENCE -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-heart-pulse text-danger me-2"></i>Contact d'urgence
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="bg-light rounded-3 p-3">
+                                <small class="text-muted d-block">Nom</small>
+                                <span class="fw-semibold">Marie Martin</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="bg-light rounded-3 p-3">
+                                <small class="text-muted d-block">Téléphone</small>
+                                <span class="fw-semibold">+261 32 12 345 67</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="bg-light rounded-3 p-3">
+                                <small class="text-muted d-block">Lien</small>
+                                <span class="fw-semibold">Conjoint(e)</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="bg-light rounded-3 p-3">
+                                <small class="text-muted d-block">Email</small>
+                                <span class="fw-semibold">marie.martin@email.com</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD SECURITE -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-shield-lock text-primary me-2"></i>Sécurité
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div>
+                            <div class="fw-semibold">Mot de passe</div>
+                            <small class="text-muted">••••••••</small>
+                        </div>
+                        <button class="btn btn-outline-primary">
+                            <i class="bi bi-key me-2"></i>Changer mon mot de passe
+                        </button>
+                    </div>
+                    <hr>
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div>
+                            <div class="fw-semibold">Authentification à deux facteurs</div>
+                            <small class="text-muted">Sécurisez votre compte</small>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="twoFactor">
+                            <label class="form-check-label" for="twoFactor">Activer</label>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div>
+                            <div class="fw-semibold">Sessions actives</div>
+                            <small class="text-muted">2 sessions en cours</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-box-arrow-right me-1"></i>Déconnecter toutes les sessions
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .nav-tabs .nav-link {
+        color: #6c757d;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .nav-tabs .nav-link:hover {
+        background-color: #f8f9fa;
+        color: #0d6efd;
+    }
+    .nav-tabs .nav-link.active {
+        background-color: #0d6efd;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    .tab-pane {
+        animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}

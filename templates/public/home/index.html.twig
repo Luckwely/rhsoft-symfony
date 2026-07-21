@@ -1,0 +1,496 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Home{% endblock %}
+
+{% block body %}
+<style>
+    /* Animations */
+    @keyframes floatBg {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(30px, -30px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+    }
+
+    @keyframes floatStat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+
+    @keyframes slideLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-60px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideRight {
+        from {
+            opacity: 0;
+            transform: translateX(60px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes pulseBadge {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.9; transform: scale(1.02); }
+    }
+
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+    }
+
+    /* Button hover effect */
+    .btn-light:hover .position-absolute {
+        transform: translateX(0) !important;
+    }
+
+    .btn-light:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 40px rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-outline-light:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 40px rgba(255, 255, 255, 0.1);
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Feature cards hover */
+    .bg-white.bg-opacity-10:hover {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 991px) {
+        .display-4 {
+            font-size: 2.5rem;
+        }
+
+        .position-absolute .rounded-circle {
+            display: none;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .display-4 {
+            font-size: 2rem;
+        }
+
+        .position-absolute .rounded-circle {
+            display: none;
+        }
+
+        .position-absolute.m-3 {
+            padding: 6px 12px !important;
+        }
+
+        .position-absolute.m-3 .fw-bold {
+            font-size: 14px !important;
+        }
+
+        .position-absolute.m-3 small {
+            font-size: 8px !important;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .display-4 {
+            font-size: 1.75rem;
+        }
+
+        .btn-lg {
+            font-size: 14px;
+            padding: 10px 20px;
+        }
+
+        .gap-4 {
+            gap: 12px !important;
+        }
+
+        .position-absolute.m-3 {
+            display: none !important;
+        }
+    }
+</style>
+<!-- SECTION HERO / HEADER -->
+<section class="bg-primary bg-gradient min-vh-100 d-flex align-items-center pt-5 position-relative overflow-hidden">
+
+    <div class="container py-5 position-relative" style="z-index: 1;">
+        <div class="row align-items-center g-5">
+            <!-- Left Column - Text Content -->
+            <div class="col-lg-6 text-center text-lg-start">
+
+                <h1 class="display-4 fw-bold text-white mb-4" style="animation: slideLeft 1s ease-out;">
+                    RH Soft Pro : La Gestion RH Multi-Entreprise
+                </h1>
+                <p class="lead text-white-50 mb-4" style="animation: slideLeft 1s ease-out 0.3s both;">
+                    Automatisez la gestion de vos ressources humaines, centralisez toutes vos données et optimisez la productivité de vos équipes en quelques clics.
+                </p>
+                <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start" style="animation: slideLeft 1s ease-out 0.6s both;">
+                    <a href="{{ path('app_pricing') }}" class="btn btn-light btn-lg px-4 fw-semibold position-relative overflow-hidden">
+                        <span class="position-absolute top-0 start-0 w-100 h-100 bg-primary bg-opacity-10"
+                              style="transform: translateX(-100%); transition: transform 0.5s ease;"></span>
+                        <i class="bi bi-eye me-2"></i>Voir les Tarifs
+                    </a>
+                    <a href="{{ path('app_login') }}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Se Connecter
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Right Column - Dashboard Image with Slide Animation -->
+            <div class="col-lg-6" style="animation: slideRight 1s ease-out 0.5s both;">
+                <div class="position-relative">
+                    <!-- Main Dashboard Image -->
+                    <div class="bg-white bg-opacity-10 rounded-4 p-3 shadow-lg overflow-hidden"
+                         style="backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);">
+                        <div class="position-relative overflow-hidden rounded-3">
+                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=500&fit=crop&crop=center"
+                                 alt="Dashboard RH Soft Pro - Gestion des ressources humaines"
+                                 class="img-fluid w-100"
+                                 style="transition: transform 0.6s ease;"
+                                 onmouseover="this.style.transform='scale(1.03)'"
+                                 onmouseout="this.style.transform='scale(1)'">
+
+                            <!-- Animated Overlay Stats -->
+                            <div class="position-absolute top-0 start-0 m-3 bg-primary rounded-3 p-2 px-3 shadow-lg"
+                                 style="animation: floatStat 3s ease-in-out infinite;">
+                                <div class="d-flex align-items-center gap-2 text-white">
+                                    <i class="bi bi-person-check"></i>
+                                    <div>
+                                        <small class="d-block fw-bold">42</small>
+                                        <small class="opacity-75" style="font-size: 10px;">Employés actifs</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="position-absolute top-0 end-0 m-3 bg-success rounded-3 p-2 px-3 shadow-lg"
+                                 style="animation: floatStat 3.5s ease-in-out infinite reverse;">
+                                <div class="d-flex align-items-center gap-2 text-white">
+                                    <i class="bi bi-graph-up"></i>
+                                    <div>
+                                        <small class="d-block fw-bold">+15%</small>
+                                        <small class="opacity-75" style="font-size: 10px;">Productivité</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="position-absolute bottom-0 start-0 m-3 bg-warning rounded-3 p-2 px-3 shadow-lg"
+                                 style="animation: floatStat 4s ease-in-out infinite 1s;">
+                                <div class="d-flex align-items-center gap-2 text-dark">
+                                    <i class="bi bi-calendar-check"></i>
+                                    <div>
+                                        <small class="d-block fw-bold">8</small>
+                                        <small class="opacity-75" style="font-size: 10px;">Congés en cours</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="position-absolute bottom-0 end-0 m-3 bg-info rounded-3 p-2 px-3 shadow-lg d-none d-md-block"
+                                 style="animation: floatStat 4.5s ease-in-out infinite 2s;">
+                                <div class="d-flex align-items-center gap-2 text-white">
+                                    <i class="bi bi-clock"></i>
+                                    <div>
+                                        <small class="d-block fw-bold">98%</small>
+                                        <small class="opacity-75" style="font-size: 10px;">Présence</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature Highlight -->
+                <div class="row g-2 mt-3">
+                    <div class="col-6">
+                        <div class="bg-white bg-opacity-10 rounded-3 p-2 text-center text-white"
+                             style="backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.05);">
+                            <i class="bi bi-qr-code fs-4 text-warning"></i>
+                            <small class="d-block">Pointage QR Code</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="bg-white bg-opacity-10 rounded-3 p-2 text-center text-white"
+                             style="backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.05);">
+                            <i class="bi bi-calendar-week fs-4 text-info"></i>
+                            <small class="d-block">Planning Hebdomadaire</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION PROBLEMES ET SOLUTIONS -->
+<section class="py-5" id="solutions">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">Fini les fichiers Excel et les papiers</h2>
+            <p class="text-muted lead">Centralisez toutes vos données RH dans une seule plateforme intelligente</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-lg rounded-4 text-center p-4">
+                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-file-earmark-excel text-primary fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold">Fin des tableaux Excel</h5>
+                    <p class="text-muted">Centralisez automatiquement toutes les données de vos employés dans un système sécurisé et accessible partout</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-lg rounded-4 text-center p-4">
+                    <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-clock-history text-success fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold">Économies de temps</h5>
+                    <p class="text-muted">Automatisez les tâches récurrentes : gestion des congés, planning, pointage et reporting</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-lg rounded-4 text-center p-4">
+                    <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-shield-check text-warning fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold">Sécurité des données</h5>
+                    <p class="text-muted">Protégez les données sensibles de vos employés avec un système sécurisé et conforme au RGPD</p>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ path('app_fonctionnalite') }}" class="btn btn-outline-primary btn-lg px-5">
+                <i class="bi bi-arrow-right me-2"></i>Découvrir toutes nos solutions
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION FONCTIONNALITES CLES (Aperçu) -->
+<section class="py-5 bg-light" id="features">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">Tout ce dont vous avez besoin</h2>
+            <p class="text-muted lead">Une suite complète pour gérer vos ressources humaines efficacement</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-lg rounded-4 p-4">
+                    <div class="bg-primary bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-people fs-1 text-primary"></i>
+                    </div>
+                    <h4 class="fw-bold">Gestion Employés</h4>
+                    <p class="text-muted">Centralisez toutes les informations de vos employés : coordonnées, contrats, documents et historique</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-lg rounded-4 p-4">
+                    <div class="bg-success bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-calendar-week fs-1 text-success"></i>
+                    </div>
+                    <h4 class="fw-bold">Planning Hebdomadaire</h4>
+                    <p class="text-muted">Créez et gérez les plannings de vos équipes en quelques clics. Visualisation intuitive et modifications en temps réel</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-lg rounded-4 p-4">
+                    <div class="bg-warning bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-qr-code fs-1 text-warning"></i>
+                    </div>
+                    <h4 class="fw-bold">Pointage QR Code</h4>
+                    <p class="text-muted">Système de pointage simple et rapide via QR Code. Suivi précis des heures de travail en temps réel</p>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ path('app_fonctionnalite') }}" class="btn btn-primary btn-lg px-5">
+                <i class="bi bi-eye me-2"></i>Voir toutes les fonctionnalités
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION COMMENT CA MARCHE -->
+<section class="py-5" id="how-it-works">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">En 3 étapes seulement</h2>
+            <p class="text-muted lead">Démarrez en quelques minutes sans compétences techniques</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="text-center p-4 rounded-4 bg-white shadow-lg h-100">
+                    <div class="position-relative d-inline-block mb-3">
+                        <div class="bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold fs-2" style="width: 80px; height: 80px;">
+                            1
+                        </div>
+                        <div class="d-none d-md-block position-absolute top-50 start-100 translate-middle-y" style="width: 40px; height: 2px; background: var(--bs-primary);"></div>
+                    </div>
+                    <h5 class="fw-bold">Créez votre compte</h5>
+                    <p class="text-muted">Inscrivez-vous en 2 minutes avec votre email. Aucune carte bancaire requise pour l'essai gratuit</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center p-4 rounded-4 bg-white shadow-lg h-100">
+                    <div class="position-relative d-inline-block mb-3">
+                        <div class="bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold fs-2" style="width: 80px; height: 80px;">
+                            2
+                        </div>
+                        <div class="d-none d-md-block position-absolute top-50 start-100 translate-middle-y" style="width: 40px; height: 2px; background: var(--bs-primary);"></div>
+                    </div>
+                    <h5 class="fw-bold">Configurez votre entreprise</h5>
+                    <p class="text-muted">Ajoutez vos employés, paramétrez les plannings et personnalisez les règles de gestion RH</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center p-4 rounded-4 bg-white shadow-lg h-100">
+                    <div class="position-relative d-inline-block mb-3">
+                        <div class="bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold fs-2" style="width: 80px; height: 80px;">
+                            3
+                        </div>
+                    </div>
+                    <h5 class="fw-bold">Démarrez la gestion</h5>
+                    <p class="text-muted">Vos employés peuvent pointer, demander des congés et consulter leurs informations en quelques clics</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION TARIFS APERCU -->
+<section class="py-5 bg-light" id="pricing">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">Une offre pour chaque besoin</h2>
+            <p class="text-muted lead">Des solutions adaptées à toutes les tailles d'entreprise</p>
+        </div>
+
+        <!-- Pricing Information Cards -->
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-lg rounded-4 text-center p-3">
+                    <div class="card-body p-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="bi bi-rocket text-primary fs-1"></i>
+                        </div>
+                        <h3 class="fw-bold">Starter</h3>
+                        <div class="mb-3">
+                            <span class="display-4 fw-bold text-primary">29€</span>
+                            <span class="text-muted">/mois</span>
+                        </div>
+                        <p class="text-muted small">Idéal pour les petites équipes</p>
+                        <ul class="list-unstyled text-start mb-4">
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Jusqu'à 10 employés</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Gestion des congés</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Planning de base</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Support email</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 border-primary border-3 shadow-lg rounded-4 position-relative text-center p-3">
+                    <div class="position-absolute top-0 start-50 translate-middle">
+                        <span class="badge bg-primary px-3 py-2">
+                            <i class="bi bi-stars me-1"></i>Le plus populaire
+                        </span>
+                    </div>
+                    <div class="card-body p-4 mt-3">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="bi bi-briefcase text-success fs-1"></i>
+                        </div>
+                        <h3 class="fw-bold">Pro</h3>
+                        <div class="mb-3">
+                            <span class="display-4 fw-bold text-primary">99€</span>
+                            <span class="text-muted">/mois</span>
+                        </div>
+                        <p class="text-muted small">Parfait pour les PME en croissance</p>
+                        <ul class="list-unstyled text-start mb-4">
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Jusqu'à 50 employés</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Toutes les fonctionnalités</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Pointage QR Code</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Reporting avancé</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Support prioritaire</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-lg rounded-4 text-center p-3">
+                    <div class="card-body p-4">
+                        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="bi bi-building text-warning fs-1"></i>
+                        </div>
+                        <h3 class="fw-bold">Enterprise</h3>
+                        <div class="mb-3">
+                            <span class="display-4 fw-bold text-primary">Sur Devis</span>
+                        </div>
+                        <p class="text-muted small">Pour les grandes organisations</p>
+                        <ul class="list-unstyled text-start mb-4">
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Employés illimités</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Multi-entreprises</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Solutions sur mesure</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Support dédié 24/7</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Single CTA Button -->
+        <div class="text-center mt-5">
+            <a href="{{ path('app_pricing') }}" class="btn btn-primary btn-lg px-5 py-3 fw-semibold shadow-lg">
+                <i class="bi bi-eye me-2"></i>Découvrir tous nos tarifs
+            </a>
+            <p class="text-muted mt-3 small">
+                <i class="bi bi-shield-check me-1"></i>Paiement sécurisé • Annulation à tout moment • Essai gratuit 14 jours
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION CTA FINAL -->
+<section class="bg-primary bg-gradient py-5">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center text-white">
+                <h2 class="display-4 fw-bold mb-3">Prêt à digitaliser vos RH ?</h2>
+                <p class="lead text-white-50 mb-4">Rejoignez les centaines d'entreprises qui ont déjà fait le choix de RH Soft Pro</p>
+                <div class="d-flex flex-wrap gap-3 justify-content-center">
+                    <a href="{{ path('app_register') }}" class="btn btn-light btn-lg px-5 fw-semibold">
+                        <i class="bi bi-arrow-right-circle me-2"></i>Commencer maintenant
+                    </a>
+                    <a href="{{ path('app_fonctionnalite') }}" class="btn btn-outline-light btn-lg px-5">
+                        <i class="bi bi-info-circle me-2"></i>En savoir plus
+                    </a>
+                </div>
+                <div class="mt-4 d-flex flex-wrap gap-4 justify-content-center">
+                    <span class="text-white-50">
+                        <i class="bi bi-check-circle-fill text-warning me-1"></i>Essai gratuit 30 jours
+                    </span>
+                    <span class="text-white-50">
+                        <i class="bi bi-check-circle-fill text-warning me-1"></i>Aucune carte bancaire requise
+                    </span>
+                    <span class="text-white-50">
+                        <i class="bi bi-check-circle-fill text-warning me-1"></i>Annulation à tout moment
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
