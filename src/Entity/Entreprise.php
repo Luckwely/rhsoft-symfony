@@ -61,9 +61,45 @@ class Entreprise
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'entreprise')]
     private Collection $users;
 
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private ?float $prixMois = 0;
+
+    #[ORM\Column] private bool $modulePaie = false;
+    #[ORM\Column] private bool $modulePointage = false;
+    #[ORM\Column] private bool $moduleRh = false;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+    }
+
+    public function isModulePaie(): bool {
+        return $this->modulePaie;
+    }
+    public function setModulePaie(bool $modulePaie): static {
+        $this->modulePaie = $modulePaie; return $this;
+    }
+
+    public function isModulePointage(): bool {
+        return $this->modulePointage;
+    }
+    public function setModulePointage(bool $modulePointage): static {
+        $this->modulePointage = $modulePointage; return $this;
+    }
+
+    public function isModuleRh(): bool {
+        return $this->moduleRh;
+    }
+    public function setModuleRh(bool $moduleRh): static {
+        $this->moduleRh = $moduleRh; return $this;
+    }
+
+    public function getPrixMois(): ?float {
+        return $this->prixMois;
+    }
+
+    public function setPrixMois(?float $prixMois): static {
+        $this->prixMois = $prixMois; return $this;
     }
 
     public function getId(): ?int

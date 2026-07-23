@@ -33,6 +33,27 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    public function findByEntrepriseWithStats(int $entrepriseId, ?string $search = null, ?string $status = null): \Doctrine\ORM\Query
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->where('u.entreprise = :id')
+            ->setParameter('id', $entrepriseId);
+
+        if ($search) {
+            $qb->andWhere('u.nom LIKE :search OR u.email LIKE :search OR u.prenom LIKE :search')
+            ->setParameter('search', '%'.$search.'%');
+        }
+
+        // CORRIGÉ : on utilise u.statut
+        if ($status) {
+            $qb->andWhere('u.statut = :statut')
+            ->setParameter('statut', $status);
+        }
+
+        $qb->orderBy('u.createdAt', 'DESC'); // u.createdAt existe dans ton Entity
+        return $qb->getQuery();
+    }
+
     //    /**
     //     * @return User[] Returns an array of User objects
     //     */

@@ -151,7 +151,7 @@ class RegistrationFormType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank (
-                        message: 'Veuillez entrer votre email'
+                        message: 'Veuillez entrer l\'email de votre entreprise'
                     ),
                     new Email (
                         message: "L'email {{value}} n'est pas un email valid"
@@ -160,6 +160,7 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
+                'label' => 'Acceptez nos terme & conditions',
                 'constraints' => [
                     new IsTrue(
                         message: 'Vous pouvez accepter notre Terme',

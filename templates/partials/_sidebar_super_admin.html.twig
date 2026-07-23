@@ -1,33 +1,32 @@
 <!-- Logo -->
 <div class="d-flex align-items-center mb-4 pb-3 border-bottom border-secondary">
-	<a href="{{ path('app_super_admin_dashboard') }}" class="sidebar-logo d-flex align-items-center">
-		<i class="bi bi-building me-2"></i>
-		<span>RH Soft Pro</span>
+	<a href="{{ path('app_super_admin_dashboard') }}" class="sidebar-logo d-flex align-items-center text-xl">
+		<span class="">RHSOFT</span>
 	</a>
-	<span class="sidebar-badge ms-2">{{ app.user.entreprise.nom ?? 'Demo' }}</span>
 </div>
 
 <!-- Navigation Menu -->
 <nav class="nav nav-pills flex-column mb-auto gap-1">
-	<a href="{{ path('app_super_admin_dashboard') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_super_admin_dashboard' %}active{% endif %}">
+    {% set current_route = app.request.attributes.get('_route') %}
+	<a href="{{ path('app_super_admin_dashboard') }}" class="nav-link {% if 'app_super_admin_dashboard' in current_route %}active{% endif %}">
 		<i class="bi bi-speedometer2 me-2"></i>
 		Dashboard Global
 	</a>
-	<a href="{{ path('app_super_admin_entreprise') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_super_admin_entreprise' %}active{% endif %}">
-		<i class="bi bi-people me-2"></i>
+	<a href="{{ path('app_super_admin_entreprise') }}" class="nav-link {% if 'app_super_admin_entreprise' in current_route %}active{% endif %}">
+		<i class="bi bi-buildings me-2"></i>
 		Gestion Entreprises
 	</a>
-	<a href="{{ path('app_super_admin_facturation') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_super_admin_facturation' %}active{% endif %}">
-		<i class="bi bi-calendar-week me-2"></i>
+	<a href="{{ path('app_super_admin_facturation') }}" class="nav-link {% if 'app_super_admin_facturation' in current_route %}active{% endif %}">
+		<i class="bi bi-receipt me-2"></i>
 		Facturation
 	</a>
-	<a href="{{ path('app_super_admin_module') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_super_admin_module' %}active{% endif %}">
-		<i class="bi bi-qr-code me-2"></i>
+	<a href="{{ path('app_super_admin_module') }}" class="nav-link {% if 'app_super_admin_module' in current_route %}active{% endif %}">
+		<i class="bi bi-grid-3x3-gap-fill me-2"></i>
 		Modules
 	</a>
-	<a href="{{ path('app_super_admin_parametre') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_super_admin_parametre' %}active{% endif %}">
-		<i class="bi bi-graph-up-arrow me-2"></i>
-		Paramètres Système
+	<a href="{{ path('app_super_admin_parametre') }}" class="nav-link {% if 'app_super_admin_parametre' in current_route %}active{% endif %}">
+		<i class="bi bi-gear me-2"></i>
+        Administration
 	</a>
 </nav>
 

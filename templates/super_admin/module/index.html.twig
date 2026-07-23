@@ -8,7 +8,7 @@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
         <div>
             <h1 class="h2 fw-bold mb-0">
-                <i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>Gestion des Modules
+                Gestion des Modules
             </h1>
             <p class="text-muted small mb-0">Activez ou désactivez les modules pour chaque entreprise</p>
         </div>
@@ -110,316 +110,56 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Ligne 1 -->
+                        {% for entreprise in pagination %}
                         <tr>
                             <td class="ps-3">
                                 <div class="d-flex align-items-center gap-2">
-                                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold" style="width: 36px; height: 36px; font-size: 14px;">TI</div>
-                                    <div>
-                                        <div class="fw-semibold">TechInnovate</div>
-                                        <div class="text-muted small">contact@techinnovate.com</div>
-                                    </div>
+                                    {% if entreprise.logo %}<img src="{{ asset('uploads/logos/'~entreprise.logo) }}" class="rounded-circle" style="width:36px;height:36px;">
+                                    {% else %}<div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;">{{ entreprise.nom|slice(0,2)|upper }}</div>{% endif %}
+                                    <div><div class="fw-semibold">{{ entreprise.nom }}</div><div class="text-muted small">{{ entreprise.email }}</div></div>
                                 </div>
                             </td>
                             <td class="text-center">
                                 <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="paie1" checked>
-                                    <label class="form-check-label visually-hidden" for="paie1">Paie</label>
+                                    <input class="form-check-input module-toggle" type="checkbox"
+                                        data-id="{{ entreprise.id }}" data-module="paie"
+                                        {{ entreprise.modulePaie ? 'checked' : '' }}>
                                 </div>
                             </td>
                             <td class="text-center">
                                 <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="pointage1">
-                                    <label class="form-check-label visually-hidden" for="pointage1">Pointage</label>
+                                    <input class="form-check-input module-toggle" type="checkbox"
+                                        data-id="{{ entreprise.id }}" data-module="pointage"
+                                        {{ entreprise.modulePointage ? 'checked' : '' }}>
                                 </div>
                             </td>
                             <td class="text-center pe-3">
                                 <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="rh1" checked>
-                                    <label class="form-check-label visually-hidden" for="rh1">RH</label>
+                                    <input class="form-check-input module-toggle" type="checkbox"
+                                        data-id="{{ entreprise.id }}" data-module="rh"
+                                        {{ entreprise.moduleRh ? 'checked' : '' }}>
                                 </div>
                             </td>
                         </tr>
+                        {% endfor %}
+                        </tbody>
 
-                        <!-- Ligne 2 -->
-                        <tr>
-                            <td class="ps-3">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-success fw-bold" style="width: 36px; height: 36px; font-size: 14px;">SR</div>
-                                    <div>
-                                        <div class="fw-semibold">SmartRH Solutions</div>
-                                        <div class="text-muted small">info@smartrh.com</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="paie2">
-                                    <label class="form-check-label visually-hidden" for="paie2">Paie</label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="pointage2" checked>
-                                    <label class="form-check-label visually-hidden" for="pointage2">Pointage</label>
-                                </div>
-                            </td>
-                            <td class="text-center pe-3">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="rh2" checked>
-                                    <label class="form-check-label visually-hidden" for="rh2">RH</label>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Ligne 3 -->
-                        <tr>
-                            <td class="ps-3">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-info fw-bold" style="width: 36px; height: 36px; font-size: 14px;">GH</div>
-                                    <div>
-                                        <div class="fw-semibold">Global HR Tech</div>
-                                        <div class="text-muted small">contact@globalhr.tech</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="paie3" checked>
-                                    <label class="form-check-label visually-hidden" for="paie3">Paie</label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="pointage3" checked>
-                                    <label class="form-check-label visually-hidden" for="pointage3">Pointage</label>
-                                </div>
-                            </td>
-                            <td class="text-center pe-3">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="rh3" checked>
-                                    <label class="form-check-label visually-hidden" for="rh3">RH</label>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Ligne 4 -->
-                        <tr>
-                            <td class="ps-3">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-warning fw-bold" style="width: 36px; height: 36px; font-size: 14px;">CP</div>
-                                    <div>
-                                        <div class="fw-semibold">Consulting Pro</div>
-                                        <div class="text-muted small">admin@consultingpro.fr</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="paie4">
-                                    <label class="form-check-label visually-hidden" for="paie4">Paie</label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="pointage4">
-                                    <label class="form-check-label visually-hidden" for="pointage4">Pointage</label>
-                                </div>
-                            </td>
-                            <td class="text-center pe-3">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="rh4" checked>
-                                    <label class="form-check-label visually-hidden" for="rh4">RH</label>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Ligne 5 -->
-                        <tr>
-                            <td class="ps-3">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-danger fw-bold" style="width: 36px; height: 36px; font-size: 14px;">DR</div>
-                                    <div>
-                                        <div class="fw-semibold">Digital RH</div>
-                                        <div class="text-muted small">contact@digitalrh.com</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="paie5" checked>
-                                    <label class="form-check-label visually-hidden" for="paie5">Paie</label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="pointage5" checked>
-                                    <label class="form-check-label visually-hidden" for="pointage5">Pointage</label>
-                                </div>
-                            </td>
-                            <td class="text-center pe-3">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="rh5">
-                                    <label class="form-check-label visually-hidden" for="rh5">RH</label>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Ligne 6 -->
-                        <tr>
-                            <td class="ps-3">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="bg-secondary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-secondary fw-bold" style="width: 36px; height: 36px; font-size: 14px;">AI</div>
-                                    <div>
-                                        <div class="fw-semibold">AI Recruit</div>
-                                        <div class="text-muted small">hello@airecruit.io</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="paie6">
-                                    <label class="form-check-label visually-hidden" for="paie6">Paie</label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="pointage6" checked>
-                                    <label class="form-check-label visually-hidden" for="pointage6">Pointage</label>
-                                </div>
-                            </td>
-                            <td class="text-center pe-3">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="rh6">
-                                    <label class="form-check-label visually-hidden" for="rh6">RH</label>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Ligne 7 -->
-                        <tr>
-                            <td class="ps-3">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-success fw-bold" style="width: 36px; height: 36px; font-size: 14px;">HS</div>
-                                    <div>
-                                        <div class="fw-semibold">HR Solutions</div>
-                                        <div class="text-muted small">info@hrsolutions.fr</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="paie7" checked>
-                                    <label class="form-check-label visually-hidden" for="paie7">Paie</label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="pointage7">
-                                    <label class="form-check-label visually-hidden" for="pointage7">Pointage</label>
-                                </div>
-                            </td>
-                            <td class="text-center pe-3">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="rh7" checked>
-                                    <label class="form-check-label visually-hidden" for="rh7">RH</label>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Ligne 8 -->
-                        <tr>
-                            <td class="ps-3">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-info fw-bold" style="width: 36px; height: 36px; font-size: 14px;">TP</div>
-                                    <div>
-                                        <div class="fw-semibold">Talent Pro</div>
-                                        <div class="text-muted small">contact@talentpro.com</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="paie8" checked>
-                                    <label class="form-check-label visually-hidden" for="paie8">Paie</label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="pointage8" checked>
-                                    <label class="form-check-label visually-hidden" for="pointage8">Pointage</label>
-                                </div>
-                            </td>
-                            <td class="text-center pe-3">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="rh8" checked>
-                                    <label class="form-check-label visually-hidden" for="rh8">RH</label>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Ligne 9 -->
-                        <tr>
-                            <td class="ps-3">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-danger fw-bold" style="width: 36px; height: 36px; font-size: 14px;">RA</div>
-                                    <div>
-                                        <div class="fw-semibold">RH Advisory</div>
-                                        <div class="text-muted small">contact@rhadvisory.fr</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="paie9">
-                                    <label class="form-check-label visually-hidden" for="paie9">Paie</label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="pointage9">
-                                    <label class="form-check-label visually-hidden" for="pointage9">Pointage</label>
-                                </div>
-                            </td>
-                            <td class="text-center pe-3">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="rh9">
-                                    <label class="form-check-label visually-hidden" for="rh9">RH</label>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Ligne 10 -->
-                        <tr>
-                            <td class="ps-3">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold" style="width: 36px; height: 36px; font-size: 14px;">PM</div>
-                                    <div>
-                                        <div class="fw-semibold">People Manager</div>
-                                        <div class="text-muted small">info@peoplemanager.com</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="paie10" checked>
-                                    <label class="form-check-label visually-hidden" for="paie10">Paie</label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="pointage10" checked>
-                                    <label class="form-check-label visually-hidden" for="pointage10">Pointage</label>
-                                </div>
-                            </td>
-                            <td class="text-center pe-3">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input" type="checkbox" id="rh10">
-                                    <label class="form-check-label visually-hidden" for="rh10">RH</label>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
+                        <script>
+                        document.querySelectorAll('.module-toggle').forEach(toggle => {
+                            toggle.addEventListener('change', function() {
+                                fetch(`{{ path('app_super_admin_toggle_module', {id: 'ID'}) }}`.replace('ID', this.dataset.id), {
+                                    method: 'POST',
+                                    headers: {'X-Requested-With': 'XMLHttpRequest'},
+                                    body: new URLSearchParams({
+                                        module: this.dataset.module,
+                                        value: this.checked
+                                    })
+                                }).then(res => res.json()).then(data => {
+                                    if(!data.success) this.checked = !this.checked; // revert si erreur
+                                });
+                            });
+                        });
+                        </script>
                 </table>
             </div>
         </div>

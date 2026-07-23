@@ -8,7 +8,7 @@
     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4">
         <div>
             <h3 class="fw-bold mb-1">
-                <i class="bi bi-clock-history text-primary me-2"></i>Suivi des Pointages
+                Suivi des Pointages
             </h3>
             <p class="text-muted mb-0">
                 <i class="bi bi-calendar3 me-1"></i>Aujourd'hui: 20 Octobre 2025
@@ -34,9 +34,6 @@
                         <div>
                             <span class="text-muted small text-uppercase fw-semibold">Présents</span>
                             <h2 class="fw-bold mb-0 mt-1">128</h2>
-                            <div class="mt-2">
-                                <span class="badge bg-success-subtle text-success rounded-pill">90%</span>
-                            </div>
                         </div>
                         <div class="bg-success bg-opacity-10 rounded-3 p-3">
                             <i class="bi bi-person-check text-success fs-4"></i>
@@ -52,9 +49,6 @@
                         <div>
                             <span class="text-muted small text-uppercase fw-semibold">En Retard</span>
                             <h2 class="fw-bold mb-0 mt-1">5</h2>
-                            <div class="mt-2">
-                                <span class="badge bg-warning-subtle text-warning rounded-pill">3%</span>
-                            </div>
                         </div>
                         <div class="bg-warning bg-opacity-10 rounded-3 p-3">
                             <i class="bi bi-clock text-warning fs-4"></i>
@@ -70,9 +64,6 @@
                         <div>
                             <span class="text-muted small text-uppercase fw-semibold">Absents</span>
                             <h2 class="fw-bold mb-0 mt-1">9</h2>
-                            <div class="mt-2">
-                                <span class="badge bg-danger-subtle text-danger rounded-pill">7%</span>
-                            </div>
                         </div>
                         <div class="bg-danger bg-opacity-10 rounded-3 p-3">
                             <i class="bi bi-person-x text-danger fs-4"></i>
@@ -88,9 +79,6 @@
                         <div>
                             <span class="text-muted small text-uppercase fw-semibold">En Congé</span>
                             <h2 class="fw-bold mb-0 mt-1">4</h2>
-                            <div class="mt-2">
-                                <span class="badge bg-info-subtle text-info rounded-pill">3%</span>
-                            </div>
                         </div>
                         <div class="bg-info bg-opacity-10 rounded-3 p-3">
                             <i class="bi bi-calendar-x text-info fs-4"></i>
@@ -179,150 +167,6 @@
                             <td class="text-center"><span class="fw-semibold">08:02</span></td>
                             <td class="text-center"><span class="fw-semibold">17:01</span></td>
                             <td class="text-center"><span class="fw-semibold">8h59</span></td>
-                            <td class="text-center">
-                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
-                                    <i class="bi bi-check-circle-fill me-1"></i>Présent
-                                </span>
-                            </td>
-                            <td class="text-center pe-3">
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-light border-0 rounded-3" type="button" data-bs-toggle="dropdown">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 py-2">
-                                        <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#correctPointageModal"><i class="bi bi-eye me-2"></i>Voir détails</button></li>
-                                        <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#correctPointageModal"><i class="bi bi-pencil me-2"></i>Corriger</button></li>
-                                        <li><button class="dropdown-item"><i class="bi bi-envelope me-2"></i>Envoyer rappel</button></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- LIGNE 2 - EN RETARD -->
-                        <tr>
-                            <td class="ps-3"><span class="text-muted small">2</span></td>
-                            <td>
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px; font-size: 14px;">
-                                        MM
-                                    </div>
-                                    <div>
-                                        <div class="fw-semibold">Marie Martin</div>
-                                        <div class="text-muted small">Commerciale</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center"><span class="fw-semibold text-warning">08:15</span></td>
-                            <td class="text-center"><span class="text-muted">-</span></td>
-                            <td class="text-center"><span class="fw-semibold">7h30</span></td>
-                            <td class="text-center">
-                                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
-                                    <i class="bi bi-clock-history me-1"></i>En Retard
-                                </span>
-                            </td>
-                            <td class="text-center pe-3">
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-light border-0 rounded-3" type="button" data-bs-toggle="dropdown">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 py-2">
-                                        <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#correctPointageModal"><i class="bi bi-eye me-2"></i>Voir détails</button></li>
-                                        <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#correctPointageModal"><i class="bi bi-pencil me-2"></i>Corriger</button></li>
-                                        <li><button class="dropdown-item"><i class="bi bi-envelope me-2"></i>Envoyer rappel</button></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- LIGNE 3 - ABSENT -->
-                        <tr>
-                            <td class="ps-3"><span class="text-muted small">3</span></td>
-                            <td>
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="bg-danger-subtle text-danger rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px; font-size: 14px;">
-                                        PD
-                                    </div>
-                                    <div>
-                                        <div class="fw-semibold">Paul Dubois</div>
-                                        <div class="text-muted small">Chef de Projet</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center"><span class="text-muted">-</span></td>
-                            <td class="text-center"><span class="text-muted">-</span></td>
-                            <td class="text-center"><span class="fw-semibold">0h</span></td>
-                            <td class="text-center">
-                                <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
-                                    <i class="bi bi-x-circle-fill me-1"></i>Absent
-                                </span>
-                            </td>
-                            <td class="text-center pe-3">
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-light border-0 rounded-3" type="button" data-bs-toggle="dropdown">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 py-2">
-                                        <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#correctPointageModal"><i class="bi bi-eye me-2"></i>Voir détails</button></li>
-                                        <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#correctPointageModal"><i class="bi bi-pencil me-2"></i>Corriger</button></li>
-                                        <li><button class="dropdown-item"><i class="bi bi-envelope me-2"></i>Envoyer rappel</button></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- LIGNE 4 - EN CONGÉ -->
-                        <tr>
-                            <td class="ps-3"><span class="text-muted small">4</span></td>
-                            <td>
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="bg-info-subtle text-info rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px; font-size: 14px;">
-                                        JL
-                                    </div>
-                                    <div>
-                                        <div class="fw-semibold">Julie Lefèvre</div>
-                                        <div class="text-muted small">RH</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center"><span class="text-muted">-</span></td>
-                            <td class="text-center"><span class="text-muted">-</span></td>
-                            <td class="text-center"><span class="fw-semibold">0h</span></td>
-                            <td class="text-center">
-                                <span class="badge bg-info-subtle text-info rounded-pill px-3 py-2">
-                                    <i class="bi bi-calendar-x me-1"></i>En Congé
-                                </span>
-                            </td>
-                            <td class="text-center pe-3">
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-light border-0 rounded-3" type="button" data-bs-toggle="dropdown">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 py-2">
-                                        <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#correctPointageModal"><i class="bi bi-eye me-2"></i>Voir détails</button></li>
-                                        <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#correctPointageModal"><i class="bi bi-pencil me-2"></i>Corriger</button></li>
-                                        <li><button class="dropdown-item"><i class="bi bi-envelope me-2"></i>Envoyer rappel</button></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- LIGNE 5 - PRÉSENT -->
-                        <tr>
-                            <td class="ps-3"><span class="text-muted small">5</span></td>
-                            <td>
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="bg-warning-subtle text-warning rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px; font-size: 14px;">
-                                        TB
-                                    </div>
-                                    <div>
-                                        <div class="fw-semibold">Thomas Bernard</div>
-                                        <div class="text-muted small">Développeur Backend</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center"><span class="fw-semibold">08:00</span></td>
-                            <td class="text-center"><span class="fw-semibold">17:30</span></td>
-                            <td class="text-center"><span class="fw-semibold">9h30</span></td>
                             <td class="text-center">
                                 <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
                                     <i class="bi bi-check-circle-fill me-1"></i>Présent

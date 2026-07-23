@@ -46,11 +46,6 @@
                 </div>
                 <h2 class="display-5 fw-bold mb-3">Heureux de vous revoir</h2>
                 <p class="lead opacity-75">Connectez-vous pour accéder à votre espace personnel et gérer vos activités</p>
-                <div class="mt-4">
-                    <span class="badge bg-light text-primary me-2 px-3 py-2">Sécurisé</span>
-                    <span class="badge bg-light text-primary me-2 px-3 py-2">Rapide</span>
-                    <span class="badge bg-light text-primary px-3 py-2">Fiable</span>
-                </div>
             </div>
         </div>
 
@@ -92,9 +87,9 @@
                                 <input type="password" name="password" id="password" class="form-control form-control-lg border-start-0" placeholder="Votre mot de passe" autocomplete="current-password" required>
                             </div>
                             <div class="invalid-feedback">Veuillez saisir votre mot de passe</div>
-                            <div class="text-end mt-2">
+                            {#<div class="text-end mt-2">
                                 <a href="#" class="text-decoration-none small text-primary">Mot de passe oublié ?</a>
-                            </div>
+                            </div>#}
                         </div>
                     </div>
 
@@ -128,18 +123,6 @@
 
                     <div class="col-12 text-center">
                         <p class="text-muted mt-2">Vous n'avez pas de compte ? <a href="{{ path("app_register") }}" class="text-primary fw-semibold">Inscrivez-vous</a></p>
-                    </div>
-
-                    <div class="col-12">
-                        <hr class="my-2">
-                        <div class="text-center">
-                            <p class="text-muted small mb-0">
-                                <svg class="me-1" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                                </svg>
-                                Connexion sécurisée
-                            </p>
-                        </div>
                     </div>
                 </div>
             </form>
