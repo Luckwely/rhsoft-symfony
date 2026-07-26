@@ -109,19 +109,38 @@ class EntrepriseRepository extends ServiceEntityRepository
     public function findAllWithModuleFilters(?string $search, ?string $module, ?string $status): \Doctrine\ORM\Query
     {
         $qb = $this->createQueryBuilder('e');
-        if ($search) $qb->andWhere('e.nom LIKE :search')->setParameter('search', '%'.$search.'%');
-        if ($module && $status !== null) {
-            $qb->andWhere("e.module$module = :status")->setParameter('status', $status === 'active');
+
+        if ($search) {
+            $qb->andWhere('e.nom LIKE :search OR e.email LIKE :search')
+               ->setParameter('search', '%'.$search.'%');
         }
-        return $qb->getQuery();
+
+        if ($module) {
+            $isActive = ($status === 'active');
+            match($module) {
+                'paie' => $qb->andWhere('e.modulePaie = :val'),
+                'pointage' => $qb->andWhere('e.modulePointage = :val'),
+                'rh' => $qb->andWhere('e.moduleRh = :val'),
+                default => null
+            };
+            $qb->setParameter('val', $status !== '' ? $isActive : true);
+        } elseif ($status !== null && $status !== '') {
+            $isActive = ($status === 'active');
+            $qb->andWhere('(e.modulePaie = :val OR e.modulePointage = :val OR e.moduleRh = :val)')
+               ->setParameter('val', $isActive);
+        }
+
+        return $qb->orderBy('e.nom', 'ASC')->getQuery();
     }
 
     public function getTauxActivation(): string
     {
-        $total = $this->count([]) * 3; // 3 modules * nb entreprises
+        $total = $this->count([]) * 3; // 3 modules * total number of companies
         $actifs = $this->createQueryBuilder('e')
-            ->select('SUM(e.modulePaie + e.modulePointage + e.moduleRh)')
+            ->select('SUM(CASE WHEN e.modulePaie = true THEN 1 ELSE 0 END + CASE WHEN e.modulePointage = true THEN 1 ELSE 0 END + CASE WHEN e.moduleRh = true THEN 1 ELSE 0 END)')
             ->getQuery()->getSingleScalarResult();
+
         return $total > 0 ? round(($actifs / $total) * 100) . '%' : '0%';
     }
+
 }

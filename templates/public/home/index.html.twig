@@ -4,6 +4,13 @@
 
 {% block body %}
 <style>
+    .header {
+         background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0)), url('../uploads/home/header-bg.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
     /* Animations */
     @keyframes floatBg {
         0%, 100% { transform: translate(0, 0) scale(1); }
@@ -124,7 +131,7 @@
     }
 </style>
 <!-- SECTION HERO / HEADER -->
-<section class="bg-primary bg-gradient min-vh-100 d-flex align-items-center pt-5 position-relative overflow-hidden">
+<section class="header min-vh-100 d-flex align-items-center pt-5 position-relative overflow-hidden">
 
     <div class="container py-5 position-relative" style="z-index: 1;">
         <div class="row align-items-center g-5">
@@ -143,7 +150,7 @@
                               style="transform: translateX(-100%); transition: transform 0.5s ease;"></span>
                         <i class="bi bi-eye me-2"></i>Voir les Tarifs
                     </a>
-                    <a href="{{ path('app_login') }}" class="btn btn-outline-light btn-lg px-4">
+                    <a href="{{ path('app_login') }}" class="btn bg-primary text-white btn-lg px-4">
                         <i class="bi bi-box-arrow-in-right me-2"></i>Se Connecter
                     </a>
                 </div>
@@ -157,75 +164,59 @@
                     <div class="bg-white bg-opacity-10 rounded-4 p-3 shadow-lg overflow-hidden"
                          style="backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);">
                         <div class="position-relative overflow-hidden rounded-3">
-                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=500&fit=crop&crop=center"
+                           <video autoplay loop muted playsinline;
                                  alt="Dashboard RH Soft Pro - Gestion des ressources humaines"
                                  class="img-fluid w-100"
                                  style="transition: transform 0.6s ease;"
                                  onmouseover="this.style.transform='scale(1.03)'"
                                  onmouseout="this.style.transform='scale(1)'">
+                                 <source src="../uploads/home/video_header.mp4" type="video/mp4">
+                            </video>
 
-                            <!-- Animated Overlay Stats -->
-                            <div class="position-absolute top-0 start-0 m-3 bg-primary rounded-3 p-2 px-3 shadow-lg"
-                                 style="animation: floatStat 3s ease-in-out infinite;">
+                           <!-- Animated Overlay Stats -->
+                            <div class="position-absolute top-0 start-0 m-3 rounded-3 p-2 px-3 shadow-lg"
+                                 style="background: rgba(13, 110, 253, 0.25); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); animation: floatStat 3s ease-in-out infinite;">
                                 <div class="d-flex align-items-center gap-2 text-white">
-                                    <i class="bi bi-person-check"></i>
+                                    <i class="bi bi-person-check fs-5 text-info"></i>
                                     <div>
-                                        <small class="d-block fw-bold">42</small>
-                                        <small class="opacity-75" style="font-size: 10px;">Employés actifs</small>
+                                        <div class="fw-bold text-white" style="font-size: 13px;">+98% Suivi Effectif</div>
+                                        <small class="opacity-75 text-white" style="font-size: 10px;">Collaborateurs Actifs Centralisés</small>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="position-absolute top-0 end-0 m-3 bg-success rounded-3 p-2 px-3 shadow-lg"
-                                 style="animation: floatStat 3.5s ease-in-out infinite reverse;">
+                            <div class="position-absolute top-0 end-0 m-3 rounded-3 p-2 px-3 shadow-lg"
+                                 style="background: rgba(25, 135, 84, 0.25); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); animation: floatStat 3.5s ease-in-out infinite reverse;">
                                 <div class="d-flex align-items-center gap-2 text-white">
-                                    <i class="bi bi-graph-up"></i>
+                                    <i class="bi bi-graph-up fs-5 text-success"></i>
                                     <div>
-                                        <small class="d-block fw-bold">+15%</small>
-                                        <small class="opacity-75" style="font-size: 10px;">Productivité</small>
+                                        <div class="fw-bold text-white" style="font-size: 13px;">Productivité +35%</div>
+                                        <small class="opacity-75 text-white" style="font-size: 10px;">Performance & Automatisation</small>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="position-absolute bottom-0 start-0 m-3 bg-warning rounded-3 p-2 px-3 shadow-lg"
-                                 style="animation: floatStat 4s ease-in-out infinite 1s;">
-                                <div class="d-flex align-items-center gap-2 text-dark">
-                                    <i class="bi bi-calendar-check"></i>
-                                    <div>
-                                        <small class="d-block fw-bold">8</small>
-                                        <small class="opacity-75" style="font-size: 10px;">Congés en cours</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="position-absolute bottom-0 end-0 m-3 bg-info rounded-3 p-2 px-3 shadow-lg d-none d-md-block"
-                                 style="animation: floatStat 4.5s ease-in-out infinite 2s;">
+                            <div class="position-absolute bottom-0 start-0 m-3 rounded-3 p-2 px-3 shadow-lg"
+                                 style="background: rgba(255, 193, 7, 0.25); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); animation: floatStat 4s ease-in-out infinite 1s;">
                                 <div class="d-flex align-items-center gap-2 text-white">
-                                    <i class="bi bi-clock"></i>
+                                    <i class="bi bi-calendar-check fs-5 text-warning"></i>
                                     <div>
-                                        <small class="d-block fw-bold">98%</small>
-                                        <small class="opacity-75" style="font-size: 10px;">Présence</small>
+                                        <div class="fw-bold text-white" style="font-size: 13px;">Gestion en Temps Réel</div>
+                                        <small class="opacity-75 text-white" style="font-size: 10px;">Suivi Fluide des Congés</small>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Feature Highlight -->
-                <div class="row g-2 mt-3">
-                    <div class="col-6">
-                        <div class="bg-white bg-opacity-10 rounded-3 p-2 text-center text-white"
-                             style="backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.05);">
-                            <i class="bi bi-qr-code fs-4 text-warning"></i>
-                            <small class="d-block">Pointage</small>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="bg-white bg-opacity-10 rounded-3 p-2 text-center text-white"
-                             style="backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.05);">
-                            <i class="bi bi-calendar-week fs-4 text-info"></i>
-                            <small class="d-block">Planning</small>
+                            <div class="position-absolute bottom-0 end-0 m-3 rounded-3 p-2 px-3 shadow-lg d-none d-md-block"
+                                 style="background: rgba(13, 202, 240, 0.25); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); animation: floatStat 4.5s ease-in-out infinite 2s;">
+                                <div class="d-flex align-items-center gap-2 text-white">
+                                    <i class="bi bi-clock fs-5 text-info"></i>
+                                    <div>
+                                        <div class="fw-bold text-white" style="font-size: 13px;">Zéro Saisie Double</div>
+                                        <small class="opacity-75 text-white" style="font-size: 10px;">Assiduité & Paie Harmonisées</small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
