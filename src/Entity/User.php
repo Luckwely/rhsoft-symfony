@@ -62,18 +62,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $cv = null; // pdf
 
-    #[ORM\Column(type: 'string', length: 50)]
-    private string $statut = 'inactif'; // actif, inactif, suspendu
-
-    #[ORM\Column(type: 'string', length: 50)]
-    private string $statutTravail = 'hors_service'; // en_service, pause_dej, pause_courte, toilette, fin_shift
-
-    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?\DateTimeImmutable $debutShiftAt = null;
-
-    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?\DateTimeImmutable $finShiftAt = null;
-
     #[ORM\Column(type: 'datetime_immutable')]
     private \DateTimeImmutable $createdAt;
 
@@ -92,20 +80,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $invitationToken = null;
 
-    //#[ORM\Column(nullable: true)]
-    //private ?\DateTimeInterface $invitationExpiresAt = null;
-
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $invitationExpiresAt = null;
 
     #[ORM\Column]
     private bool $firstLogin = true;
 
-    // --- BANQUE ---
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $banqueNom = null;
+
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $banqueIban = null;
+
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $banqueRib = null;
 
@@ -114,16 +100,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'float', nullable: true)]
     private ?float $soldeConge = 25;
-
-    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $heureDebut = null;
-
-    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $heureFin = null;
-
-    #[ORM\Column(length: 10, nullable: true)]
-    private ?string $pause = '1h';
-
 
     public function __construct()
     {
@@ -170,31 +146,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setSoldeConge(?float $soldeConge): self {
         $this->soldeConge = $soldeConge; return $this;
     }
-
-    public function getHeureDebut(): ?\DateTimeInterface {
-        return $this->heureDebut;
-    }
-
-    public function setHeureDebut(?\DateTimeInterface $heureDebut): self {
-        $this->heureDebut = $heureDebut; return $this;
-    }
-
-    public function getHeureFin(): ?\DateTimeInterface {
-        return $this->heureFin;
-    }
-
-    public function setHeureFin(?\DateTimeInterface $heureFin): self {
-        $this->heureFin = $heureFin; return $this;
-    }
-
-    public function getPause(): ?string {
-        return $this->pause;
-    }
-
-    public function setPause(?string $pause): self {
-        $this->pause = $pause; return $this;
-    }
-
 
     public function isFirstLogin(): bool
     {
@@ -399,13 +350,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->invitationExpiresAt = $invitationExpiresAt; return $this;
     }
 
-    //public function getInvitationExpiresAt(): ?\DateTimeInterface {
-    //    return $this->invitationExpiresAt;
-    //}
-    //public function setInvitationExpiresAt(?\DateTimeInterface $invitationExpiresAt): static {
-    //    $this->invitationExpiresAt = $invitationExpiresAt; return $this;
-    //}
-
     public function getAdresse(): ?string {
         return $this->adresse;
     }
@@ -428,38 +372,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setCv(?string $cv): static {
         $this->cv = $cv; return $this;
-    }
-
-    public function getStatut(): string {
-        return $this->statut;
-    }
-
-    public function setStatut(string $statut): static {
-        $this->statut = $statut; return $this;
-    }
-
-    public function getStatutTravail(): string {
-        return $this->statutTravail;
-    }
-
-    public function setStatutTravail(string $statutTravail): static {
-        $this->statutTravail = $statutTravail; return $this;
-    }
-
-    public function getDebutShiftAt(): ?\DateTimeImmutable {
-        return $this->debutShiftAt;
-    }
-
-    public function setDebutShiftAt(?\DateTimeImmutable $debutShiftAt): static {
-        $this->debutShiftAt = $debutShiftAt; return $this;
-    }
-
-    public function getFinShiftAt(): ?\DateTimeImmutable {
-        return $this->finShiftAt;
-    }
-
-    public function setFinShiftAt(?\DateTimeImmutable $finShiftAt): static {
-        $this->finShiftAt = $finShiftAt; return $this;
     }
 
     public function getCreatedAt(): \DateTimeImmutable {
@@ -489,6 +401,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setBanqueRib(?string $banqueRib): static {
         $this->banqueRib = $banqueRib; return $this;
     }
-
 
 }

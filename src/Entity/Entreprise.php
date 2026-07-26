@@ -64,9 +64,14 @@ class Entreprise
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
     private ?float $prixMois = 0;
 
-    #[ORM\Column] private bool $modulePaie = false;
-    #[ORM\Column] private bool $modulePointage = false;
-    #[ORM\Column] private bool $moduleRh = false;
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $modulePaie = false;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $modulePointage = false;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $moduleRh = false;
 
     public function __construct()
     {
