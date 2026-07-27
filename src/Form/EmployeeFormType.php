@@ -6,12 +6,14 @@ use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\{
     FileType,
     TextType,
     DateType,
     NumberType,
-    TextareaType,
+    ChoiceType,
+    EmailType
 };
 use Symfony\Component\Validator\Constraints\{
     NotBlank,
@@ -26,6 +28,11 @@ class EmployeeFormType extends AbstractType
     {
         $builder
             ->add('prenom', TextType::class, [
+                'label' => 'Prénom',
+                'attr' => [
+                    'placeholder' => 'Votre prénom',
+                    'class' => 'form-control'
+                ],
                 'constraints' => [
                     new NotBlank(
                         message: "Le prénom est obligatoire"
@@ -33,13 +40,23 @@ class EmployeeFormType extends AbstractType
                 ]
             ])
             ->add('nom', TextType::class, [
+                'label' => 'Nom',
+                'attr' => [
+                    'placeholder' => 'Votre nom',
+                    'class' => 'form-control'
+                ],
                 'constraints' => [
                     new NotBlank(
                         message: 'Le nom est obligatoire'
                     )
                 ]
             ])
-            ->add('email', TextType::class, [
+            ->add('email', EmailType::class, [
+                'label' => 'Email',
+                'attr' => [
+                    'placeholder' => 'Votre email',
+                    'class' => 'form-control'
+                ],
                 'constraints' => [
                     new NotBlank(
                         message: 'Email obligatoire'
@@ -49,9 +66,43 @@ class EmployeeFormType extends AbstractType
                     )
                 ]
             ])
-            ->add('telephone', TextType::class, ['required' => false])
-            ->add('adresse', TextType::class, ['required' => false]) // mieux pour adresse
+            ->add('telephone', TextType::class, [
+                'label' => 'Telephone',
+                'attr' => [
+                    'placeholder' => 'Votre numero de telephone',
+                    'class' => 'form-control'
+                ],
+                'required' => false
+            ])
+            ->add('adresse', TextType::class, [
+                'label' => 'Adresse',
+                'attr' => [
+                    'placeholder' => 'Votre adresse',
+                    'class' => 'form-control'
+                ],
+                'required' => false
+            ])
+            ->add('roles', ChoiceType::class, [
+                'label' => 'Rôle',
+                'attr' => [
+                    'class' => 'form-control'
+                ],
+                'required' => true,
+                'choices'  => [
+                    'RH' => "ROLE_RH",
+                    'manager' => "ROLE_MANAGER",
+                    'employe' => "ROLE_EMPLOYE",
+                ],
+                'multiple' => false,
+                'expanded' => false,
+                'placeholder' => 'Choisir un rôle',
+            ])
             ->add('photo', FileType::class, [
+                'label' => 'Photo',
+                'attr' => [
+                    'placeholder' => 'Votre photo de profile',
+                    'class' => 'form-control'
+                ],
                 'mapped' => false,
                 'required' => false,
                 'constraints' => [
@@ -64,15 +115,30 @@ class EmployeeFormType extends AbstractType
             ])
 
             ->add('dateEmbauche', DateType::class, [
+                'label' => 'Date embauche',
+                'attr' => [
+                    'placeholder' => 'Date',
+                    'class' => 'form-control'
+                ],
                 'widget' => 'single_text',
                 'required' => false
             ])
 
             ->add('soldeConge', NumberType::class, [
+                'label' => 'Solde congé',
+                'attr' => [
+                    'placeholder' => 'Votre nombre congé',
+                    'class' => 'form-control'
+                ],
                 'required' => false
             ])
 
             ->add('cv', FileType::class, [
+                'label' => 'CV',
+                'attr' => [
+                    'placeholder' => 'Votre Cv en pdf',
+                    'class' => 'form-control'
+                ],
                 'mapped' => false,
                 'required' => false,
                 'constraints' => [
@@ -83,6 +149,15 @@ class EmployeeFormType extends AbstractType
                     )
                 ]
             ]);
+
+            $builder->get('roles')->addModelTransformer(new CallbackTransformer(
+                function ($rolesArray) {
+                    return $rolesArray? $rolesArray[0] : null;
+                },
+                function ($roleString) {
+                    return $roleString? [$roleString] : ['ROLE_USER'];
+                }
+            ));
     }
 
     public function configureOptions(OptionsResolver $resolver): void

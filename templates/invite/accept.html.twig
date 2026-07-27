@@ -3,7 +3,6 @@
 {% block title %}Activer votre compte{% endblock %}
 
 {% block body %}
-<div class="bg-light min-vh-100 d-flex align-items-center py-5">
     <div class="container">
         <!-- Flash Messages -->
         <div>
@@ -33,11 +32,6 @@
                     </div>
                     <h2 class="display-5 fw-bold mb-3">Bienvenue {{ user.prenom }} !</h2>
                     <p class="lead opacity-75">Définissez votre mot de passe pour <strong>{{ user.entreprise.nom }}</strong></p>
-                    <div class="mt-4">
-                        <span class="badge bg-light text-primary me-2 px-3 py-2">Sécurisé</span>
-                        <span class="badge bg-light text-primary me-2 px-3 py-2">Rapide</span>
-                        <span class="badge bg-light text-primary px-3 py-2">Facile</span>
-                    </div>
                 </div>
             </div>
 
@@ -99,22 +93,9 @@
                                 Activer mon compte
                             </button>
                         </div>
-
-                        <div class="col-12">
-                            <hr class="my-2">
-                            <div class="text-center">
-                                <p class="text-muted small mb-0">
-                                    <svg class="me-1" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                                    </svg>
-                                    Compte sécurisé - {{ user.entreprise.nom }}
-                                </p>
-                            </div>
-                        </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

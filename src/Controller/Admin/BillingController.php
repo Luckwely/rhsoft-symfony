@@ -34,7 +34,7 @@ class BillingController extends AbstractController
         $em->flush();
 
         $this->addFlash('success', 'Abonnement activé avec succès!');
-        return $this->redirectToRoute('app_dashboard');
+        return $this->redirectToRoute('app_login');
     }
 
     #[Route('/billing/cancel', name: 'app_billing_cancel')]

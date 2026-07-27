@@ -40,10 +40,17 @@
                 </div>
 
                 {# ADRESSE #}
-                <div class="col-12 mb-3">
+                <div class="col-md-6 mb-3">
                     {{ form_label(form.adresse, 'Adresse', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.adresse, {'attr': {'class': 'form-control', 'rows': 2}}) }}
                     {{ form_errors(form.adresse) }}
+                </div>
+
+                {# ROLE #}
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.roles, 'Roles', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.roles, {'attr': {'class': 'form-control', 'rows': 2}}) }}
+                    {{ form_errors(form.roles) }}
                 </div>
 
                 {# PHOTO #}

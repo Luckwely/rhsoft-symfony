@@ -27,9 +27,9 @@ class EmployeeController extends AbstractController
 
         $queryBuilder = $em->getRepository(User::class)->createQueryBuilder('u')
             ->where('u.entreprise = :entreprise')
-            ->andWhere('u.roles LIKE :role')
+            ->andWhere('u.is_active = :active')
             ->setParameter('entreprise', $entreprise)
-            ->setParameter('role', '%ROLE_EMPLOYE%');
+            ->setParameter('active', true);
 
         // RECHERCHE
         if ($search = $request->query->get('q')) {
@@ -61,18 +61,16 @@ class EmployeeController extends AbstractController
         $admin = $this->getUser();
         $entreprise = $admin->getEntreprise();
 
-        $user = new User(); // 1. Créer l'objet AVANT
-        $form = $this->createForm(EmployeeFormType::class, $user); // 2. Créer le form AVANT
+        $user = new User();
+        $form = $this->createForm(EmployeeFormType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
             // On set ce qui n'est pas dans le form
             $user->setEntreprise($entreprise);
-            $user->setRoles(['ROLE_EMPLOYE']);
             $user->setIsActive(false);
             $user->setIsVerified(false);
-            $user->setStatut('inactif');
 
             // UPLOAD PHOTO
             $photoFile = $form->get('photo')->getData();
@@ -82,7 +80,7 @@ class EmployeeController extends AbstractController
                 $user->setPhoto($newFilename);
             }
 
-            // UPLOAD CV - BUG CORRIGE ICI
+            // UPLOAD CV
             $cvFile = $form->get('cv')->getData();
             if ($cvFile) { // <-- $cvFile pas $photoFile
                 $newFilename = uniqid().'.'.$cvFile->guessExtension();
@@ -95,7 +93,7 @@ class EmployeeController extends AbstractController
             $user->setInvitationToken($token);
             $user->setInvitationExpiresAt(new \DateTimeImmutable('+48 hours'));
 
-            $em->persist($user); // 3. Un seul persist
+            $em->persist($user);
             $em->flush();
 
             // EMAIL
@@ -117,7 +115,7 @@ class EmployeeController extends AbstractController
         }
 
         return $this->render('admin/employee/new.html.twig', [
-            'form' => $form->createView(), // 4. Toujours passer le form
+            'form' => $form->createView(),
         ]);
     }
 
