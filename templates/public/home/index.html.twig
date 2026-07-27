@@ -139,7 +139,7 @@
             <div class="col-lg-6 text-center text-lg-start">
 
                 <h1 class="display-4 fw-bold text-white mb-4" style="animation: slideLeft 1s ease-out;">
-                    RH Soft Pro : La Gestion RH Multi-Entreprise
+                    La Gestion RH Multi-Entreprise
                 </h1>
                 <p class="lead text-white-50 mb-4" style="animation: slideLeft 1s ease-out 0.3s both;">
                     Automatisez la gestion de vos ressources humaines, centralisez toutes vos données et optimisez la productivité de vos équipes en quelques clics.
@@ -148,7 +148,7 @@
                     <a href="{{ path('app_pricing') }}" class="btn btn-light btn-lg px-4 fw-semibold position-relative overflow-hidden">
                         <span class="position-absolute top-0 start-0 w-100 h-100 bg-primary bg-opacity-10"
                               style="transform: translateX(-100%); transition: transform 0.5s ease;"></span>
-                        <i class="bi bi-eye me-2"></i>Voir les Tarifs
+                        <i class="bi bi-tag-fill me-2"></i>Voir les Tarifs
                     </a>
                     <a href="{{ path('app_login') }}" class="btn bg-primary text-white btn-lg px-4">
                         <i class="bi bi-box-arrow-in-right me-2"></i>Se Connecter
@@ -159,66 +159,68 @@
 
             <!-- Right Column - Dashboard Image with Slide Animation -->
             <div class="col-lg-6" style="animation: slideRight 1s ease-out 0.5s both;">
-                <div class="position-relative">
-                    <!-- Main Dashboard Image -->
-                    <div class="bg-white bg-opacity-10 rounded-4 p-3 shadow-lg overflow-hidden"
-                         style="backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);">
-                        <div class="position-relative overflow-hidden rounded-3">
-                           <video autoplay loop muted playsinline;
-                                 alt="Dashboard RH Soft Pro - Gestion des ressources humaines"
-                                 class="img-fluid w-100"
-                                 style="transition: transform 0.6s ease;"
-                                 onmouseover="this.style.transform='scale(1.03)'"
-                                 onmouseout="this.style.transform='scale(1)'">
-                                 <source src="../uploads/home/video_header.mp4" type="video/mp4">
-                            </video>
+                <div class="position-relative px-lg-4">
 
-                           <!-- Animated Overlay Stats -->
-                            <div class="position-absolute top-0 start-0 m-3 rounded-3 p-2 px-3 shadow-lg"
-                                 style="background: rgba(13, 110, 253, 0.25); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); animation: floatStat 3s ease-in-out infinite;">
-                                <div class="d-flex align-items-center gap-2 text-white">
-                                    <i class="bi bi-person-check fs-5 text-info"></i>
-                                    <div>
-                                        <div class="fw-bold text-white" style="font-size: 13px;">+98% Suivi Effectif</div>
-                                        <small class="opacity-75 text-white" style="font-size: 10px;">Collaborateurs Actifs Centralisés</small>
-                                    </div>
-                                </div>
-                            </div>
+                    <!-- Main Dashboard Image Container with Custom Shape & Overflow Hidden -->
+                    <div class="bg-white bg-opacity-10 p-3 shadow-lg"
+                         style="backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16% 84% 77% 23% / 27% 42% 58% 73%; overflow: hidden;">
+                        <div class="position-relative w-100 h-100">
+                           <video autoplay loop muted playsinline
+                                  alt="Dashboard RH Soft Pro - Gestion des ressources humaines"
+                                  class="img-fluid w-100"
+                                  style="transition: transform 0.6s ease; border-radius: 16% 84% 77% 23% / 27% 42% 58% 73%; display: block;"
+                                  onmouseover="this.style.transform='scale(1.03)'"
+                                  onmouseout="this.style.transform='scale(1)'">
+                               <source src="../uploads/home/video_header.mp4" type="video/mp4">
+                           </video>
+                        </div>
+                    </div>
 
-                            <div class="position-absolute top-0 end-0 m-3 rounded-3 p-2 px-3 shadow-lg"
-                                 style="background: rgba(25, 135, 84, 0.25); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); animation: floatStat 3.5s ease-in-out infinite reverse;">
-                                <div class="d-flex align-items-center gap-2 text-white">
-                                    <i class="bi bi-graph-up fs-5 text-success"></i>
-                                    <div>
-                                        <div class="fw-bold text-white" style="font-size: 13px;">Productivité +35%</div>
-                                        <small class="opacity-75 text-white" style="font-size: 10px;">Performance & Automatisation</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="position-absolute bottom-0 start-0 m-3 rounded-3 p-2 px-3 shadow-lg"
-                                 style="background: rgba(255, 193, 7, 0.25); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); animation: floatStat 4s ease-in-out infinite 1s;">
-                                <div class="d-flex align-items-center gap-2 text-white">
-                                    <i class="bi bi-calendar-check fs-5 text-warning"></i>
-                                    <div>
-                                        <div class="fw-bold text-white" style="font-size: 13px;">Gestion en Temps Réel</div>
-                                        <small class="opacity-75 text-white" style="font-size: 10px;">Suivi Fluide des Congés</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="position-absolute bottom-0 end-0 m-3 rounded-3 p-2 px-3 shadow-lg d-none d-md-block"
-                                 style="background: rgba(13, 202, 240, 0.25); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); animation: floatStat 4.5s ease-in-out infinite 2s;">
-                                <div class="d-flex align-items-center gap-2 text-white">
-                                    <i class="bi bi-clock fs-5 text-info"></i>
-                                    <div>
-                                        <div class="fw-bold text-white" style="font-size: 13px;">Zéro Saisie Double</div>
-                                        <small class="opacity-75 text-white" style="font-size: 10px;">Assiduité & Paie Harmonisées</small>
-                                    </div>
-                                </div>
+                    <!-- Animated Overlay Stats (Moved outside overflow-hidden container to prevent clipping) -->
+                    <div class="position-absolute top-0 start-0 m-2 m-lg-4 rounded-3 p-2 px-3 shadow-lg"
+                         style="background: rgba(13, 110, 253, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); animation: floatStat 3s ease-in-out infinite; z-index: 2;">
+                        <div class="d-flex align-items-center gap-2 text-white">
+                            <i class="bi bi-person-check fs-5 text-info"></i>
+                            <div>
+                                <div class="fw-bold text-white text-nowrap" style="font-size: 13px;">+98% Suivi Effectif</div>
+                                <small class="opacity-75 text-white text-nowrap" style="font-size: 10px;">Collaborateurs Actifs Centralisés</small>
                             </div>
                         </div>
                     </div>
+
+                    <div class="position-absolute top-0 end-0 m-2 m-lg-4 rounded-3 p-2 px-3 shadow-lg"
+                         style="background: rgba(25, 135, 84, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); animation: floatStat 3.5s ease-in-out infinite reverse; z-index: 2;">
+                        <div class="d-flex align-items-center gap-2 text-white">
+                            <i class="bi bi-graph-up fs-5 text-success"></i>
+                            <div>
+                                <div class="fw-bold text-white text-nowrap" style="font-size: 13px;">Productivité +35%</div>
+                                <small class="opacity-75 text-white text-nowrap" style="font-size: 10px;">Performance & Automatisation</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="position-absolute bottom-0 start-0 m-2 m-lg-4 rounded-3 p-2 px-3 shadow-lg"
+                         style="background: rgba(255, 193, 7, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); animation: floatStat 4s ease-in-out infinite 1s; z-index: 2;">
+                        <div class="d-flex align-items-center gap-2 text-white">
+                            <i class="bi bi-calendar-check fs-5 text-warning"></i>
+                            <div>
+                                <div class="fw-bold text-white text-nowrap" style="font-size: 13px;">Gestion en Temps Réel</div>
+                                <small class="opacity-75 text-white text-nowrap" style="font-size: 10px;">Suivi Fluide des Congés</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="position-absolute bottom-0 end-0 m-2 m-lg-4 rounded-3 p-2 px-3 shadow-lg d-none d-md-block"
+                         style="background: rgba(13, 202, 240, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); animation: floatStat 4.5s ease-in-out infinite 2s; z-index: 2;">
+                        <div class="d-flex align-items-center gap-2 text-white">
+                            <i class="bi bi-clock fs-5 text-info"></i>
+                            <div>
+                                <div class="fw-bold text-white text-nowrap" style="font-size: 13px;">Zéro Saisie Double</div>
+                                <small class="opacity-75 text-white text-nowrap" style="font-size: 10px;">Assiduité & Paie Harmonisées</small>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

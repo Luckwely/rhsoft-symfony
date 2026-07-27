@@ -1,11 +1,10 @@
 <!-- NAVBAR -->
-<nav id="navbar" class="navbar navbar-expand-lg navbar-light shadow" style="background: transparent; box-shadow: rgba(243, 243, 243, 0.08) 0px 5px 15px;">
+<nav class="navbar bg-primary navbar-expand-lg navbar-light shadow" style=" box-shadow: rgba(243, 243, 243, 0.08) 0px 5px 15px;">
     <div class="container">
 
         <!-- LOGO -->
-        <a class="navbar-brand d-flex align-items-center fw-bold fs-4 text-primary" href="{{ path("app_home") }}">
-            <i class="bi bi-buildings-fill me-2 fs-3"></i>
-            RH Soft Pro
+        <a class="" href="{{ path("app_home") }}">
+            <img src="../uploads/home/logo.png" alt="Logo RH Soft Pro" width="auto" height="50" style="object-fit: cover;">
         </a>
 
         <!-- TOGGLER MOBILE -->
@@ -38,10 +37,10 @@
             <!-- BOUTONS DROITE -->
             <div class="d-flex flex-column flex-lg-row gap-2">
                 <a href="{{ path('app_login') }}" class="btn bg-white text-primary">
-                    <i class="bi bi-box-arrow-in-right me-1"></i>Connexion
+                    <i class="bi bi-person-circle me-1"></i>Connexion
                 </a>
-                <a href="{{ path('app_register') }}" class="btn btn-primary">
-                    <i class="bi bi-rocket-takeoff me-1"></i>Essai Gratuit
+                <a href="{{ path('app_register') }}" class="btn btn-outline-light">
+                    <i class="bi bi-gift-fill me-1"></i>Essai Gratuit
                 </a>
             </div>
         </div>
