@@ -4,6 +4,16 @@
 
 {% block body %}
 <div class="container-fluid px-4 py-3">
+    <!-- Flash Messages -->
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label == 'error' ? 'danger' : 'success' }} alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+                <i class="bi {{ label == 'error' ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill' }} me-2"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
     <!-- 1. HEADER -->
     <div class="mb-4">
         <h3 class="fw-bold mb-1">
@@ -50,10 +60,11 @@
                             <small class="text-muted">Modifiez les informations de votre entreprise</small>
                         </div>
                         <div class="card-body">
-                            <form class="row g-3">
+                            <form method="POST" class="row g-3">
+                                <input type="hidden" name="action_type" value="entreprise">
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">Nom de l'entreprise</label>
-                                    <input type="text" class="form-control" value="RH Soft Pro">
+                                    <input type="text" name="nom" class="form-control" value="{{ entreprise.nom }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">Logo</label>
@@ -62,41 +73,21 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">Adresse</label>
-                                    <input type="text" class="form-control" value="Antananarivo, Madagascar">
+                                    <input type="text" name="adresse" class="form-control" value="{{ entreprise.adresse }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">Téléphone</label>
-                                    <input type="text" class="form-control" value="+261 34 12 345 67">
+                                    <input type="text" name="telephone" class="form-control" value="{{ entreprise.tel }}">
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-6">
                                     <label class="form-label fw-semibold">NIF</label>
-                                    <input type="text" class="form-control" value="123456789">
+                                    <input type="text" name="nif" class="form-control" value="{{ entreprise.nif }}">
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label fw-semibold">STAT</label>
-                                    <input type="text" class="form-control" value="98765">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label fw-semibold">RCS</label>
-                                    <input type="text" class="form-control" value="RCS 2025 B 12345">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label fw-semibold">Code Postal</label>
-                                    <input type="text" class="form-control" value="101">
-                                </div>
-                                <div class="col-md-12">
-                                    <label class="form-label fw-semibold">Devise</label>
-                                    <select class="form-select">
-                                        <option value="EUR" selected>Euro (€)</option>
-                                        <option value="USD">Dollar ($)</option>
-                                        <option value="MGA">Ariary (Ar)</option>
-                                    </select>
-                                </div>
-                                <div class="col-12">
-                                    <button class="btn btn-primary">
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn btn-primary">
                                         <i class="bi bi-check2 me-1"></i>Enregistrer
                                     </button>
-                                    <button class="btn btn-outline-secondary ms-2">
+                                    <button type="reset" class="btn btn-outline-secondary ms-2">
                                         <i class="bi bi-arrow-counterclockwise me-1"></i>Annuler
                                     </button>
                                 </div>
@@ -114,14 +105,12 @@
                                 <h5 class="fw-bold mb-0">
                                     <i class="bi bi-people text-primary me-2"></i>Utilisateurs
                                 </h5>
-                                <small class="text-muted">Gérez les accès à la plateforme</small>
+                                <small class="text-muted">Gérez les accès et les statuts des comptes</small>
                             </div>
-                            <button class="btn btn-primary btn-sm">
-                                <i class="bi bi-person-plus me-1"></i>Inviter
-                            </button>
                         </div>
                         <div class="card-body p-0">
-                            <div class="table-responsive">
+                            <!-- Added overflow-visible to prevent clipping dropdowns -->
+                            <div class="table-responsive overflow-visible" style="min-height: 300px;">
                                 <table class="table table-hover align-middle table-borderless mb-0">
                                     <thead class="bg-light">
                                         <tr>
@@ -133,96 +122,70 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td class="ps-3">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <div class="bg-danger-subtle text-danger rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 12px;">AD</div>
-                                                    <span class="fw-semibold">Admin</span>
-                                                </div>
-                                            </td>
-                                            <td>admin@rhsoft.com</td>
-                                            <td><span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">Admin</span></td>
-                                            <td><span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">Actif</span></td>
-                                            <td class="text-center pe-3">
-                                                <button class="btn btn-sm btn-light border-0">
-                                                    <i class="bi bi-three-dots-vertical"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="ps-3">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 12px;">MR</div>
-                                                    <span class="fw-semibold">Manager RH</span>
-                                                </div>
-                                            </td>
-                                            <td>rh@rhsoft.com</td>
-                                            <td><span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">Manager</span></td>
-                                            <td><span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">Actif</span></td>
-                                            <td class="text-center pe-3">
-                                                <button class="btn btn-sm btn-light border-0">
-                                                    <i class="bi bi-three-dots-vertical"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="ps-3">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <div class="bg-warning-subtle text-warning rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 12px;">JD</div>
-                                                    <span class="fw-semibold">Jean Dupont</span>
-                                                </div>
-                                            </td>
-                                            <td>jean.dupont@rhsoft.com</td>
-                                            <td><span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">Employé</span></td>
-                                            <td><span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">En attente</span></td>
-                                            <td class="text-center pe-3">
-                                                <button class="btn btn-sm btn-light border-0">
-                                                    <i class="bi bi-three-dots-vertical"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
+                                        {% for u in users %}
+                                            {# Ajustez selon la propriété réelle de votre entité User (ex: isSuspended ou isActive) #}
+                                            {% set isSuspended = u.isSuspended is defined ? u.isSuspended : (u.isActive is defined ? not u.isActive : false) %}
+                                            <tr>
+                                                <td class="ps-3">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 12px;">
+                                                            {{ u.email|slice(0, 2)|upper }}
+                                                        </div>
+                                                        <span class="fw-semibold">{{ u.email|split('@')[0]|capitalize }}</span>
+                                                    </div>
+                                                </td>
+                                                <td>{{ u.email }}</td>
+                                                <td>
+                                                    <!-- Inline Role Form -->
+                                                    <form action="{{ path('admin_user_update_role', {id: u.id}) }}" method="POST" class="d-flex align-items-center gap-2">
+                                                        <input type="hidden" name="token" value="{{ csrf_token('role_user_' ~ u.id) }}">
+                                                        <select name="role" class="form-select form-select-sm rounded-pill px-3" onchange="this.form.submit()">
+                                                            <option value="ROLE_EMPLOYE" {% if 'ROLE_EMPLOYE' in u.roles and 'ROLE_ADMIN' not in u.roles %}selected{% endif %}>Agent</option>
+                                                            <option value="ROLE_MANAGER" {% if 'ROLE_MANAGER' in u.roles %}selected{% endif %}>Manager</option>
+                                                            <option value="ROLE_RH" {% if 'ROLE_RH' in u.roles %}selected{% endif %}>RH</option>
+                                                            <option value="ROLE_ADMIN" {% if 'ROLE_ADMIN' in u.roles %}selected{% endif %}>Admin</option>
+                                                        </select>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    {% if isSuspended %}
+                                                        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">Suspendu</span>
+                                                    {% else %}
+                                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">Actif</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="text-center pe-3">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-light border-0 shadow-none" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false">
+                                                            <i class="bi bi-three-dots-vertical"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 py-2">
+                                                            <li>
+                                                                <form action="{{ path('admin_user_toggle_suspend', {id: u.id}) }}" method="POST">
+                                                                    <input type="hidden" name="token" value="{{ csrf_token('suspend_user_' ~ u.id) }}">
+                                                                    {% if isSuspended %}
+                                                                        <button type="submit" class="dropdown-item py-2 text-success">
+                                                                            <i class="bi bi-check-circle me-2"></i>Activer le compte
+                                                                        </button>
+                                                                    {% else %}
+                                                                        <button type="submit" class="dropdown-item py-2 text-danger">
+                                                                            <i class="bi bi-slash-circle me-2"></i>Suspendre le compte
+                                                                        </button>
+                                                                    {% endif %}
+                                                                </form>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted py-3">Aucun utilisateur trouvé pour cette entreprise.</td>
+                                            </tr>
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Permissions des rôles -->
-                    <div class="card border-0 shadow-sm rounded-4">
-                        <div class="card-header bg-transparent border-0">
-                            <h5 class="fw-bold mb-0">
-                                <i class="bi bi-shield-check text-primary me-2"></i>Permissions des Rôles
-                            </h5>
-                            <small class="text-muted">Définissez les droits de chaque rôle</small>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" checked>
-                                <label class="form-check-label fw-semibold">Manager peut valider les congés</label>
-                                <br>
-                                <small class="text-muted">Les managers peuvent approuver ou refuser les demandes de congé</small>
-                            </div>
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox">
-                                <label class="form-check-label fw-semibold">Employé peut voir le salaire des autres</label>
-                                <br>
-                                <small class="text-muted">Permet aux employés de consulter les informations salariales</small>
-                            </div>
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" checked>
-                                <label class="form-check-label fw-semibold">Manager peut modifier les plannings</label>
-                                <br>
-                                <small class="text-muted">Les managers peuvent créer et modifier les plannings des équipes</small>
-                            </div>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" checked>
-                                <label class="form-check-label fw-semibold">Employé peut demander des congés</label>
-                                <br>
-                                <small class="text-muted">Les employés peuvent soumettre des demandes de congé</small>
-                            </div>
-                            <button class="btn btn-primary mt-3">
-                                <i class="bi bi-check2 me-1"></i>Enregistrer les permissions
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -237,56 +200,17 @@
                             <small class="text-muted">Configurez les horaires et règles de pointage</small>
                         </div>
                         <div class="card-body">
-                            <form class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Heure Début Standard</label>
-                                    <input type="time" class="form-control" value="08:00">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Heure Fin Standard</label>
-                                    <input type="time" class="form-control" value="17:00">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Durée Pause Déjeuner</label>
-                                    <input type="time" class="form-control" value="01:00">
-                                </div>
+                            <form method="POST" class="row g-3">
+                                <input type="hidden" name="action_type" value="pointage">
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">Tolérance Retard</label>
                                     <div class="input-group">
-                                        <input type="number" class="form-control" value="15">
+                                        <input type="number" name="tolerance_retard" class="form-control" value="{{ entreprise.toleranceRetard }}">
                                         <span class="input-group-text">minutes</span>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Nombre de jours par semaine</label>
-                                    <select class="form-select">
-                                        <option value="5" selected>5 jours (Lun-Ven)</option>
-                                        <option value="6">6 jours (Lun-Sam)</option>
-                                        <option value="7">7 jours</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Heures par jour</label>
-                                    <input type="number" class="form-control" value="8">
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" checked>
-                                        <label class="form-check-label fw-semibold">Activer la géolocalisation</label>
-                                        <br>
-                                        <small class="text-muted">Les employés devront partager leur position lors du pointage</small>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox">
-                                        <label class="form-check-label fw-semibold">Autoriser le pointage mobile</label>
-                                        <br>
-                                        <small class="text-muted">Les employés peuvent pointer depuis l'application mobile</small>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <button class="btn btn-primary">
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn btn-primary">
                                         <i class="bi bi-check2 me-1"></i>Enregistrer
                                     </button>
                                 </div>
@@ -302,197 +226,19 @@
                             <h5 class="fw-bold mb-0">
                                 <i class="bi bi-calendar-check text-primary me-2"></i>Règles de Congés
                             </h5>
-                            <small class="text-muted">Configurez les règles de gestion des congés</small>
+                            <small class="text-muted">Configurez les types de congés associés</small>
                         </div>
                         <div class="card-body">
-                            <form class="row g-3">
-                                <div class="col-md-4">
-                                    <label class="form-label fw-semibold">Jours Congés Payés / An</label>
-                                    <input type="number" class="form-control" value="25">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-semibold">Jours RTT / An</label>
-                                    <input type="number" class="form-control" value="10">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-semibold">Report Max</label>
-                                    <input type="number" class="form-control" value="5">
-                                    <small class="text-muted">jours maximum reportés</small>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Délai de validation (jours)</label>
-                                    <input type="number" class="form-control" value="48">
-                                    <small class="text-muted">heures pour valider une demande</small>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Période d'acquisition</label>
-                                    <select class="form-select">
-                                        <option value="annuel" selected>Annuel (Janvier-Décembre)</option>
-                                        <option value="semestriel">Semestriel</option>
-                                        <option value="trimestriel">Trimestriel</option>
-                                    </select>
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" checked>
-                                        <label class="form-check-label fw-semibold">Autoriser les reports</label>
-                                        <br>
-                                        <small class="text-muted">Les employés peuvent reporter leurs jours non utilisés</small>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox">
-                                        <label class="form-check-label fw-semibold">Validation automatique pour les managers</label>
-                                        <br>
-                                        <small class="text-muted">Les demandes des managers sont validées automatiquement</small>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <button class="btn btn-primary">
-                                        <i class="bi bi-check2 me-1"></i>Enregistrer
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ONGLET 5: NOTIFICATIONS -->
-                <div class="tab-pane fade" id="notifications">
-                    <div class="card border-0 shadow-sm rounded-4">
-                        <div class="card-header bg-transparent border-0">
-                            <h5 class="fw-bold mb-0">
-                                <i class="bi bi-bell text-primary me-2"></i>Préférences Email
-                            </h5>
-                            <small class="text-muted">Configurez les notifications par email</small>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" checked>
-                                <label class="form-check-label fw-semibold">Nouvelle demande de congé</label>
-                                <br>
-                                <small class="text-muted">Notifications lorsqu'un employé soumet une demande</small>
-                            </div>
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" checked>
-                                <label class="form-check-label fw-semibold">Employé en retard</label>
-                                <br>
-                                <small class="text-muted">Alertes lorsqu'un employé est en retard</small>
-                            </div>
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox">
-                                <label class="form-check-label fw-semibold">Rapport hebdomadaire</label>
-                                <br>
-                                <small class="text-muted">Reçu chaque lundi avec les indicateurs clés</small>
-                            </div>
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" checked>
-                                <label class="form-check-label fw-semibold">Validation de pointage</label>
-                                <br>
-                                <small class="text-muted">Confirmation lors de la validation des pointages</small>
-                            </div>
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox">
-                                <label class="form-check-label fw-semibold">Annonces RH</label>
-                                <br>
-                                <small class="text-muted">Communications importantes du service RH</small>
-                            </div>
-                            <button class="btn btn-primary mt-2">
-                                <i class="bi bi-check2 me-1"></i>Enregistrer
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ONGLET 6: INTEGRATIONS -->
-                <div class="tab-pane fade" id="integrations">
-                    <div class="card border-0 shadow-sm rounded-4">
-                        <div class="card-header bg-transparent border-0">
-                            <h5 class="fw-bold mb-0">
-                                <i class="bi bi-plug text-primary me-2"></i>Intégrations
-                            </h5>
-                            <small class="text-muted">Connectez vos applications préférées</small>
-                        </div>
-                        <div class="card-body">
-                            <!-- Google Calendar -->
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
-                                <div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="bg-danger-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                            <i class="bi bi-google text-danger fs-4"></i>
-                                        </div>
-                                        <div>
-                                            <div class="fw-semibold">Google Calendar</div>
-                                            <small class="text-muted">Synchronisez les congés avec Google Calendar</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-link me-1"></i>Connecter
-                                </button>
-                            </div>
-
-                            <!-- Slack -->
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
-                                <div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                            <i class="bi bi-slack text-primary fs-4"></i>
-                                        </div>
-                                        <div>
-                                            <div class="fw-semibold">Slack</div>
-                                            <small class="text-muted">Recevez les notifications RH sur Slack</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
-                                    <i class="bi bi-check-circle me-1"></i>Connecté
-                                </span>
-                            </div>
-
-                            <!-- Microsoft Teams -->
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
-                                <div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="bg-info-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                            <i class="bi bi-microsoft-teams text-info fs-4"></i>
-                                        </div>
-                                        <div>
-                                            <div class="fw-semibold">Microsoft Teams</div>
-                                            <small class="text-muted">Intégration avec Teams pour les notifications</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-link me-1"></i>Connecter
-                                </button>
-                            </div>
-
-                            <!-- Zapier -->
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="bg-warning-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                            <i class="bi bi-zap text-warning fs-4"></i>
-                                        </div>
-                                        <div>
-                                            <div class="fw-semibold">Zapier</div>
-                                            <small class="text-muted">Automatisez vos workflows RH</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-link me-1"></i>Connecter
-                                </button>
-                            </div>
-
-                            <div class="mt-3 pt-3 border-top">
-                                <small class="text-muted">
-                                    <i class="bi bi-shield-check me-1"></i>
-                                    Les connexions sont sécurisées via OAuth 2.0
-                                </small>
-                            </div>
+                            <p class="text-muted mb-3">Les types de congés de votre entreprise sont gérés dynamiquement via le module dédié.</p>
+                            <ul class="list-group">
+                                {% for conge in entreprise.typeConge %}
+                                    <li class="list-group-item border-0 bg-light mb-2 rounded-3">
+                                        <i class="bi bi-check-circle text-success me-2"></i>{{ conge.libelle ?? 'Congé' }}
+                                    </li>
+                                {% else %}
+                                    <li class="list-group-item border-0 text-muted">Aucun type de congé configuré pour le moment.</li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     </div>
                 </div>

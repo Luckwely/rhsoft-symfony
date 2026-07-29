@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Conge;
+use App\Entity\Entreprise;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +18,40 @@ class CongeRepository extends ServiceEntityRepository
         parent::__construct($registry, Conge::class);
     }
 
-    //    /**
-    //     * @return Conge[] Returns an array of Conge objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Find all leaves for a given enterprise, optionally filtered by status.
+     * Useful for Admin and RH dashboards.
+     *
+     * @return Conge[]
+     */
+    public function findByEntrepriseAndStatus(Entreprise $entreprise, ?string $statut = null): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->andWhere('c.entreprise = :entreprise')
+            ->setParameter('entreprise', $entreprise)
+            ->orderBy('c.createdAt', 'DESC');
 
-    //    public function findOneBySomeField($value): ?Conge
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if ($statut) {
+            $qb->andWhere('c.statut = :statut')
+               ->setParameter('statut', $statut);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Find all leaves submitted by a specific employee.
+     * Useful for Agents viewing their own requests.
+     *
+     * @return Conge[]
+     */
+    public function findByEmployee(User $employee): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.employee = :employee')
+            ->setParameter('employee', $employee)
+            ->orderBy('c.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

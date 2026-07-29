@@ -73,6 +73,9 @@ class Entreprise
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $moduleRh = false;
 
+    #[ORM\Column(type: 'integer', options: ['default' => 15])]
+    private ?int $toleranceRetard = 15;
+
     /**
      * @var Collection<int, Conge>
      */
@@ -83,6 +86,17 @@ class Entreprise
     {
         $this->users = new ArrayCollection();
         $this->typeConge = new ArrayCollection();
+    }
+
+    public function getToleranceRetard(): ?int
+    {
+        return $this->toleranceRetard;
+    }
+
+    public function setToleranceRetard(?int $toleranceRetard): static
+    {
+        $this->toleranceRetard = $toleranceRetard;
+        return $this;
     }
 
     public function isModulePaie(): bool {

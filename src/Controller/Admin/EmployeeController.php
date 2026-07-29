@@ -240,4 +240,36 @@ class EmployeeController extends AbstractController
         }
         return $this->redirectToRoute('app_admin_employee');
     }
+
+    #[Route('/employees/{id}/update-role', name: 'admin_user_update_role', methods: ['POST'])]
+    public function updateRole(Request $request, User $user, EntityManagerInterface $em): Response
+    {
+        // Multi-tenant security check
+        if ($user->getEntreprise() !== $this->getUser()->getEntreprise()) {
+            throw $this->createAccessDeniedException('Cet employé n\'appartient pas à votre entreprise.');
+        }
+
+        // CSRF Token validation
+        $token = $request->request->get('token');
+        if (!$this->isCsrfTokenValid('role_user_' . $user->getId(), $token)) {
+            $this->addFlash('danger', 'Jeton CSRF invalide.');
+            return $this->redirectToRoute('app_admin_employee'); // Or your settings route name
+        }
+
+        $newRole = $request->request->get('role');
+        $allowedRoles = ['ROLE_EMPLOYE', 'ROLE_MANAGER', 'ROLE_RH', 'ROLE_ADMIN'];
+
+        if (in_array($newRole, $allowedRoles)) {
+            // Update the array-based role property
+            $user->setRoles([$newRole]);
+            $em->flush();
+
+            $this->addFlash('success', 'Rôle mis à jour avec succès.');
+        } else {
+            $this->addFlash('danger', 'Rôle non valide.');
+        }
+
+        // Redirect back to wherever your users table is displayed (e.g., settings or employee list)
+        return $this->redirectToRoute('app_admin_employee');
+    }
 }
