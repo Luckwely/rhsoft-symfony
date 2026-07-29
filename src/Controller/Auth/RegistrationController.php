@@ -49,7 +49,7 @@ class RegistrationController extends AbstractController
             $entreprise->setTel($form->get('tel_entreprise')->getData());
             $entreprise->setEmail($user->getEmail());
 
-            // 2. SET PLAN BASED ON WHAT USER CLICKED
+  
             if ($plan === 'essai') {
                 $entreprise->setStatus('trial');
                 $entreprise->setPlan('essai');

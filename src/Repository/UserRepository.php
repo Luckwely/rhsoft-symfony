@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Entity\Entreprise; 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -52,6 +53,19 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         $qb->orderBy('u.createdAt', 'DESC'); // u.createdAt existe dans ton Entity
         return $qb->getQuery();
+    }
+
+    public function findDistinctServices(Entreprise $entreprise): array
+    {
+        return $this->createQueryBuilder('u')
+            ->select('u.service')
+            ->distinct()
+            ->where('u.entreprise = :entreprise')
+            ->andWhere('u.service IS NOT NULL')
+            ->setParameter('entreprise', $entreprise)
+            ->orderBy('u.service', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
     }
 
     //    /**

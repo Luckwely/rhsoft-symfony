@@ -26,7 +26,7 @@ class InviteController extends AbstractController
         }
 
         if ($this->getUser()) {
-            return $this->redirectToRoute('app_dashboard');
+            return $this->redirectToRoute('app_admin_dashboard');
         }
 
         if ($user->isActive()) {

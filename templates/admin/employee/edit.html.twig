@@ -5,7 +5,7 @@
     <div class="card shadow-sm">
         <div class="card-header d-flex justify-content-between">
             <h3 class="mb-0">Modifier Employé: {{ employee.prenom }} {{ employee.nom }}</h3>
-            <a href="{{ path('app_employee_list') }}" class="btn btn-secondary btn-sm">
+            <a href="{{ path('app_admin_employee') }}" class="btn btn-secondary btn-sm">
                 <i class="bi bi-arrow-left"></i> Retour
             </a>
         </div>
@@ -82,7 +82,7 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-save"></i> Mettre à jour
                 </button>
-                <a href="{{ path('app_employee_list') }}" class="btn btn-secondary">Annuler</a>
+                <a href="{{ path('app_admin_employee') }}" class="btn btn-secondary">Annuler</a>
             </div>
             {{ form_end(form) }}
         </div>

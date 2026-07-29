@@ -7,8 +7,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/super-admin')] // Prefix
-#[IsGranted('ROLE_SUPER_ADMIN')] // Verrou
+#[Route('/super-admin')]
+#[IsGranted('ROLE_SUPER_ADMIN')]
 final class DashboardController extends AbstractController
 {
     #[Route('/dashboard', name: 'app_super_admin_dashboard')]

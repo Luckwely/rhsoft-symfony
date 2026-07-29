@@ -8,33 +8,34 @@
 
 <!-- Navigation Menu -->
 <nav class="nav nav-pills flex-column mb-auto gap-1">
+    {% set current_route = app.request.attributes.get('_route') %}
     <a href="{{ path('app_admin_dashboard') }}"
-        class="nav-link {% if app.request.attributes.get('_route') == 'app_admin_dashboard' %}active{% endif %}">
+        class="nav-link {% if 'app_admin_dashboard' in current_route %}active{% endif %}">
         <i class="bi bi-speedometer2 me-2"></i>
         Tableau de bord
     </a>
-    <a href="{{ path('app_employee_list') }}"
-        class="nav-link {% if app.request.attributes.get('_route') == 'app_employee_list' %}active{% endif %}">
+    <a href="{{ path('app_admin_employee') }}"
+        class="nav-link {% if 'app_admin_employee' in current_route %}active{% endif %}">
         <i class="bi bi-people me-2"></i>
         Employés
     </a>
-    <a href="{{ path('app_employee_planning') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_employee_planning' %}active{% endif %}">
+    <a href="{{ path('app_admin_planning') }}" class="nav-link {% if 'app_admin_planning' in current_route %}active{% endif %}">
         <i class="bi bi-calendar-week me-2"></i>
         Planning
     </a>
-    <a href="{{ path('app_admin_pointage') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_admin_pointage' %}active{% endif %}">
+    <a href="{{ path('app_admin_pointage') }}" class="nav-link {% if 'app_admin_pointage' in current_route %}active{% endif %}">
         <i class="bi bi-qr-code me-2"></i>
         Pointage
     </a>
-    <a href="{{ path('app_admin_conge') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_admin_conge' %}active{% endif %}">
+    <a href="{{ path('app_admin_conge') }}" class="nav-link {% if 'app_admin_conge' in current_route %}active{% endif %}">
         <i class="bi bi-calendar-check me-2"></i>
         Congés
     </a>
-    <a href="{{ path('app_admin_reporting') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_admin_reporting' %}active{% endif %}">
+    <a href="{{ path('app_admin_reporting') }}" class="nav-link {% if 'app_admin_reporting' in current_route %}active{% endif %}">
         <i class="bi bi-graph-up-arrow me-2"></i>
         Reporting
     </a>
-    <a href="{{ path('app_admin_parametre') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_admin_parametre' %}active{% endif %}">
+    <a href="{{ path('app_admin_parametre') }}" class="nav-link {% if 'app_admin_parametre' in current_route %}active{% endif %}">
         <i class="bi bi-gear me-2"></i>
         Paramètres
     </a>

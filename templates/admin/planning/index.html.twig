@@ -1,410 +1,138 @@
 {% extends 'layouts/base_admin.html.twig' %}
-
 {% block title %}Planning de l'équipe{% endblock %}
-
 {% block body %}
 <div class="container-fluid px-4 py-3">
+
+    <div class="card border-0 bg-light rounded-4 shadow-sm mb-3 p-3">
+        <form method="GET" action="{{ path('app_admin_planning') }}" class="">
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+                <input type="text" name="q" value="{{ search }}" placeholder="Rechercher employé..." class="form-control" style="max-width: 250px;">
+                <select name="role" class="form-select" style="max-width: 200px;">
+                    <option value="">Tous les rôles</option>
+                    <option value="ROLE_ADMIN" {{ role=='ROLE_ADMIN'?'selected' }}>Admin</option>
+                    <option value="ROLE_RH" {{ role=='ROLE_RH'?'selected' }}>RH</option>
+                    <option value="ROLE_MANAGER" {{ role=='ROLE_MANAGER'?'selected' }}>Manager</option>
+                    <option value="ROLE_EMPLOYE" {{ role=='ROLE_EMPLOYE'?'selected' }}>Agent</option>
+                </select>
+                <button class="btn btn-primary btn-sm"><i class="bi bi-search"></i> Filtrer</button>
+            </div>
+        </form>
+    </div>
+
+<form method="POST" action="{{ path('app_admin_planning_save') }}">
+    <input type="hidden" name="week_start" value="{{ weekStart|date('Y-m-d') }}">
+
     <!-- HEADER -->
-    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="fw-bold mb-1">
-                Planning de l'équipe
-            </h3>
+            <h3 class="fw-bold mb-1">Planning de l'équipe ({{ employees.getTotalItemCount }})</h3>
             <p class="text-muted mb-0">
-                <i class="bi bi-calendar3 me-1"></i>Semaine 42 - 14 au 20 Oct 2025
+                <i class="bi bi-calendar3 me-1"></i>
+                Semaine {{ weekStart|date('W') }} - {{ weekStart|date('d M') }} au {{ weekStart|date_modify('+6 days')|date('d M Y') }}
+                {% if not canEdit %}<span class="badge bg-danger ms-2">Lecture seule - Semaine passée</span>{% endif %}
             </p>
         </div>
-        <div class="d-flex gap-2 mt-3 mt-lg-0 flex-wrap">
-            <div class="btn-group" role="group">
-                <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-chevron-left"></i></button>
-                <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-calendar2-week me-1"></i>Aujourd'hui</button>
-                <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-chevron-right"></i></button>
-            </div>
-            <button class="btn btn-outline-dark btn-sm"><i class="bi bi-download me-1"></i>Exporter</button>
-            <a href="" class="btn btn-primary btn-sm">
-                <i class="bi bi-plus-lg me-1"></i>Nouveau Shift
+        <div class="d-flex gap-2">
+            <a href="{{ path('app_admin_planning', {week: prevWeek|date('Y-m-d'), q: search, role: role}) }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-chevron-left"></i>
             </a>
+            <a href="{{ path('app_admin_planning', {q: search, role: role}) }}" class="btn btn-outline-secondary btn-sm">
+                Aujourd'hui
+            </a>
+            <a href="{{ path('app_admin_planning', {week: nextWeek|date('Y-m-d'), q: search, role: role}) }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+            {% if canEdit %}
+                <button type="submit" class="btn btn-success btn-sm">
+                    <i class="bi bi-save me-1"></i>Enregistrer
+                </button>
+            {% endif %}
         </div>
+
     </div>
 
-    <!-- FILTRES -->
-    <div class="card border-0 bg-light rounded-4 shadow-sm mb-4">
-        <div class="card-body d-flex flex-wrap gap-3 align-items-center">
-            <select class="form-select" style="max-width: 200px;">
-                <option value="">Tous les services</option>
-                <option value="tech">Tech</option>
-                <option value="commercial">Commercial</option>
-                <option value="rh">RH</option>
-                <option value="compta">Compta</option>
-            </select>
-            <select class="form-select" style="max-width: 200px;">
-                <option value="">Tous les statuts</option>
-                <option value="present">Présent</option>
-                <option value="absent">Absent</option>
-                <option value="conges">En congé</option>
-            </select>
-            <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-printer me-1"></i>Imprimer</button>
-            <span class="ms-auto text-muted small"><i class="bi bi-people me-1"></i>3 employés</span>
-        </div>
-    </div>
-
-    <!-- TABLEAU PLANNING AVEC JOURS ET HEURES -->
+    <!-- TABLEAU -->
     <div class="card border-0 shadow-sm rounded-4">
-        <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
-            <table class="table table-bordered align-middle mb-0" style="border-color: #d0d5dd; font-size: 12px; min-width: 700px;">
-                <thead class="bg-light sticky-top" style="top: 0; z-index: 10;">
-                    <tr>
-                        <th style="width: 100px; min-width: 100px;" class="bg-white border-2 ps-2 py-2">
-                            <i class="bi bi-person-circle text-muted me-1"></i>Employé
-                        </th>
-                        <th style="width: 70px; min-width: 70px;" class="text-center border-2 py-2">Shift</th>
-                        <th style="width: 55px; min-width: 55px;" class="text-center border-2 py-2">Pause</th>
-                        {% for day in ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'] %}
-                            <th style="width: 45px; min-width: 45px; padding: 2px 2px;" class="text-center border-2 py-1">
-                                <span style="font-size: 8px;">{{ day }}</span>
-                            </th>
-                        {% endfor %}
-                        <th style="width: 50px; min-width: 50px;" class="text-center border-2 py-2">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- JEAN DUPONT -->
-                    <tr>
-                        <td class="bg-white ps-2 border-2">
-                            <div class="d-flex align-items-center gap-1">
-                                <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center" style="width:28px;height:28px;font-size:10px">JD</div>
-                                <div>
-                                    <div class="fw-semibold" style="font-size:10px;">Jean Dupont</div>
-                                    <div class="text-muted" style="font-size:8px;">Tech</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="text-center border-2">
-                            <select class="form-select form-select-sm border-0 bg-light text-center" style="font-size:9px; padding:2px 2px; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="08:00-17:00" selected>08:00-17:00</option>
-                                <option value="09:00-18:00">09:00-18:00</option>
-                                <option value="10:00-19:00">10:00-19:00</option>
-                                <option value="06:00-15:00">06:00-15:00</option>
-                                <option value="13:00-22:00">13:00-22:00</option>
-                                <option value="Repos">Repos</option>
-                                <option value="Congé">Congé</option>
-                            </select>
-                        </td>
-                        <td class="text-center border-2">
-                            <input type="text" class="form-control form-control-sm border-0 bg-light text-center" value="1h" style="font-size:9px; padding:1px 2px; width:100%;">
-                        </td>
-                        <!-- Lundi -->
-                        <td class="text-center border-1 p-0 bg-success-subtle">
-                            <select class="form-select form-select-sm border-0 bg-success-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#198754; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail" selected>T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                            </select>
-                        </td>
-                        <!-- Mardi -->
-                        <td class="text-center border-1 p-0 bg-success-subtle">
-                            <select class="form-select form-select-sm border-0 bg-success-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#198754; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail" selected>T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                            </select>
-                        </td>
-                        <!-- Mercredi -->
-                        <td class="text-center border-1 p-0 bg-success-subtle">
-                            <select class="form-select form-select-sm border-0 bg-success-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#198754; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail" selected>T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                            </select>
-                        </td>
-                        <!-- Jeudi -->
-                        <td class="text-center border-1 p-0 bg-success-subtle">
-                            <select class="form-select form-select-sm border-0 bg-success-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#198754; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail" selected>T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                            </select>
-                        </td>
-                        <!-- Vendredi -->
-                        <td class="text-center border-1 p-0 bg-success-subtle">
-                            <select class="form-select form-select-sm border-0 bg-success-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#198754; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail" selected>T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                            </select>
-                        </td>
-                        <!-- Samedi -->
-                        <td class="text-center border-1 p-0 bg-warning-subtle">
-                            <select class="form-select form-select-sm border-0 bg-warning-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#ffc107; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail">T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                                <option value="Repos" selected>R</option>
-                            </select>
-                        </td>
-                        <!-- Dimanche -->
-                        <td class="text-center border-1 p-0 bg-warning-subtle">
-                            <select class="form-select form-select-sm border-0 bg-warning-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#ffc107; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail">T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                                <option value="Repos" selected>R</option>
-                            </select>
-                        </td>
-                        <td class="text-center fw-bold text-primary border-2" style="font-size:10px;">40h</td>
-                    </tr>
+    <div class="table-responsive">
+    <table class="table table-bordered align-middle mb-0" style="font-size: 12px;">
+        <thead class="bg-light">
+            <tr>
+                <th style="width: 150px;">Employé</th>
+                {% for day in days %}<th class="text-center">{{ day|slice(0,3)|capitalize }}</th>{% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for employe in employees %}
+        <tr>
+            <td class="fw-semibold">{{ employe.prenom }} {{ employe.nom }}</td>
+            {% for day in days %}
+                {% set p = planningMap[employe.id][day]?? null %}
+                <td class="p-1 {{ not canEdit? 'bg-light' }}">
+                    <div class="d-flex flex-column gap-1">
 
-                    <!-- MARIE MARTIN -->
-                    <tr>
-                        <td class="bg-white ps-2 border-2">
-                            <div class="d-flex align-items-center gap-1">
-                                <div class="rounded-circle bg-success-subtle text-success fw-bold d-flex align-items-center justify-content-center" style="width:28px;height:28px;font-size:10px">MM</div>
-                                <div>
-                                    <div class="fw-semibold" style="font-size:10px;">Marie Martin</div>
-                                    <div class="text-muted" style="font-size:8px;">Commercial</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="text-center border-2">
-                            <select class="form-select form-select-sm border-0 bg-light text-center" style="font-size:9px; padding:2px 2px; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="08:00-17:00">08:00-17:00</option>
-                                <option value="09:00-18:00">09:00-18:00</option>
-                                <option value="10:00-19:00">10:00-19:00</option>
-                                <option value="06:00-15:00">06:00-15:00</option>
-                                <option value="13:00-22:00" selected>13:00-22:00</option>
-                                <option value="Repos">Repos</option>
-                                <option value="Congé">Congé</option>
-                            </select>
-                        </td>
-                        <td class="text-center border-2">
-                            <input type="text" class="form-control form-control-sm border-0 bg-light text-center" value="1h30" style="font-size:9px; padding:1px 2px; width:100%;">
-                        </td>
-                        <!-- Lundi -->
-                        <td class="text-center border-1 p-0 bg-success-subtle">
-                            <select class="form-select form-select-sm border-0 bg-success-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#198754; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail" selected>T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                            </select>
-                        </td>
-                        <!-- Mardi -->
-                        <td class="text-center border-1 p-0 bg-success-subtle">
-                            <select class="form-select form-select-sm border-0 bg-success-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#198754; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail" selected>T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                            </select>
-                        </td>
-                        <!-- Mercredi -->
-                        <td class="text-center border-1 p-0 bg-danger-subtle">
-                            <select class="form-select form-select-sm border-0 bg-danger-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#dc3545; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail">T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé" selected>C</option>
-                                <option value="TT">TT</option>
-                            </select>
-                        </td>
-                        <!-- Jeudi -->
-                        <td class="text-center border-1 p-0 bg-success-subtle">
-                            <select class="form-select form-select-sm border-0 bg-success-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#198754; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail" selected>T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                            </select>
-                        </td>
-                        <!-- Vendredi -->
-                        <td class="text-center border-1 p-0 bg-info-subtle">
-                            <select class="form-select form-select-sm border-0 bg-info-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#0dcaf0; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail">T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT" selected>TT</option>
-                            </select>
-                        </td>
-                        <!-- Samedi -->
-                        <td class="text-center border-1 p-0 bg-warning-subtle">
-                            <select class="form-select form-select-sm border-0 bg-warning-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#ffc107; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail">T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                                <option value="Repos" selected>R</option>
-                            </select>
-                        </td>
-                        <!-- Dimanche -->
-                        <td class="text-center border-1 p-0 bg-warning-subtle">
-                            <select class="form-select form-select-sm border-0 bg-warning-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#ffc107; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail">T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                                <option value="Repos" selected>R</option>
-                            </select>
-                        </td>
-                        <td class="text-center fw-bold text-primary border-2" style="font-size:10px;">35h</td>
-                    </tr>
+                        {# HACK: Si disabled on envoie quand meme la valeur avec un hidden #}
+                        {% if not canEdit %}
+                            <input type="hidden" name="planning[{{ employe.id }}][{{ day }}][isDayOff]" value="{{ p and p.isDayOff? '1' : '0' }}">
+                        {% endif %}
 
-                    <!-- PAUL DUBOIS -->
-                    <tr>
-                        <td class="bg-white ps-2 border-2">
-                            <div class="d-flex align-items-center gap-1">
-                                <div class="rounded-circle bg-warning-subtle text-warning fw-bold d-flex align-items-center justify-content-center" style="width:28px;height:28px;font-size:10px">PD</div>
-                                <div>
-                                    <div class="fw-semibold" style="font-size:10px;">Paul Dubois</div>
-                                    <div class="text-muted" style="font-size:8px;">RH</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="text-center border-2">
-                            <select class="form-select form-select-sm border-0 bg-light text-center" style="font-size:9px; padding:2px 2px; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="08:00-17:00">08:00-17:00</option>
-                                <option value="09:00-18:00">09:00-18:00</option>
-                                <option value="10:00-19:00">10:00-19:00</option>
-                                <option value="06:00-15:00" selected>06:00-15:00</option>
-                                <option value="13:00-22:00">13:00-22:00</option>
-                                <option value="Repos">Repos</option>
-                                <option value="Congé">Congé</option>
-                            </select>
-                        </td>
-                        <td class="text-center border-2">
-                            <input type="text" class="form-control form-control-sm border-0 bg-light text-center" value="45min" style="font-size:9px; padding:1px 2px; width:100%;">
-                        </td>
-                        <!-- Lundi -->
-                        <td class="text-center border-1 p-0 bg-success-subtle">
-                            <select class="form-select form-select-sm border-0 bg-success-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#198754; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail" selected>T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                            </select>
-                        </td>
-                        <!-- Mardi -->
-                        <td class="text-center border-1 p-0 bg-success-subtle">
-                            <select class="form-select form-select-sm border-0 bg-success-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#198754; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail" selected>T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                            </select>
-                        </td>
-                        <!-- Mercredi -->
-                        <td class="text-center border-1 p-0 bg-success-subtle">
-                            <select class="form-select form-select-sm border-0 bg-success-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#198754; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail" selected>T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                            </select>
-                        </td>
-                        <!-- Jeudi -->
-                        <td class="text-center border-1 p-0 bg-success-subtle">
-                            <select class="form-select form-select-sm border-0 bg-success-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#198754; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail" selected>T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                            </select>
-                        </td>
-                        <!-- Vendredi -->
-                        <td class="text-center border-1 p-0 bg-success-subtle">
-                            <select class="form-select form-select-sm border-0 bg-success-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#198754; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail" selected>T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                            </select>
-                        </td>
-                        <!-- Samedi -->
-                        <td class="text-center border-1 p-0 bg-warning-subtle">
-                            <select class="form-select form-select-sm border-0 bg-warning-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#ffc107; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail">T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                                <option value="Repos" selected>R</option>
-                            </select>
-                        </td>
-                        <!-- Dimanche -->
-                        <td class="text-center border-1 p-0 bg-warning-subtle">
-                            <select class="form-select form-select-sm border-0 bg-warning-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#ffc107; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="Travail">T</option>
-                                <option value="Pause">P</option>
-                                <option value="Congé">C</option>
-                                <option value="TT">TT</option>
-                                <option value="Repos" selected>R</option>
-                            </select>
-                        </td>
-                        <td class="text-center fw-bold text-primary border-2" style="font-size:10px;">38h</td>
-                    </tr>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox"
+                                   name="planning[{{ employe.id }}][{{ day }}][isDayOff]" value="1"
+                                   {{ p and p.isDayOff? 'checked' }} {{ not canEdit? 'disabled' }}>
+                            <label class="form-check-label" style="font-size:10px">Jour d'off</label>
+                        </div>
 
-                    <!-- SOPHIE MARTIN - Congé -->
-                    <tr>
-                        <td class="bg-white ps-2 border-2">
-                            <div class="d-flex align-items-center gap-1">
-                                <div class="rounded-circle bg-danger-subtle text-danger fw-bold d-flex align-items-center justify-content-center" style="width:28px;height:28px;font-size:10px">SM</div>
-                                <div>
-                                    <div class="fw-semibold" style="font-size:10px;">Sophie Martin</div>
-                                    <div class="text-muted" style="font-size:8px;">Design</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="text-center border-2">
-                            <select class="form-select form-select-sm border-0 bg-light text-center" style="font-size:9px; padding:2px 2px; appearance: none; -webkit-appearance: none; background-image: none;">
-                                <option value="08:00-17:00">08:00-17:00</option>
-                                <option value="09:00-18:00">09:00-18:00</option>
-                                <option value="10:00-19:00">10:00-19:00</option>
-                                <option value="06:00-15:00">06:00-15:00</option>
-                                <option value="13:00-22:00">13:00-22:00</option>
-                                <option value="Repos">Repos</option>
-                                <option value="Congé" selected>Congé</option>
-                            </select>
-                        </td>
-                        <td class="text-center border-2">
-                            <input type="text" class="form-control form-control-sm border-0 bg-light text-center" value="-" style="font-size:9px; padding:1px 2px; width:100%;">
-                        </td>
-                        {% for i in 1..7 %}
-                            <td class="text-center border-1 p-0 bg-danger-subtle">
-                                <select class="form-select form-select-sm border-0 bg-danger-subtle text-center" style="font-size:7px; padding:0px 2px; min-height:20px; color:#dc3545; appearance: none; -webkit-appearance: none; background-image: none;">
-                                    <option value="Congé" selected>C</option>
-                                    <option value="Travail">T</option>
-                                    <option value="Pause">P</option>
-                                    <option value="TT">TT</option>
-                                </select>
-                            </td>
-                        {% endfor %}
-                        <td class="text-center fw-bold text-danger border-2" style="font-size:10px;">0h</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                        <label class="form-check-label" style="font-size:9px">Début</label>
+                        <input type="time" class="form-control form-control-sm {{ not canEdit? 'bg-light' }}"
+                               name="planning[{{ employe.id }}][{{ day }}][heureDebut]"
+                               value="{{ p and p.heureDebut? p.heureDebut|date('H:i') : '08:00' }}"
+                               {{ not canEdit? 'readonly' }}>
+
+                        <label class="form-check-label" style="font-size:9px">Fin</label>
+                        <input type="time" class="form-control form-control-sm {{ not canEdit? 'bg-light' }}"
+                               name="planning[{{ employe.id }}][{{ day }}][heureFin]"
+                               value="{{ p and p.heureFin? p.heureFin|date('H:i') : '17:00' }}"
+                               {{ not canEdit? 'readonly' }}>
+
+                        <label class="form-check-label" style="font-size:9px">Pause min</label>
+                        <input type="number" class="form-control form-control-sm {{ not canEdit? 'bg-light' }}"
+                               name="planning[{{ employe.id }}][{{ day }}][pauseMinutes]"
+                               value="{{ p? p.pauseMinutes : 60 }}" {{ not canEdit? 'readonly' }}>
+                    </div>
+                </td>
+            {% endfor %}
+        </tr>
+        {% else %}
+            <tr>
+                <td colspan="8" class="text-center py-5">
+                    <div class="py-4">
+                        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="bi bi-people text-muted fs-1"></i>
+                        </div>
+                        <h5 class="fw-bold">Aucun employé trouvé</h5>
+                        <p class="text-muted small">Commencez par ajouter votre premier employé</p>
+                        <a href="{{ path('app_admin_employee_new') }}" class="btn btn-primary">
+                            <i class="bi bi-person-plus me-1"></i>Ajouter un employé
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
     </div>
 
-    <!-- LÉGENDE -->
-    <div class="row mt-3">
-        <div class="col-12">
-            <div class="d-flex gap-3 flex-wrap align-items-center">
-                <span class="fw-semibold small">Légende :</span>
-                <span class="badge bg-success-subtle text-success px-2 py-1" style="font-size:10px;">T = Travail</span>
-                <span class="badge bg-warning-subtle text-warning px-2 py-1" style="font-size:10px;">P = Pause</span>
-                <span class="badge bg-danger-subtle text-danger px-2 py-1" style="font-size:10px;">C = Congé</span>
-                <span class="badge bg-info-subtle text-info px-2 py-1" style="font-size:10px;">TT = Télétravail</span>
-                <span class="badge bg-warning-subtle text-warning px-2 py-1" style="font-size:10px;">R = Repos</span>
-                <span class="badge bg-light text-muted px-2 py-1" style="font-size:10px;">- = Off</span>
-                <span class="text-muted small ms-2">
-                    <i class="bi bi-arrow-repeat me-1"></i>Modifications automatiques
-                </span>
-            </div>
+    <!-- PAGINATION -->
+    <div class="card-footer bg-transparent border-0 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 py-3">
+        <div class="text-muted small">
+            <i class="bi bi-info-circle me-1"></i>
+            {{ employees.getTotalItemCount }} employés au total
+        </div>
+        <div>
+            {{ knp_pagination_render(employees) }}
         </div>
     </div>
+</form>
 </div>
 {% endblock %}

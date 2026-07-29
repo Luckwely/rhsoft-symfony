@@ -2,7 +2,7 @@
 
 {% block body %}
 <div class="container-fluid px-4 py-3">
-    <!-- HEADER MODERNE -->
+    <!-- HEADER -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
         <div>
             <h4 class="fw-bold mb-1">
@@ -13,7 +13,7 @@
             </p>
         </div>
         <div class="d-flex gap-2 mt-3 mt-md-0">
-            <a href="{{ path('app_employee_new') }}" class="btn btn-primary">
+            <a href="{{ path('app_admin_employee_new') }}" class="btn btn-primary">
                 <i class="bi bi-person-plus me-1"></i>Ajouter Employé
             </a>
         </div>
@@ -44,7 +44,7 @@
                     <button class="btn btn-primary flex-grow-1" type="submit">
                         <i class="bi bi-search me-1"></i>Rechercher
                     </button>
-                    <a href="{{ path('app_employee_list') }}" class="btn btn-outline-secondary" title="Réinitialiser">
+                    <a href="{{ path('app_admin_employee') }}" class="btn btn-outline-secondary" title="Réinitialiser">
                         <i class="bi bi-arrow-clockwise"></i>
                     </a>
                 </div>
@@ -53,7 +53,7 @@
     </div>
 
     <!-- TABLEAU PRINCIPAL -->
-    <form method="post" action="{{ path('app_employee_bulk_delete') }}" id="bulk-form">
+    <form method="post" action="{{ path('app_admin_employee_bulk_delete') }}" id="bulk-form">
         <input type="hidden" name="_token" value="{{ csrf_token('bulk-delete') }}">
 
         <div class="card border-0 shadow-sm rounded-4">
@@ -90,39 +90,45 @@
                                 <td class="ps-3">
                                     <input type="checkbox" name="ids[]" value="{{ employee.id }}" class="form-check-input rowCheckbox">
                                 </td>
-                                <td><span class="text-muted small">#{{ employee.id }}</span></td>
                                 <td>
-                                    {% if employee.photo %}
-                                        <img src="{{ asset('uploads/employees/' ~ employee.photo) }}" width="40" height="40" class="rounded-circle object-fit-cover" style="object-fit:cover;">
-                                    {% else %}
-                                        <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:40px;height:40px;font-size:14px">
-                                            {{ employee.prenom|slice(0,1)|upper }}{{ employee.nom|slice(0,1)|upper }}
-                                        </div>
-                                    {% endif %}
+                                    <span class="text-muted small">#{{ employee.id }}</span>
                                 </td>
                                 <td>
-                                    <div class="fw-semibold">{{ employee.prenom }} {{ employee.nom }}</div>
+                                {% if employee.photo %}
+                                    <img src="{{ asset('uploads/employees/' ~ employee.photo) }}" width="40" height="40" class="rounded-circle object-fit-cover" style="object-fit:cover;">
+                                {% else %}
+                                    <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:40px;height:40px;font-size:14px">
+                                        {{ employee.prenom|slice(0,1)|upper }}{{ employee.nom|slice(0,1)|upper }}
+                                    </div>
+                                {% endif %}
                                 </td>
                                 <td>
-                                    <span class="text-muted small">{{ employee.email }}</span>
+                                    <div class="fw-semibold">
+                                        {{ employee.prenom }} {{ employee.nom }}
+                                    </div>
                                 </td>
                                 <td>
-                                    {% if employee.isActive %}
-                                        <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Actif
-                                        </span>
-                                    {% else %}
-                                        <span class="badge rounded-pill bg-warning-subtle text-warning px-3 py-2">
-                                            <i class="bi bi-clock-history me-1"></i>En attente
-                                        </span>
-                                    {% endif %}
+                                    <span class="text-muted small">
+                                        {{ employee.email }}
+                                    </span>
+                                </td>
+                                <td>
+                                {% if employee.isActive %}
+                                    <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2">
+                                        <i class="bi bi-check-circle-fill me-1"></i>Actif
+                                    </span>
+                                {% else %}
+                                    <span class="badge rounded-pill bg-warning-subtle text-warning px-3 py-2">
+                                        <i class="bi bi-clock-history me-1"></i>En attente
+                                    </span>
+                                {% endif %}
                                 </td>
                                 <td>
                                     <div class="d-flex gap-1 justify-content-center">
                                         <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#details-{{ employee.id }}" title="Voir détails">
                                             <i class="bi bi-eye"></i>
                                         </button>
-                                        <a href="{{ path('app_employee_edit', {id: employee.id}) }}" class="btn btn-sm btn-outline-primary" title="Modifier">
+                                        <a href="{{ path('app_admin_employee_edit', {id: employee.id}) }}" class="btn btn-sm btn-outline-primary" title="Modifier">
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                         {% if not employee.isActive %}
@@ -152,7 +158,7 @@
                                         </div>
 
                                         <div class="row g-3">
-                                            <div class="col-md-3">
+                                            <div class="col-md-4">
                                                 <div class="bg-white rounded-3 p-3 shadow-sm h-100">
                                                     <div class="d-flex align-items-center gap-2">
                                                         <i class="bi bi-telephone text-primary"></i>
@@ -163,7 +169,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-3">
+                                            <div class="col-md-4">
                                                 <div class="bg-white rounded-3 p-3 shadow-sm h-100">
                                                     <div class="d-flex align-items-center gap-2">
                                                         <i class="bi bi-geo-alt text-primary"></i>
@@ -174,29 +180,33 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-3">
+                                            <div class="col-md-4">
                                                 <div class="bg-white rounded-3 p-3 shadow-sm h-100">
                                                     <div class="d-flex align-items-center gap-2">
                                                         <i class="bi bi-calendar3 text-primary"></i>
                                                         <div>
                                                             <small class="text-muted d-block">Date Embauche</small>
-                                                            <span class="fw-semibold">{{ employee.dateEmbauche ? employee.dateEmbauche|date('d/m/Y') : 'N/A' }}</span>
+                                                            <span class="fw-semibold">
+                                                                {{ employee.dateEmbauche ? employee.dateEmbauche|date('d/m/Y') : 'N/A' }}
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-3">
+                                            <div class="col-md-4">
                                                 <div class="bg-white rounded-3 p-3 shadow-sm h-100">
                                                     <div class="d-flex align-items-center gap-2">
                                                         <i class="bi bi-clock-history text-primary"></i>
                                                         <div>
                                                             <small class="text-muted d-block">Ancienneté</small>
-                                                            <span class="fw-semibold">{{ employee.dateEmbauche ? date().diff(employee.dateEmbauche).y ~ ' ans' : 'N/A' }}</span>
+                                                            <span class="fw-semibold">
+                                                                {{ employee.dateEmbauche ? date().diff(employee.dateEmbauche).y ~ ' ans' : 'N/A' }}
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-3">
+                                            <div class="col-md-4">
                                                 <div class="bg-white rounded-3 p-3 shadow-sm h-100">
                                                     <div class="d-flex align-items-center gap-2">
                                                         <i class="bi bi-calendar-check text-primary"></i>
@@ -207,30 +217,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            
-                                            <div class="col-md-3">
-                                                <div class="bg-white rounded-3 p-3 shadow-sm h-100">
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <i class="bi bi-cup-hot text-primary"></i>
-                                                        <div>
-                                                            <small class="text-muted d-block">Pause</small>
-                                                            <span class="fw-semibold">{{ employee.pause ?? '1h' }}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="bg-white rounded-3 p-3 shadow-sm h-100">
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <i class="bi bi-person-check text-primary"></i>
-                                                        <div>
-                                                            <small class="text-muted d-block">Statut Présence</small>
-                                                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill">En travail</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-12">
+                                            <div class="col-md-4">
                                                 <div class="bg-white rounded-3 p-3 shadow-sm">
                                                     <div class="d-flex align-items-center gap-2">
                                                         <i class="bi bi-file-earmark-pdf text-danger"></i>
@@ -255,7 +242,7 @@
                                                             <strong>Planning Semaine {{ "now"|date('W') }}</strong>
                                                             <span class="text-muted small ms-2">({{ "now"|date('d/m/Y') }} - {{ "now"|date_modify("+6 days")|date('d/m/Y') }})</span>
                                                         </div>
-                                                        <a href="{{ path('app_employee_planning', {id: employee.id}) }}" class="btn btn-sm btn-outline-success">
+                                                        <a href="{{ path('app_admin_planning', {id: employee.id}) }}" class="btn btn-sm btn-outline-success">
                                                             <i class="bi bi-pencil-square me-1"></i>Modifier
                                                         </a>
                                                     </div>
@@ -271,73 +258,78 @@
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                {% set days = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'] %}
-                                                                {% set monday = "monday this week"|date('Y-m-d') %}
-                                                                {% set plannings = employee.plannings|filter(p => p.weekStart|date('Y-m-d') == monday) %}
 
-                                                                {% if plannings|length > 0 %}
-                                                                    {% for p in plannings %}
-                                                                        <tr class="{{ p.isDayOff ? 'table-warning' : '' }}">
-                                                                            <td>
-                                                                                <span class="fw-semibold">{{ p.dayOfWeek|capitalize }}</span>
-                                                                            </td>
-                                                                            <td>
-                                                                                {% if p.isDayOff %}
-                                                                                    <span class="badge bg-warning-subtle text-warning rounded-pill">
-                                                                                        <i class="bi bi-calendar-x me-1"></i>Repos
-                                                                                    </span>
-                                                                                {% else %}
-                                                                                    <span class="text-primary">{{ p.heureDebut|date('H:i') }} - {{ p.heureFin|date('H:i') }}</span>
-                                                                                {% endif %}
-                                                                            </td>
-                                                                            <td>{{ p.pause ? p.pause|date('H:i') : '-' }}</td>
-                                                                            <td>{{ p.pausette ? p.pausette|date('H:i') : '-' }}</td>
-                                                                            <td>
-                                                                                {% if p.isDayOff %}
-                                                                                    <span class="badge bg-secondary-subtle text-secondary rounded-pill">Repos</span>
-                                                                                {% else %}
-                                                                                    <span class="badge bg-success-subtle text-success rounded-pill">Présent</span>
-                                                                                {% endif %}
-                                                                            </td>
-                                                                        </tr>
-                                                                    {% endfor %}
-                                                                {% else %}
-                                                                    {# DONNEES FACTICES POUR TESTER LE RENDU #}
-                                                                    {% for day in days %}
-                                                                        <tr>
-                                                                            <td><span class="fw-semibold">{{ day|capitalize }}</span></td>
-                                                                            <td>
-                                                                                {% if day in ['samedi', 'dimanche'] %}
-                                                                                    <span class="badge bg-warning-subtle text-warning rounded-pill">
-                                                                                        <i class="bi bi-calendar-x me-1"></i>Repos
-                                                                                    </span>
-                                                                                {% else %}
-                                                                                    <span class="text-primary">
-                                                                                        {% if day == 'lundi' %}09:00 - 17:00
-                                                                                        {% elseif day == 'mardi' %}09:00 - 17:00
-                                                                                        {% elseif day == 'mercredi' %}09:00 - 17:00
-                                                                                        {% elseif day == 'jeudi' %}09:00 - 17:00
-                                                                                        {% else %}09:00 - 16:00
-                                                                                        {% endif %}
-                                                                                    </span>
-                                                                                {% endif %}
-                                                                            </td>
-                                                                            <td>
-                                                                                {% if day in ['samedi', 'dimanche'] %}-{% else %}12:00 - 13:00{% endif %}
-                                                                            </td>
-                                                                            <td>
-                                                                                {% if day in ['samedi', 'dimanche'] %}-{% else %}15:00 - 15:15{% endif %}
-                                                                            </td>
-                                                                            <td>
-                                                                                {% if day in ['samedi', 'dimanche'] %}
-                                                                                    <span class="badge bg-secondary-subtle text-secondary rounded-pill">Repos</span>
-                                                                                {% else %}
-                                                                                    <span class="badge bg-success-subtle text-success rounded-pill">Présent</span>
-                                                                                {% endif %}
-                                                                            </td>
-                                                                        </tr>
-                                                                    {% endfor %}
-                                                                {% endif %}
+                                                            {% set days = [
+                                                                'lundi',
+                                                                'mardi',
+                                                                'mercredi',
+                                                                'jeudi',
+                                                                'vendredi',
+                                                                'samedi',
+                                                                'dimanche'
+                                                            ] %}
+                                                            {% set dayOrder = {
+                                                                lundi:1,
+                                                                mardi:2,
+                                                                mercredi:3,
+                                                                jeudi:4,
+                                                                vendredi:5,
+                                                                samedi:6,
+                                                                dimanche:7
+                                                            } %} {# MAP POUR TRIER #}
+                                                            {% set monday = "monday this week"|date('Y-m-d') %}
+                                                            {% set plannings = employee.plannings|filter(
+                                                                p => p.weekStart|date('Y-m-d') == monday
+                                                            ) %}
+
+                                                            {% if plannings|length > 0 %}
+                                                                {# TRI PAR JOUR AVEC LA MAP #}
+                                                            {% set plannings = plannings|sort((a, b) => dayOrder[a.dayOfWeek] <=> dayOrder[b.dayOfWeek]) %}
+
+                                                                {% for p in plannings %}
+                                                                <tr class="{{ p.isDayOff ? 'table-warning' : '' }}">
+                                                                    <td><span class="fw-semibold">{{ p.dayOfWeek|capitalize }}</span></td>
+                                                                    <td>
+                                                                        {% if p.isDayOff %}
+                                                                            <span class="badge bg-warning-subtle text-warning rounded-pill"><i class="bi bi-calendar-x me-1"></i>Repos</span>
+                                                                        {% else %}
+                                                                            <span class="text-primary">{{ p.heureDebut|date('H:i') }} - {{ p.heureFin|date('H:i') }}</span>
+                                                                        {% endif %}
+                                                                    </td>
+                                                                    <td>{{ p.pauseMinutes ? p.pauseMinutes ~ ' min' : '-' }}</td>
+                                                                    <td>
+                                                                        {% if p.isDayOff %}
+                                                                            <span class="badge bg-secondary-subtle text-secondary rounded-pill">Repos</span>
+                                                                        {% else %}
+                                                                            <span class="badge bg-success-subtle text-success rounded-pill">Présent</span>
+                                                                        {% endif %}
+                                                                    </td>
+                                                                </tr>
+                                                                {% endfor %}
+
+                                                            {% else %}
+                                                                {# DONNEES FACTICES #}
+                                                                {% for day in days %}
+                                                                <tr>
+                                                                    <td><span class="fw-semibold">{{ day|capitalize }}</span></td>
+                                                                    <td>
+                                                                        {% if day in ['samedi', 'dimanche'] %}
+                                                                            <span class="badge bg-warning-subtle text-warning rounded-pill"><i class="bi bi-calendar-x me-1"></i>Repos</span>
+                                                                        {% else %}
+                                                                            <span class="text-primary">09:00 - 17:00</span>
+                                                                        {% endif %}
+                                                                    </td>
+                                                                    <td>{{ day in ['samedi', 'dimanche'] ? '-' : '60 min' }}</td>
+                                                                    <td>
+                                                                        {% if day in ['samedi', 'dimanche'] %}
+                                                                            <span class="badge bg-secondary-subtle text-secondary rounded-pill">Repos</span>
+                                                                        {% else %}
+                                                                            <span class="badge bg-success-subtle text-success rounded-pill">Présent</span>
+                                                                        {% endif %}
+                                                                    </td>
+                                                                </tr>
+                                                                {% endfor %}
+                                                            {% endif %}
                                                             </tbody>
                                                         </table>
                                                     </div>

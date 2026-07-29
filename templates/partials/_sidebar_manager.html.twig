@@ -9,28 +9,29 @@
 
 <!-- Navigation Menu -->
 <nav class="nav nav-pills flex-column mb-auto gap-1">
+    {% set current_route = app.request.attributes.get('_route') %}
     <a href="{{ path('app_manager_profile') }}"
-        class="nav-link {% if app.request.attributes.get('_route') == 'app_manager_profile' %}active{% endif %}">
+        class="nav-link {% if 'app_manager_profile' in current_route %}active{% endif %}">
         <i class="bi bi-person-circle me-2"></i>
         Mon Profil
     </a>
     <a href="{{ path('app_manager_monEquipe') }}"
-        class="nav-link {% if app.request.attributes.get('_route') == 'app_manager_monEquipe' %}active{% endif %}">
+        class="nav-link {% if 'app_manager_monEquipe' in current_route %}active{% endif %}">
         <i class="bi bi-people me-2"></i>
         Mon Equipe
     </a>
     <a href="{{ path('app_manager_planning') }}"
-        class="nav-link {% if app.request.attributes.get('_route') == 'app_manager_planning' %}active{% endif %}">
+        class="nav-link {% if 'app_manager_planning' in current_route %}active{% endif %}">
         <i class="bi bi-calendar-week me-2"></i>
         Planning Equipe
     </a>
     <a href="{{ path('app_manager_pointage') }}"
-        class="nav-link {% if app.request.attributes.get('_route') == 'app_manager_pointage' %}active{% endif %}">
+        class="nav-link {% if 'app_manager_pointage' in current_route %}active{% endif %}">
         <i class="bi bi-clock-history me-2"></i>
         Pointages
     </a>
     <a href="{{ path('app_manager_demandes') }}"
-        class="nav-link {% if app.request.attributes.get('_route') == 'app_manager_demandes' %}active{% endif %}">
+        class="nav-link {% if 'app_manager_demandes' in current_route %}active{% endif %}">
         <i class="bi bi-clipboard-check me-2"></i>
         Demandes
     </a>

@@ -73,9 +73,16 @@ class Entreprise
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $moduleRh = false;
 
+    /**
+     * @var Collection<int, Conge>
+     */
+    #[ORM\OneToMany(targetEntity: Conge::class, mappedBy: 'entreprise')]
+    private Collection $typeConge;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->typeConge = new ArrayCollection();
     }
 
     public function isModulePaie(): bool {
@@ -292,6 +299,36 @@ class Entreprise
             // set the owning side to null (unless already changed)
             if ($user->getEntreprise() === $this) {
                 $user->setEntreprise(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Conge>
+     */
+    public function getTypeConge(): Collection
+    {
+        return $this->typeConge;
+    }
+
+    public function addTypeConge(Conge $typeConge): static
+    {
+        if (!$this->typeConge->contains($typeConge)) {
+            $this->typeConge->add($typeConge);
+            $typeConge->setEntreprise($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTypeConge(Conge $typeConge): static
+    {
+        if ($this->typeConge->removeElement($typeConge)) {
+            // set the owning side to null (unless already changed)
+            if ($typeConge->getEntreprise() === $this) {
+                $typeConge->setEntreprise(null);
             }
         }
 

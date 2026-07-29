@@ -2,6 +2,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Entity\Planning;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Form\EmployeeFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,18 +13,31 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[Route('/admin')]
+#[IsGranted('ROLE_ADMIN')]
 class EmployeeController extends AbstractController
 {
-    #[Route('/admin/employees', name: 'app_employee_list')]
+    #[Route('/employees', name: 'app_admin_employee')]
     public function list(
         Request $request,
         EntityManagerInterface $em,
         PaginatorInterface $paginator
     ): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $entreprise = $this->getUser()->getEntreprise();
+
+        $mondayThisWeek = new \DateTime('monday this week');
+        $plannings = $em->getRepository(Planning::class)->findBy([
+            'entreprise' => $entreprise,
+            'weekStart' => $mondayThisWeek
+        ]);
+        $planningMap = [];
+        foreach($plannings as $p){
+            $planningMap[$p->getUser()->getId()] = $p;
+        }
 
         $queryBuilder = $em->getRepository(User::class)->createQueryBuilder('u')
             ->where('u.entreprise = :entreprise')
@@ -40,16 +54,17 @@ class EmployeeController extends AbstractController
 
         $employees = $paginator->paginate(
             $queryBuilder,
-            $request->query->getInt('page', 1), // Page actuelle
-            10 // Nb d'éléments par page
+            $request->query->getInt('page', 1),
+            10
         );
 
         return $this->render('admin/employee/list.html.twig', [
-            'employees' => $employees
+            'employees' => $employees,
+            'planningMap' => $planningMap
         ]);
     }
 
-    #[Route('/admin/employees/new', name: 'app_employee_new')]
+    #[Route('/employees/new', name: 'app_admin_employee_new')]
     public function new(
         Request $request,
         EntityManagerInterface $em,
@@ -57,7 +72,6 @@ class EmployeeController extends AbstractController
         string $upload_dir
     ): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $admin = $this->getUser();
         $entreprise = $admin->getEntreprise();
 
@@ -111,7 +125,7 @@ class EmployeeController extends AbstractController
                 $this->addFlash('danger', 'Erreur email: ' . $e->getMessage());
             }
 
-            return $this->redirectToRoute('app_employee_list');
+            return $this->redirectToRoute('app_admin_employee');
         }
 
         return $this->render('admin/employee/new.html.twig', [
@@ -119,7 +133,7 @@ class EmployeeController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/employees/{id}/edit', name: 'app_employee_edit')]
+    #[Route('/employees/{id}/edit', name: 'app_admin_employee_edit')]
     public function edit(Request $request, User $employee, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(EmployeeFormType::class, $employee);
@@ -146,7 +160,7 @@ class EmployeeController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Employé modifié');
-            return $this->redirectToRoute('app_employee_list');
+            return $this->redirectToRoute('app_admin_employee');
         }
 
         return $this->render('admin/employee/edit.html.twig', [
@@ -155,7 +169,7 @@ class EmployeeController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/employees/{id}/delete', name: 'app_employee_delete', methods: ['POST'])]
+    #[Route('/employees/{id}/delete', name: 'app_admin_employee_delete', methods: ['POST'])]
     public function delete(
         Request $request,
         User $user,
@@ -171,10 +185,10 @@ class EmployeeController extends AbstractController
             $em->flush();
             $this->addFlash('success', 'Employé supprimé.');
         }
-        return $this->redirectToRoute('app_employee_list');
+        return $this->redirectToRoute('app_admin_employee');
     }
 
-    #[Route('/admin/employees/{id}/resend', name: 'app_employee_resend')]
+    #[Route('/employees/{id}/resend', name: 'app_admin_employee_resend')]
     public function resend(
         User $user,
         EntityManagerInterface $em,
@@ -206,10 +220,10 @@ class EmployeeController extends AbstractController
 
         $this->addFlash('success', 'Invitation renvoyée à ' . $user->getEmail());
 
-        return $this->redirectToRoute('app_employee_list');
+        return $this->redirectToRoute('app_admin_employee');
     }
 
-    #[Route('/admin/employees/bulk-delete', name: 'app_employee_bulk_delete', methods: ['POST'])]
+    #[Route('/employees/bulk-delete', name: 'app_admin_employee_bulk_delete', methods: ['POST'])]
     public function bulkDelete(Request $request, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -224,6 +238,6 @@ class EmployeeController extends AbstractController
             $em->flush();
             $this->addFlash('success', count($ids).' employé(s) supprimé(s)');
         }
-        return $this->redirectToRoute('app_employee_list');
+        return $this->redirectToRoute('app_admin_employee');
     }
 }

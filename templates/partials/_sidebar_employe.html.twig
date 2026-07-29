@@ -9,28 +9,29 @@
 
 <!-- Navigation Menu -->
 <nav class="nav nav-pills flex-column mb-auto gap-1">
+    {% set current_route = app.request.attributes.get('_route') %}
     <a href="{{ path('app_employe_profile') }}"
-        class="nav-link {% if app.request.attributes.get('_route') == 'app_employe_profile' %}active{% endif %}">
+        class="nav-link {% 'app_employe_profile' in current_route %}active{% endif %}">
         <i class="bi bi-person-circle me-2"></i>
         Mon Profil
     </a>
     <a href="{{ path('app_employe_planning') }}"
-        class="nav-link {% if app.request.attributes.get('_route') == 'app_employe_planning' %}active{% endif %}">
+        class="nav-link {% if 'app_employe_planning' in current_route %}active{% endif %}">
         <i class="bi bi-clock-history me-2"></i>
         Planning & Pointage
     </a>
     <a href="{{ path('app_employe_demandes') }}"
-        class="nav-link {% if app.request.attributes.get('_route') == 'app_employe_demandes' %}active{% endif %}">
+        class="nav-link {% if 'app_employe_demandes' in current_route %}active{% endif %}">
         <i class="bi bi-clipboard2 me-2"></i>
         Demandes
     </a>
     <a href="{{ path('app_employe_conge') }}"
-        class="nav-link {% if app.request.attributes.get('_route') == 'app_employe_conge' %}active{% endif %}">
+        class="nav-link {% if 'app_employe_conge' in current_route %}active{% endif %}">
         <i class="bi bi-umbrella me-2"></i>
         Mes Congés
     </a>
     <a href="{{ path('app_employe_paie') }}"
-        class="nav-link {% if app.request.attributes.get('_route') == 'app_employe_paie' %}active{% endif %}">
+        class="nav-link {% 'app_employe_paie' in current_route %}active{% endif %}">
         <i class="bi bi-wallet2 me-2"></i>
         Mes Fiches de Paie
     </a>

@@ -12,15 +12,13 @@ class SecurityController extends AbstractController
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        // Si déjà connecté, on redirige direct vers son dashboard
+
         if ($this->getUser()) {
             return $this->redirectToDashboard();
         }
 
-        // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
 
-        // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('auth/security/login.html.twig', [
@@ -36,7 +34,6 @@ class SecurityController extends AbstractController
 
     }
 
-    // Fonction privée pour éviter de répéter le code
     private function redirectToDashboard(): Response
     {
         if ($this->isGranted('ROLE_ADMIN')) {

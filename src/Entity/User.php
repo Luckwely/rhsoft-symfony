@@ -101,10 +101,50 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'float', nullable: true)]
     private ?float $soldeConge = 25;
 
+    /**
+     * @var Collection<int, Pointage>
+     */
+    #[ORM\OneToMany(targetEntity: Pointage::class, mappedBy: 'employee')]
+    private Collection $pointages;
+
+    /**
+     * @var Collection<int, Pointage>
+     */
+    #[ORM\ManyToMany(targetEntity: Pointage::class, mappedBy: 'corrigePar')]
+    private Collection $CorrigePar;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $poste = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $service = null;
+
+    #[ORM\Column(type: 'decimal', precision: 4, scale: 2, options: ['default' => 8.0])]
+    private ?float $heuresContractuelles = 8.0;
+
+    /**
+     * @var Collection<int, Conge>
+     */
+    #[ORM\OneToMany(targetEntity: Conge::class, mappedBy: 'employe')]
+    private Collection $conges;
+
+    // GETTERS SETTERS
+    public function getPoste(): ?string { return $this->poste; }
+    public function setPoste(?string $poste): static { $this->poste = $poste; return $this; }
+
+    public function getService(): ?string { return $this->service; }
+    public function setService(?string $service): static { $this->service = $service; return $this; }
+
+    public function getHeuresContractuelles(): ?float { return $this->heuresContractuelles; }
+    public function setHeuresContractuelles(?float $heuresContractuelles): static { $this->heuresContractuelles = $heuresContractuelles; return $this; }
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->plannings = new ArrayCollection();
+        $this->pointages = new ArrayCollection();
+        $this->CorrigePar = new ArrayCollection();
+        $this->conges = new ArrayCollection();
     }
 
     public function getPlannings(): Collection
@@ -199,7 +239,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-    
+
     public function getRoles(): array
     {
             $roles = $this->roles;
@@ -402,6 +442,93 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setBanqueRib(?string $banqueRib): static {
         $this->banqueRib = $banqueRib; return $this;
+    }
+
+    /**
+     * @return Collection<int, Pointage>
+     */
+    public function getPointages(): Collection
+    {
+        return $this->pointages;
+    }
+
+    public function addPointage(Pointage $pointage): static
+    {
+        if (!$this->pointages->contains($pointage)) {
+            $this->pointages->add($pointage);
+            $pointage->setEmployee($this);
+        }
+
+        return $this;
+    }
+
+    public function removePointage(Pointage $pointage): static
+    {
+        if ($this->pointages->removeElement($pointage)) {
+            // set the owning side to null (unless already changed)
+            if ($pointage->getEmployee() === $this) {
+                $pointage->setEmployee(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Pointage>
+     */
+    public function getCorrigePar(): Collection
+    {
+        return $this->CorrigePar;
+    }
+
+    public function addCorrigePar(Pointage $corrigePar): static
+    {
+        if (!$this->CorrigePar->contains($corrigePar)) {
+            $this->CorrigePar->add($corrigePar);
+            $corrigePar->addCorrigePar($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCorrigePar(Pointage $corrigePar): static
+    {
+        if ($this->CorrigePar->removeElement($corrigePar)) {
+            $corrigePar->removeCorrigePar($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Conge>
+     */
+    public function getConges(): Collection
+    {
+        return $this->conges;
+    }
+
+    public function addConge(Conge $conge): static
+    {
+        if (!$this->conges->contains($conge)) {
+            $this->conges->add($conge);
+            $conge->setEmploye($this);
+        }
+
+        return $this;
+    }
+
+    public function removeConge(Conge $conge): static
+    {
+        if ($this->conges->removeElement($conge)) {
+            // set the owning side to null (unless already changed)
+            if ($conge->getEmploye() === $this) {
+                $conge->setEmploye(null);
+            }
+        }
+
+        return $this;
     }
 
 }
