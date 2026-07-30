@@ -15,7 +15,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class CongeController extends AbstractController
 {
-    #[Route('/', name: 'app_admin_conge_index')] // Fixed route name mismatch
+    #[Route('/', name: 'app_admin_conge')] // Fixed route name mismatch
     public function index(CongeRepository $congeRepo): Response
     {
         $user = $this->getUser();
@@ -47,7 +47,7 @@ class CongeController extends AbstractController
         $em->flush();
 
         $this->addFlash('success', 'Congé validé avec succès.');
-        return $this->redirectToRoute('app_admin_conge_index');
+        return $this->redirectToRoute('app_admin_conge');
     }
 
     #[Route('/{id}/refuser', name: 'app_admin_conge_refuser', methods: ['POST'])] // Restricted to POST
@@ -60,10 +60,10 @@ class CongeController extends AbstractController
 
         $conge->setStatut(Conge::STATUS_REFUSE);
         $conge->setValidePar($this->getUser());
-        $conge->setValideLe(new \DateTimeImmutable()); // Good practice to track when it was refused too
+        $conge->setValideLe(new \DateTimeImmutable());
         $em->flush();
 
         $this->addFlash('danger', 'Congé refusé.');
-        return $this->redirectToRoute('app_admin_conge_index');
+        return $this->redirectToRoute('app_admin_conge');
     }
 }

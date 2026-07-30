@@ -1,12 +1,12 @@
 <!-- Logo & Role Header -->
-<div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom border-secondary px-2">
+<div class="d-flex align-items-center justify-content-between gap-2 mb-4 pb-3 border-bottom border-secondary px-2" style="min-width: 0;">
     <!-- Logo -->
-    <a href="{{ path('app_admin_dashboard') }}" class="sidebar-logo d-flex align-items-center text-decoration-none">
-        <img src="../uploads/home/logo.png" alt="RH Soft Pro Logo" style="max-height: 38px; object-fit: contain;">
+    <a href="{{ path('app_admin_dashboard') }}" class="sidebar-logo d-flex align-items-center text-decoration-none flex-shrink-0 overflow-hidden">
+        <img src="{{ asset('uploads/home/logo.png') }}" alt="RH Soft Pro Logo" style="display: block; max-height: 38px; width: auto; max-width: 100%; object-fit: contain;">
     </a>
 
     <!-- User Role Badge -->
-    <div class="ms-auto">
+    <div class="ms-auto flex-shrink-0">
         {% if 'ROLE_SUPER_ADMIN' in app.user.roles %}
             <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Super Admin</span>
         {% elseif 'ROLE_ADMIN' in app.user.roles %}
@@ -23,34 +23,34 @@
 
 <!-- Navigation Menu -->
 <nav class="nav nav-pills flex-column mb-auto gap-1">
-    {% set current_route = app.request.attributes.get('_route') %}
+    {% set current_route = app.request.attributes.get('_route')|default('') %}
     <a href="{{ path('app_admin_dashboard') }}"
-        class="nav-link {% if 'app_admin_dashboard' in current_route %}active{% endif %}">
+        class="nav-link{% if current_route == 'app_admin_dashboard' %} active{% endif %}">
         <i class="bi bi-speedometer2 me-2"></i>
         Tableau de bord
     </a>
     <a href="{{ path('app_admin_employee') }}"
-        class="nav-link {% if 'app_admin_employee' in current_route %}active{% endif %}">
+        class="nav-link{% if current_route == 'app_admin_employee' or current_route starts with 'app_admin_employee_' %} active{% endif %}">
         <i class="bi bi-people me-2"></i>
         Employés
     </a>
-    <a href="{{ path('app_admin_planning') }}" class="nav-link {% if 'app_admin_planning' in current_route %}active{% endif %}">
+    <a href="{{ path('app_admin_planning') }}" class="nav-link{% if current_route == 'app_admin_planning' or current_route starts with 'app_admin_planning_' %} active{% endif %}">
         <i class="bi bi-calendar-week me-2"></i>
         Planning
     </a>
-    <a href="{{ path('app_admin_pointage') }}" class="nav-link {% if 'app_admin_pointage' in current_route %}active{% endif %}">
+    <a href="{{ path('app_admin_pointage') }}" class="nav-link{% if current_route == 'app_admin_pointage' or current_route starts with 'app_admin_pointage_' %} active{% endif %}">
         <i class="bi bi-qr-code me-2"></i>
         Pointage
     </a>
-    <a href="{{ path('app_admin_conge_index') }}" class="nav-link {% if 'app_admin_conge' in current_route %}active{% endif %}">
+    <a href="{{ path('app_admin_conge') }}" class="nav-link{% if current_route == 'app_admin_conge' or current_route starts with 'app_admin_conge_' %} active{% endif %}">
         <i class="bi bi-calendar-check me-2"></i>
         Congés
     </a>
-    <a href="{{ path('app_admin_reporting') }}" class="nav-link {% if 'app_admin_reporting' in current_route %}active{% endif %}">
+    <a href="{{ path('app_admin_reporting') }}" class="nav-link{% if current_route == 'app_admin_reporting' or current_route starts with 'app_admin_reporting_' %} active{% endif %}">
         <i class="bi bi-graph-up-arrow me-2"></i>
         Reporting
     </a>
-    <a href="{{ path('app_admin_parametre') }}" class="nav-link {% if 'app_admin_parametre' in current_route %}active{% endif %}">
+    <a href="{{ path('app_admin_parametre') }}" class="nav-link{% if current_route == 'app_admin_parametre' or current_route starts with 'app_admin_parametre_' %} active{% endif %}">
         <i class="bi bi-gear me-2"></i>
         Paramètres
     </a>
