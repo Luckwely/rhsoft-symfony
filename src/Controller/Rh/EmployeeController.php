@@ -4,7 +4,11 @@ namespace App\Controller\Rh;
 
 use App\Entity\User;
 use App\Entity\Planning;
+use App\Form\EmployeeFormType;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Mime\Email;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,8 +27,7 @@ final class EmployeeController extends AbstractController
         PaginatorInterface $paginator
     ): Response
     {
-
-    $entreprise = $this->getUser()->getEntreprise();
+        $entreprise = $this->getUser()->getEntreprise();
 
         $mondayThisWeek = new \DateTime('monday this week');
         $plannings = $em->getRepository(Planning::class)->findBy([
@@ -61,12 +64,11 @@ final class EmployeeController extends AbstractController
         ]);
     }
 
-    #[Route('/employees/new', name: 'app_rh_employee_new')]
+    #[Route('/embauche', name: 'app_rh_employee_embauche')]
     public function new(
         Request $request,
         EntityManagerInterface $em,
-        MailerInterface $mailer,
-        string $upload_dir
+        MailerInterface $mailer
     ): Response
     {
         $admin = $this->getUser();
@@ -77,25 +79,25 @@ final class EmployeeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-            // On set ce qui n'est pas dans le form
             $user->setEntreprise($entreprise);
             $user->setIsActive(false);
             $user->setIsVerified(false);
+
+            $uploadDir = $this->getParameter('employees_directory');
 
             // UPLOAD PHOTO
             $photoFile = $form->get('photo')->getData();
             if ($photoFile) {
                 $newFilename = uniqid().'.'.$photoFile->guessExtension();
-                $photoFile->move($upload_dir, $newFilename);
+                $photoFile->move($uploadDir, $newFilename);
                 $user->setPhoto($newFilename);
             }
 
             // UPLOAD CV
             $cvFile = $form->get('cv')->getData();
-            if ($cvFile) { // <-- $cvFile pas $photoFile
+            if ($cvFile) {
                 $newFilename = uniqid().'.'.$cvFile->guessExtension();
-                $cvFile->move($upload_dir, $newFilename);
+                $cvFile->move($uploadDir, $newFilename);
                 $user->setCv($newFilename);
             }
 
@@ -122,7 +124,7 @@ final class EmployeeController extends AbstractController
                 $this->addFlash('danger', 'Erreur email: ' . $e->getMessage());
             }
 
-            return $this->redirectToRoute('app_admin_employee');
+            return $this->redirectToRoute('app_rh_employee');
         }
 
         return $this->render('rh/employee/embauche.html.twig', [
@@ -137,12 +139,13 @@ final class EmployeeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $uploadDir = $this->getParameter('employees_directory');
 
             // Gestion Upload Photo
             $photoFile = $form->get('photo')->getData();
             if ($photoFile) {
                 $newFilename = uniqid().'.'.$photoFile->guessExtension();
-                $photoFile->move($this->getParameter('employees_directory'), $newFilename);
+                $photoFile->move($uploadDir, $newFilename);
                 $employee->setPhoto($newFilename);
             }
 
@@ -150,19 +153,19 @@ final class EmployeeController extends AbstractController
             $cvFile = $form->get('cv')->getData();
             if ($cvFile) {
                 $newFilename = uniqid().'.'.$cvFile->guessExtension();
-                $cvFile->move($this->getParameter('employees_directory'), $newFilename);
+                $cvFile->move($uploadDir, $newFilename);
                 $employee->setCv($newFilename);
             }
 
             $em->flush();
 
             $this->addFlash('success', 'Employé modifié');
-            return $this->redirectToRoute('app_admin_employee');
+            return $this->redirectToRoute('app_rh_employee');
         }
 
         return $this->render('rh/employee/edit.html.twig', [
             'employee' => $employee,
-            'form' => $form->createView(), // <-- IL MANQUAIT CETTE LIGNE
+            'form' => $form->createView(),
         ]);
     }
 
@@ -173,7 +176,7 @@ final class EmployeeController extends AbstractController
         MailerInterface $mailer
     ): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_RH');
 
         if ($user->getEntreprise() !== $this->getUser()->getEntreprise()) {
             throw $this->createAccessDeniedException('Cet employé n\'appartient pas à votre entreprise.');
@@ -195,21 +198,56 @@ final class EmployeeController extends AbstractController
 
         $mailer->send($email);
 
-
         $this->addFlash('success', 'Invitation renvoyée à ' . $user->getEmail());
 
         return $this->redirectToRoute('app_rh_employee');
     }
 
-    #[Route('/embauche', name: 'app_rh_employee_embauche')]
-    public function embauche(): Response
+    #[Route('/sortie', name: 'app_rh_employee_sortie')]
+    public function sortie(
+        Request $request,
+        EntityManagerInterface $em,
+        PaginatorInterface $paginator
+    ): Response
     {
-        return $this->render('rh/employee/embauche.html.twig');
+        $entreprise = $this->getUser()->getEntreprise();
+
+        // Query builder for departed employees (inactive members belonging to the company)
+        $queryBuilder = $em->getRepository(User::class)->createQueryBuilder('u')
+            ->where('u.entreprise = :entreprise')
+            ->andWhere('u.is_active = :active')
+            ->setParameter('entreprise', $entreprise)
+            ->setParameter('active', false)
+            ->orderBy('u.id', 'DESC');
+
+        // Optional search filter for departures if needed
+        if ($search = $request->query->get('q')) {
+            $queryBuilder
+                ->andWhere('u.nom LIKE :search OR u.prenom LIKE :search OR u.email LIKE :search')
+                ->setParameter('search', '%'.$search.'%');
+        }
+
+        $sorties = $paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            10
+        );
+
+        return $this->render('rh/employee/sortie.html.twig', [
+            'sorties' => $sorties,
+        ]);
     }
 
-    #[Route('/sortie', name: 'app_rh_employee_sortie')]
-    public function sortie(): Response
+    #[Route('/employees/{id}/certificat', name: 'app_rh_employee_certificat')]
+    public function certificat(User $user): Response
     {
-        return $this->render('rh/employee/sortie.html.twig');
+        // Security check: ensure employee belongs to the RH's enterprise
+        if ($user->getEntreprise() !== $this->getUser()->getEntreprise()) {
+            throw $this->createAccessDeniedException('Cet employé n\'appartient pas à votre entreprise.');
+        }
+
+        return $this->render('rh/employee/certificat_pdf.html.twig', [
+            'employee' => $user
+        ]);
     }
 }

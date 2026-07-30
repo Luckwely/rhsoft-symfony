@@ -128,6 +128,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Conge::class, mappedBy: 'employe')]
     private Collection $conges;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dateSortie = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $motifSortie = null;
+
     // GETTERS SETTERS
     public function getPoste(): ?string { return $this->poste; }
     public function setPoste(?string $poste): static { $this->poste = $poste; return $this; }
@@ -145,6 +151,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->pointages = new ArrayCollection();
         $this->CorrigePar = new ArrayCollection();
         $this->conges = new ArrayCollection();
+    }
+
+    public function getDateSortie(): ?\DateTimeInterface
+    {
+        return $this->dateSortie;
+    }
+
+    public function setDateSortie(?\DateTimeInterface $dateSortie): static
+    {
+        $this->dateSortie = $dateSortie;
+        return $this;
+    }
+
+    public function getMotifSortie(): ?string
+    {
+        return $this->motifSortie;
+    }
+
+    public function setMotifSortie(?string $motifSortie): static
+    {
+        $this->motifSortie = $motifSortie;
+        return $this;
     }
 
     public function getPlannings(): Collection

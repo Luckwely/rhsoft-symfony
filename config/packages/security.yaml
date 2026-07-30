@@ -41,7 +41,11 @@ security:
 
     # Note: Only the *first* matching rule is applied
     access_control:
+        - { path: ^/super/admin, roles: ROLE_SUPER_ADMIN }
         - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/rh, roles: ROLE_RH }
+        - { path: ^/manager, roles: ROLE_MANAGER }
+        - { path: ^/employe, roles: ROLE_EMPLOYE }
 
         - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/billing, roles: ROLE_USER }
@@ -52,7 +56,7 @@ security:
         - { path: ^/pricing, roles: PUBLIC_ACCESS }
         - { path: ^/verify, roles: PUBLIC_ACCESS }
         - { path: ^/invite/accept, roles: PUBLIC_ACCESS }
-        
+
         - { path: ^/, roles: PUBLIC_ACCESS }
 
 when@test:

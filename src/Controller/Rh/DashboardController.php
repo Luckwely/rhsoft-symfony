@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Rh; // 1. Changer le namespace
+namespace App\Controller\Rh; 
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
