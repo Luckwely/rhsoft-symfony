@@ -82,10 +82,17 @@ class Entreprise
     #[ORM\OneToMany(targetEntity: Conge::class, mappedBy: 'entreprise')]
     private Collection $typeConge;
 
+    /**
+     * @var Collection<int, Offre>
+     */
+    #[ORM\OneToMany(targetEntity: Offre::class, mappedBy: 'entreprise')]
+    private Collection $offres;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->typeConge = new ArrayCollection();
+        $this->offres = new ArrayCollection();
     }
 
     public function getToleranceRetard(): ?int
@@ -343,6 +350,36 @@ class Entreprise
             // set the owning side to null (unless already changed)
             if ($typeConge->getEntreprise() === $this) {
                 $typeConge->setEntreprise(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Offre>
+     */
+    public function getOffres(): Collection
+    {
+        return $this->offres;
+    }
+
+    public function addOffre(Offre $offre): static
+    {
+        if (!$this->offres->contains($offre)) {
+            $this->offres->add($offre);
+            $offre->setEntreprise($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOffre(Offre $offre): static
+    {
+        if ($this->offres->removeElement($offre)) {
+            // set the owning side to null (unless already changed)
+            if ($offre->getEntreprise() === $this) {
+                $offre->setEntreprise(null);
             }
         }
 

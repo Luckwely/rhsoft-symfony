@@ -1,0 +1,45 @@
+{% extends 'layouts/base_carriere.html.twig' %}
+
+{% block title %}{{ offre.titre }} - {{ offre.entreprise.nom }}{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <a href="{{ path('app_carriere_globale') }}" class="btn btn-link mb-3"><i class="bi bi-arrow-left"></i> Retour aux offres</a>
+
+            <h1 class="mb-2">{{ offre.titre }}</h1>
+            <p class="text-muted">
+                <strong>{{ offre.entreprise.nom }}</strong> •
+                Publiée le {{ offre.createdAt|date('d/m/Y') }}
+                {% if offre.dateExpiration %}
+                    • Expire le {{ offre.dateExpiration|date('d/m/Y') }}
+                {% endif %}
+            </p>
+
+            <hr>
+
+            <h3>Description du poste</h3>
+            <div class="mt-3">
+                {{ offre.description|nl2br }}
+            </div>
+
+            <hr>
+
+           <a href="{{ path('app_candidature_new', {id: offre.id}) }}" class="btn btn-primary btn-lg">Postuler à cette offre</a>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">À propos de {{ offre.entreprise.nom }}</h5>
+                    <p class="card-text">Découvrez plus d'offres de cette entreprise.</p>
+                    <a href="{{ path('app_carriere_entreprise', {slug: offre.entreprise.slug}) }}" class="btn btn-outline-secondary w-100">
+                        Voir toutes les offres
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

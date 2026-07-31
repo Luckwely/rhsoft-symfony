@@ -34,6 +34,11 @@
         <i class="bi bi-people me-2"></i>
         Employés
     </a>
+    <a href="{{ path('admin_offre_index') }}"
+        class="nav-link{% if current_route == 'admin_offre_index' or current_route starts with 'admin_offre_index' %} active{% endif %}">
+        <i class="bi bi-people me-2"></i>
+        Offres
+    </a>
     <a href="{{ path('app_admin_planning') }}" class="nav-link{% if current_route == 'app_admin_planning' or current_route starts with 'app_admin_planning_' %} active{% endif %}">
         <i class="bi bi-calendar-week me-2"></i>
         Planning

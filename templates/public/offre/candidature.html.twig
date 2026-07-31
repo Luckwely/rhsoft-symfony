@@ -1,0 +1,18 @@
+{% extends 'layouts/base_carriere.html.twig' %}
+{% block title %}Postuler - {{ offre.titre }}{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <h1>Postuler à: {{ offre.titre }}</h1>
+    <p class="text-muted mb-4">{{ offre.entreprise.nom }}</p>
+
+    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+        {{ form_row(form.nom) }}
+        {{ form_row(form.email) }}
+        {{ form_row(form.telephone) }}
+        {{ form_row(form.cv) }}
+        {{ form_row(form.lettreMotivation) }}
+        <button class="btn btn-primary btn-lg">Envoyer ma candidature</button>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

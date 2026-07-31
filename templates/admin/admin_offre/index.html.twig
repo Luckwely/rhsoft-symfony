@@ -1,0 +1,31 @@
+{% extends 'layouts/base_admin.html.twig' %} {# Ton layout admin #}
+
+{% block title %}Admin - Offres{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between mb-4">
+    <h1>Gestion des Offres</h1>
+    <a href="{{ path('admin_offre_new') }}" class="btn btn-primary">+ Nouvelle Offre</a>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr><th>Titre</th><th>Entreprise</th><th>Status</th><th>Candidatures</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+    {% for offre in offres %}
+        <tr>
+            <td>{{ offre.titre }}</td>
+            <td>{{ offre.entreprise.nom }}</td>
+            <td><span class="badge bg-success">{{ offre.status }}</span></td>
+            <td>{{ offre.candidatures|length }}</td>
+            <td>
+                <a href="{{ path('admin_offre_edit', {id: offre.id}) }}" class="btn btn-sm btn-warning">Editer</a>
+            </td>
+        </tr>
+    {% else %}
+        <tr><td colspan="5">Aucune offre</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

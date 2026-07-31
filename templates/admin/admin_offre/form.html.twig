@@ -1,0 +1,14 @@
+{% extends 'layouts/base_admin.html.twig' %}
+
+{% block title %}{{ offre.id ? 'Editer' : 'Créer' }} une Offre{% endblock %}
+
+{% block body %}
+<h1>{{ offre.id ? 'Editer' : 'Créer' }} une Offre</h1>
+
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button class="btn btn-success mt-3">Enregistrer</button>
+{{ form_end(form) }}
+
+<a href="{{ path('admin_offre_index') }}" class="btn btn-link mt-3">Retour</a>
+{% endblock %}
