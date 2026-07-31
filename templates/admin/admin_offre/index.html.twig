@@ -1,31 +1,132 @@
-{% extends 'layouts/base_admin.html.twig' %} {# Ton layout admin #}
+{% extends 'layouts/base_admin.html.twig' %}
 
 {% block title %}Admin - Offres{% endblock %}
 
 {% block body %}
-<div class="d-flex justify-content-between mb-4">
-    <h1>Gestion des Offres</h1>
-    <a href="{{ path('admin_offre_new') }}" class="btn btn-primary">+ Nouvelle Offre</a>
-</div>
+<div class="container-fluid px-0">
+    <!-- En-tête  -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h4 class="fw-bold mb-1">
+                Gestion des Offres
+            </h4>
+            <p class="text-muted small mb-0">
+                <i class="bi bi-database me-1"></i>{{ offres|length }} offre(s) au total
+            </p>
+        </div>
+        <div class="d-flex gap-2 mt-3 mt-md-0">
+            <a href="{{ path('app_admin_offre_new') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i>Nouvelle Offre
+            </a>
+        </div>
+    </div>
 
-<table class="table table-striped">
-    <thead>
-        <tr><th>Titre</th><th>Entreprise</th><th>Status</th><th>Candidatures</th><th>Actions</th></tr>
-    </thead>
-    <tbody>
-    {% for offre in offres %}
-        <tr>
-            <td>{{ offre.titre }}</td>
-            <td>{{ offre.entreprise.nom }}</td>
-            <td><span class="badge bg-success">{{ offre.status }}</span></td>
-            <td>{{ offre.candidatures|length }}</td>
-            <td>
-                <a href="{{ path('admin_offre_edit', {id: offre.id}) }}" class="btn btn-sm btn-warning">Editer</a>
-            </td>
-        </tr>
-    {% else %}
-        <tr><td colspan="5">Aucune offre</td></tr>
-    {% endfor %}
-    </tbody>
-</table>
+    <!-- Carte avec tableau -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4 py-3">
+                                Titre
+                            </th>
+                            <th class="py-3 d-none d-md-table-cell">
+                                Description
+                            </th>
+                            <th class="py-3">
+                                Status
+                            </th>
+                            <th class="py-3 text-center">
+                                Candidatures
+                            </th>
+                            <th class="py-3">
+                                Crée le
+                            </th>
+                            <th class="pe-4 py-3 text-end">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for offre in offres %}
+                        <tr>
+                            <td class="ps-4 py-3">
+                                <div class="fw-semibold">{{ offre.titre }}</div>
+                                <div class="small text-muted d-md-none mt-1">
+                                    {{ offre.description|length > 60 ? offre.description|slice(0, 60) ~ '...' : offre.description }}
+                                </div>
+                            </td>
+                            <td class="py-3 d-none d-md-table-cell">
+                                <div class="text-truncate" style="max-width: 250px;">
+                                    {{ offre.description }}
+                                </div>
+                            </td>
+                            <td class="py-3">
+                                {% set statusColors = {
+                                    'ouverte': 'success',
+                                    'fermée': 'secondary',
+                                    'brouillon': 'danger'
+                                } %}
+                                <span class="badge bg-{{ statusColors[offre.status]|default('secondary') }} rounded-pill px-3 py-2">
+                                    <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>
+                                    {{ offre.status }}
+                                </span>
+                            </td>
+                            <td class="py-3 text-center">
+                                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">
+                                    <i class="bi bi-people-fill me-1"></i>
+                                    {{ offre.candidatures|length }}
+                                </span>
+                            </td>
+                            <td class="py-3 text-center">
+                                    <i class="bi bi-calendar me-1"></i>
+                                    {{ offre.createdAt|date('y-m-d') }}
+                            </td>
+                            <td class="pe-4 py-3 text-end">
+                                <div class="d-flex flex-wrap justify-content-end gap-1">
+                                    <a href="{{ path('app_admin_offre_candidatures', {id: offre.id}) }}"
+                                       class="btn btn-sm btn-info text-white rounded-pill px-3">
+                                        <i class="bi bi-eye me-1"></i>
+                                        <span class="d-none d-sm-inline">Voir</span>
+                                        <span class="d-inline d-sm-none">Voir</span>
+                                    </a>
+                                    <a href="{{ path('app_admin_offre_edit', {id: offre.id}) }}"
+                                       class="btn btn-sm btn-warning rounded-pill px-3">
+                                        <i class="bi bi-pencil me-1"></i>
+                                        <span class="d-none d-sm-inline">Éditer</span>
+                                        <span class="d-inline d-sm-none">Éditer</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <div class="text-muted">
+                                    <i class="bi bi-inbox display-4 d-block mb-3"></i>
+                                    <p class="mb-0">Aucune offre disponible</p>
+                                    <small class="text-muted">Commencez par créer votre première offre</small>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pied de page avec informations -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 pt-2 text-muted small">
+        <div>
+            <i class="bi bi-info-circle me-1"></i>
+            Affichage de <span class="fw-medium">{{ offres|length }}</span> offre(s)
+        </div>
+        <div>
+            <i class="bi bi-arrow-up-circle me-1"></i>
+            Cliquez sur "Voir candidats" pour gérer les candidatures
+        </div>
+    </div>
+</div>
 {% endblock %}

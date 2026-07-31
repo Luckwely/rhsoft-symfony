@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+
 #[Route('/admin')]
 #[IsGranted('ROLE_ADMIN')]
 class EmployeeController extends AbstractController
@@ -76,6 +77,18 @@ class EmployeeController extends AbstractController
         $entreprise = $admin->getEntreprise();
 
         $user = new User();
+
+        // Pre-fill fields if passed from query parameters (accepted candidature)
+        if ($request->query->has('nom')) {
+            $user->setNom($request->query->get('nom'));
+        }
+        if ($request->query->has('email')) {
+            $user->setEmail($request->query->get('email'));
+        }
+        if ($request->query->has('telephone')) {
+            $user->setTelephone($request->query->get('telephone'));
+        }
+
         $form = $this->createForm(EmployeeFormType::class, $user);
         $form->handleRequest($request);
 
@@ -96,7 +109,7 @@ class EmployeeController extends AbstractController
 
             // UPLOAD CV
             $cvFile = $form->get('cv')->getData();
-            if ($cvFile) { // <-- $cvFile pas $photoFile
+            if ($cvFile) {
                 $newFilename = uniqid().'.'.$cvFile->guessExtension();
                 $cvFile->move($upload_dir, $newFilename);
                 $user->setCv($newFilename);

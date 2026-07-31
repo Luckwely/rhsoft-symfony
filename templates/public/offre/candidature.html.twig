@@ -3,16 +3,74 @@
 
 {% block body %}
 <div class="container py-5">
-    <h1>Postuler à: {{ offre.titre }}</h1>
-    <p class="text-muted mb-4">{{ offre.entreprise.nom }}</p>
+    {# Flash Messages Handling #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label == 'success' ? 'success' : 'danger' }} alert-dismissible fade show shadow-sm rounded-4 mb-4" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
 
-    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
-        {{ form_row(form.nom) }}
-        {{ form_row(form.email) }}
-        {{ form_row(form.telephone) }}
-        {{ form_row(form.cv) }}
-        {{ form_row(form.lettreMotivation) }}
-        <button class="btn btn-primary btn-lg">Envoyer ma candidature</button>
-    {{ form_end(form) }}
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+        <div class="mb-4">
+            <a href="{{ path('app_offre_show', {id: offre.id}) }}" class="text-decoration-none text-muted fw-semibold">
+                <i class="bi bi-arrow-left me-1"></i> Retour
+            </a>
+        </div>
+
+            <div class="card border-0 shadow-sm p-4 rounded-4">
+                <h1 class="h3 fw-bold mb-1">Postuler à : {{ offre.titre }}</h1>
+                <p class="text-muted mb-4">{{ offre.entreprise.nom }}</p>
+
+                {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'class': 'needs-validation'}}) }}
+
+                    {# Champ Nom #}
+                    <div class="mb-3">
+                        {{ form_label(form.nom, 'Nom complet', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                        {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'Votre nom et prénom'}}) }}
+                        {{ form_errors(form.nom) }}
+                    </div>
+
+                    {# Champ Email #}
+                    <div class="mb-3">
+                        {{ form_label(form.email, 'Adresse email', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                        {{ form_widget(form.email, {'attr': {'class': 'form-control', 'placeholder': 'votre.email@exemple.com'}}) }}
+                        {{ form_errors(form.email) }}
+                    </div>
+
+                    {# Champ Téléphone #}
+                    <div class="mb-3">
+                        {{ form_label(form.telephone, 'Numéro de téléphone', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                        {{ form_widget(form.telephone, {'attr': {'class': 'form-control', 'placeholder': '+261 XX XX XXX XX'}}) }}
+                        {{ form_errors(form.telephone) }}
+                    </div>
+
+                    {# Champ CV #}
+                    <div class="mb-3">
+                        {{ form_label(form.cv, 'Curriculum Vitae (PDF)', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                        {{ form_widget(form.cv, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.cv) }}
+                    </div>
+
+                    {# Champ Lettre de motivation #}
+                    <div class="mb-4">
+                        {{ form_label(form.lettreMotivation, 'Lettre de motivation', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                        {{ form_widget(form.lettreMotivation, {'attr': {'class': 'form-control', 'rows': 5, 'placeholder': 'Parlez-nous de vous et de vos motivations...'}}) }}
+                        {{ form_errors(form.lettreMotivation) }}
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill">
+                            <i class="bi bi-send-fill me-2"></i>Envoyer ma candidature
+                        </button>
+                    </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -1,4 +1,4 @@
-{% extends 'layouts/base_admin.html.twig' %}
+{% extends 'layouts/base_rh.html.twig' %}
 
 {% block title %}{{ offre.id ? 'Editer' : 'Créer' }} une Offre{% endblock %}
 
@@ -27,7 +27,7 @@
         </div>
 
         <button class="btn btn-success mt-3 px-4">Enregistrer</button>
-        <a href="{{ path('app_admin_offre') }}" class="btn btn-outline-secondary mt-3 ms-2">Retour</a>
+        <a href="{{ path('app_rh_recrutement') }}" class="btn btn-outline-secondary mt-3 ms-2">Retour</a>
 
     {{ form_end(form) }}
 </div>

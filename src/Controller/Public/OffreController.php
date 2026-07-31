@@ -3,7 +3,7 @@ namespace App\Controller\Public;
 
 use App\Entity\Offre;
 use App\Entity\Candidature;
-use App\Form\CandidatureType;// <-- IL MANQUAIT CE USE
+use App\Form\CandidatureType;
 use App\Repository\OffreRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 #[Route('/carriere')]
 class OffreController extends AbstractController
 {
-    // 1. PAGE GLOBALE : TOUTES LES OFFRES
     #[Route('/', name: 'app_carriere_globale')]
     public function index(OffreRepository $offreRepository): Response
     {
@@ -29,7 +28,6 @@ class OffreController extends AbstractController
         ]);
     }
 
-    // 2. PAGE PAR ENTREPRISE
     #[Route('/{slug}', name: 'app_carriere_entreprise')]
     public function byEntreprise(string $slug, OffreRepository $offreRepository): Response
     {
@@ -40,7 +38,6 @@ class OffreController extends AbstractController
         ]);
     }
 
-    // 3. DETAIL PUBLIQUE - CORRIGE ICI
     #[Route('/offre/{id}', name: 'app_offre_show')]
     public function show(Offre $offre): Response
     {
@@ -48,7 +45,7 @@ class OffreController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        return $this->render('public/offre/show.html.twig', [ // <-- CORRIGE LE CHEMIN ICI
+        return $this->render('public/offre/show.html.twig', [
             'offre' => $offre,
         ]);
     }
@@ -66,7 +63,6 @@ class OffreController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Upload CV
             $cvFile = $form->get('cv')->getData();
             if ($cvFile) {
                 $newFilename = uniqid().'_'.preg_replace('/\s+/', '_', $cvFile->getClientOriginalName());
@@ -82,7 +78,7 @@ class OffreController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Votre candidature a bien été envoyée !');
-            return $this->redirectToRoute('app_offre_show', ['id' => $offre->getId()]);
+            return $this->redirectToRoute('app_candidature_new', ['id' => $offre->getId()]);
         }
 
         return $this->render('public/offre/candidature.html.twig', [
@@ -90,5 +86,4 @@ class OffreController extends AbstractController
             'offre' => $offre,
         ]);
     }
-
 }

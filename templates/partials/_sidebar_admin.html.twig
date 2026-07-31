@@ -26,37 +26,37 @@
     {% set current_route = app.request.attributes.get('_route')|default('') %}
     <a href="{{ path('app_admin_dashboard') }}"
         class="nav-link{% if current_route == 'app_admin_dashboard' %} active{% endif %}">
-        <i class="bi bi-speedometer2 me-2"></i>
+        <i class="bi bi-house-door-fill me-2"></i> {# More specific dashboard icon #}
         Tableau de bord
     </a>
     <a href="{{ path('app_admin_employee') }}"
         class="nav-link{% if current_route == 'app_admin_employee' or current_route starts with 'app_admin_employee_' %} active{% endif %}">
-        <i class="bi bi-people me-2"></i>
+        <i class="bi bi-person-fill me-2"></i> {# Replaced people with person-fill #}
         Employés
     </a>
-    <a href="{{ path('admin_offre_index') }}"
-        class="nav-link{% if current_route == 'admin_offre_index' or current_route starts with 'admin_offre_index' %} active{% endif %}">
-        <i class="bi bi-people me-2"></i>
-        Offres
+    <a href="{{ path('app_admin_offre') }}"
+        class="nav-link{% if current_route == 'app_admin_offre' or current_route starts with 'app_admin_offre_' %} active{% endif %}">
+        <i class="bi bi-briefcase-fill me-2"></i> {# Changed to briefcase for job offers #}
+        Offres d'emploi
     </a>
     <a href="{{ path('app_admin_planning') }}" class="nav-link{% if current_route == 'app_admin_planning' or current_route starts with 'app_admin_planning_' %} active{% endif %}">
-        <i class="bi bi-calendar-week me-2"></i>
+        <i class="bi bi-calendar2-week-fill me-2"></i> {# Updated to calendar2-week-fill #}
         Planning
     </a>
     <a href="{{ path('app_admin_pointage') }}" class="nav-link{% if current_route == 'app_admin_pointage' or current_route starts with 'app_admin_pointage_' %} active{% endif %}">
-        <i class="bi bi-qr-code me-2"></i>
+        <i class="bi bi-qr-code-scan me-2"></i> {# Changed to qr-code-scan for a more action-oriented feel #}
         Pointage
     </a>
     <a href="{{ path('app_admin_conge') }}" class="nav-link{% if current_route == 'app_admin_conge' or current_route starts with 'app_admin_conge_' %} active{% endif %}">
-        <i class="bi bi-calendar-check me-2"></i>
+        <i class="bi bi-calendar-check-fill me-2"></i> {# Added -fill for solid version #}
         Congés
     </a>
     <a href="{{ path('app_admin_reporting') }}" class="nav-link{% if current_route == 'app_admin_reporting' or current_route starts with 'app_admin_reporting_' %} active{% endif %}">
-        <i class="bi bi-graph-up-arrow me-2"></i>
+        <i class="bi bi-bar-chart-fill me-2"></i> {# Changed to bar-chart-fill for a more professional reporting icon #}
         Reporting
     </a>
     <a href="{{ path('app_admin_parametre') }}" class="nav-link{% if current_route == 'app_admin_parametre' or current_route starts with 'app_admin_parametre_' %} active{% endif %}">
-        <i class="bi bi-gear me-2"></i>
+        <i class="bi bi-gear-fill me-2"></i> {# Added -fill for consistency #}
         Paramètres
     </a>
 </nav>
