@@ -68,14 +68,27 @@ final class EmployeeController extends AbstractController
     public function new(
         Request $request,
         EntityManagerInterface $em,
-        MailerInterface $mailer
+        MailerInterface $mailer,
+        string $upload_dir
     ): Response
     {
         $admin = $this->getUser();
         $entreprise = $admin->getEntreprise();
 
         $user = new User();
+        // Pre-fill fields if passed from query parameters (accepted candidature)
+        if ($request->query->has('nom')) {
+            $user->setNom($request->query->get('nom'));
+        }
+        if ($request->query->has('email')) {
+            $user->setEmail($request->query->get('email'));
+        }
+        if ($request->query->has('telephone')) {
+            $user->setTelephone($request->query->get('telephone'));
+        }
+
         $form = $this->createForm(EmployeeFormType::class, $user);
+        
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

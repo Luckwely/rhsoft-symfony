@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Repository;
 
 use App\Entity\Conge;
@@ -8,9 +7,7 @@ use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<Conge>
- */
+/** @extends ServiceEntityRepository<Conge> */
 class CongeRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -18,12 +15,7 @@ class CongeRepository extends ServiceEntityRepository
         parent::__construct($registry, Conge::class);
     }
 
-    /**
-     * Find all leaves for a given enterprise, optionally filtered by status.
-     * Useful for Admin and RH dashboards.
-     *
-     * @return Conge[]
-     */
+    /** @return Conge[] */
     public function findByEntrepriseAndStatus(Entreprise $entreprise, ?string $statut = null): array
     {
         $qb = $this->createQueryBuilder('c')
@@ -32,19 +24,13 @@ class CongeRepository extends ServiceEntityRepository
             ->orderBy('c.createdAt', 'DESC');
 
         if ($statut) {
-            $qb->andWhere('c.statut = :statut')
-               ->setParameter('statut', $statut);
+            $qb->andWhere('c.statut = :statut')->setParameter('statut', $statut);
         }
 
         return $qb->getQuery()->getResult();
     }
 
-    /**
-     * Find all leaves submitted by a specific employee.
-     * Useful for Agents viewing their own requests.
-     *
-     * @return Conge[]
-     */
+    /** @return Conge[] */
     public function findByEmployee(User $employee): array
     {
         return $this->createQueryBuilder('c')
@@ -53,5 +39,28 @@ class CongeRepository extends ServiceEntityRepository
             ->orderBy('c.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    /** @return Conge[] */
+    public function findEnAttenteByEntreprise(Entreprise $entreprise, ?string $type = null, ?string $search = null): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->join('c.employee', 'e')
+            ->join('c.typeConge', 't')
+            ->where('c.entreprise = :entreprise')
+            ->andWhere('c.statut = :statut')
+            ->setParameter('entreprise', $entreprise)
+            ->setParameter('statut', Conge::STATUS_DEMANDE)
+            ->orderBy('c.createdAt', 'DESC');
+
+        if ($type) {
+            $qb->andWhere('t.code = :type')->setParameter('type', $type);
+        }
+        if ($search) {
+            $qb->andWhere('LOWER(e.nom) LIKE LOWER(:search) OR LOWER(e.prenom) LIKE LOWER(:search)')
+               ->setParameter('search', '%'.$search.'%');
+        }
+
+        return $qb->getQuery()->getResult();
     }
 }
