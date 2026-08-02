@@ -1,490 +1,131 @@
 {% extends 'layouts/base_manager.html.twig' %}
-
 {% block title %}Planning de l'équipe{% endblock %}
-
 {% block body %}
 <div class="container-fluid px-4 py-3">
+
+    <div class="card border-0 bg-light rounded-4 shadow-sm mb-3 p-3">
+        <form method="GET" action="{{ path('app_manager_planning') }}" class="">
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+                <input type="text" name="q" value="{{ search }}" placeholder="Rechercher employé..." class="form-control" style="max-width: 250px;">
+                <button class="btn btn-primary btn-sm"><i class="bi bi-search"></i> Filtrer</button>
+            </div>
+        </form>
+    </div>
+
+<form method="POST" action="{{ path('app_manager_planning_save') }}">
+    <input type="hidden" name="week_start" value="{{ weekStart|date('Y-m-d') }}">
+
     <!-- HEADER -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="fw-bold mb-1">
-                <i class="bi bi-calendar-week text-primary me-2"></i>Planning de l'équipe
-            </h3>
+            <h3 class="fw-bold mb-1">Planning de l'équipe ({{ employees.getTotalItemCount }})</h3>
             <p class="text-muted mb-0">
-                <i class="bi bi-clock-history me-1"></i>Organisez les plannings de votre équipe
+                <i class="bi bi-calendar3 me-1"></i>
+                Semaine {{ weekStart|date('W') }} - {{ weekStart|date('d M') }} au {{ weekStart|date_modify('+6 days')|date('d M Y') }}
+                {% if not canEdit %}<span class="badge bg-danger ms-2">Lecture seule - Semaine passée</span>{% endif %}
             </p>
         </div>
-        <button class="btn btn-outline-dark btn-sm mt-3 mt-md-0">
-            <i class="bi bi-download me-1"></i>Exporter
-        </button>
-    </div>
-
-    <!-- NAVIGATION ONGLETS BOOTSTRAP -->
-    <ul class="nav nav-tabs border-0 gap-2 mb-4" id="planningTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active border-0 rounded-3 px-4"
-                    id="tab-planning-btn"
-                    data-bs-toggle="tab"
-                    data-bs-target="#tab-planning"
-                    type="button"
-                    role="tab"
-                    aria-controls="tab-planning"
-                    aria-selected="true">
-                <i class="bi bi-calendar3 text-primary me-2"></i>Planning Equipe
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link border-0 rounded-3 px-4"
-                    id="tab-creer-btn"
-                    data-bs-toggle="tab"
-                    data-bs-target="#tab-creer"
-                    type="button"
-                    role="tab"
-                    aria-controls="tab-creer"
-                    aria-selected="false">
-                <i class="bi bi-pencil-square text-success me-2"></i>Créer / Modifier
-            </button>
-        </li>
-    </ul>
-
-    <!-- CONTENU ONGLETS -->
-    <div class="tab-content" id="planningTabsContent">
-
-        <!-- ONGLET 1: PLANNING EQUIPE -->
-        <div class="tab-pane fade show active" id="tab-planning" role="tabpanel" aria-labelledby="tab-planning-btn">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-transparent border-0">
-                    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <button class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-chevron-left"></i>
-                            </button>
-                            <h5 class="mb-0 fw-bold">Semaine du 20 au 26 Octobre 2025</h5>
-                            <button class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-chevron-right"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-calendar2-week"></i>
-                            </button>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <select class="form-select form-select-sm" style="width: 150px;">
-                                <option value="">Tous les services</option>
-                                <option value="tech">Tech</option>
-                                <option value="commercial">Commercial</option>
-                                <option value="rh">RH</option>
-                                <option value="design">Design</option>
-                            </select>
-                            <button class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-funnel me-1"></i>Filtrer
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-bordered text-center align-middle mb-0" style="border-color: #e9ecef;">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th style="width: 150px;" class="py-3">Employé</th>
-                                    <th class="py-3">Lun 20</th>
-                                    <th class="py-3">Mar 21</th>
-                                    <th class="py-3">Mer 22</th>
-                                    <th class="py-3">Jeu 23</th>
-                                    <th class="py-3">Ven 24</th>
-                                    <th class="py-3">Sam 25</th>
-                                    <th class="py-3">Dim 26</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Employé 1: Jean Dupont -->
-                                <tr>
-                                    <td class="text-start ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px;">JD</div>
-                                            <div class="fw-semibold">Jean Dupont</div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
-                                            <i class="bi bi-calendar-x me-1"></i>Congé
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
-                                            <i class="bi bi-calendar-x me-1"></i>Congé
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
-                                            <i class="bi bi-moon me-1"></i>Repos
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
-                                            <i class="bi bi-moon me-1"></i>Repos
-                                        </span>
-                                    </td>
-                                </tr>
-
-                                <!-- Employé 2: Marie Martin -->
-                                <tr>
-                                    <td class="text-start ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px;">MM</div>
-                                            <div class="fw-semibold">Marie Martin</div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
-                                            <i class="bi bi-clock me-1"></i>09h-18h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
-                                            <i class="bi bi-clock me-1"></i>09h-18h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
-                                            <i class="bi bi-clock me-1"></i>09h-18h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
-                                            <i class="bi bi-clock me-1"></i>09h-18h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
-                                            <i class="bi bi-clock me-1"></i>09h-18h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
-                                            <i class="bi bi-moon me-1"></i>Repos
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
-                                            <i class="bi bi-moon me-1"></i>Repos
-                                        </span>
-                                    </td>
-                                </tr>
-
-                                <!-- Employé 3: Paul Dubois -->
-                                <tr>
-                                    <td class="text-start ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-warning-subtle text-warning rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px;">PD</div>
-                                            <div class="fw-semibold">Paul Dubois</div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info-subtle text-info rounded-pill px-3 py-2">
-                                            <i class="bi bi-mortarboard me-1"></i>Formation
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info-subtle text-info rounded-pill px-3 py-2">
-                                            <i class="bi bi-mortarboard me-1"></i>Formation
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
-                                            <i class="bi bi-moon me-1"></i>Repos
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
-                                            <i class="bi bi-moon me-1"></i>Repos
-                                        </span>
-                                    </td>
-                                </tr>
-
-                                <!-- Employé 4: Julie Lefèvre -->
-                                <tr>
-                                    <td class="text-start ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-info-subtle text-info rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px;">JL</div>
-                                            <div class="fw-semibold">Julie Lefèvre</div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
-                                            <i class="bi bi-moon me-1"></i>Repos
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
-                                            <i class="bi bi-moon me-1"></i>Repos
-                                        </span>
-                                    </td>
-                                </tr>
-
-                                <!-- Employé 5: Thomas Bernard -->
-                                <tr>
-                                    <td class="text-start ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-danger-subtle text-danger rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px;">TB</div>
-                                            <div class="fw-semibold">Thomas Bernard</div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
-                                            <i class="bi bi-moon me-1"></i>Repos
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
-                                            <i class="bi bi-moon me-1"></i>Repos
-                                        </span>
-                                    </td>
-                                </tr>
-
-                                <!-- Employé 6: Sarah Rakoto -->
-                                <tr>
-                                    <td class="text-start ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-secondary-subtle text-secondary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px;">SR</div>
-                                            <div class="fw-semibold">Sarah Rakoto</div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
-                                            <i class="bi bi-calendar-x me-1"></i>Congé
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
-                                            <i class="bi bi-calendar-x me-1"></i>Congé
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
-                                            <i class="bi bi-calendar-x me-1"></i>Congé
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i>08h-17h
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
-                                            <i class="bi bi-moon me-1"></i>Repos
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
-                                            <i class="bi bi-moon me-1"></i>Repos
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="card-footer bg-transparent border-0 d-flex flex-wrap gap-3 align-items-center py-3">
-                    <span class="text-muted small">Légende:</span>
-                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">Travail</span>
-                    <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">Congé</span>
-                    <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">Horaire décalé</span>
-                    <span class="badge bg-info-subtle text-info rounded-pill px-3 py-2">Formation</span>
-                    <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">Repos</span>
-                    <span class="ms-auto text-muted small">
-                        <i class="bi bi-arrow-repeat me-1"></i>Mise à jour automatique
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        <!-- ONGLET 2: CRÉER / MODIFIER -->
-        <div class="tab-pane fade" id="tab-creer" role="tabpanel" aria-labelledby="tab-creer-btn">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-transparent border-0">
-                    <h5 class="fw-bold mb-0">
-                        <i class="bi bi-pencil-square text-success me-2"></i>Créer / Modifier un shift
-                    </h5>
-                    <small class="text-muted">Attribuez un shift à un employé</small>
-                </div>
-                <div class="card-body">
-                    <form class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Employé <span class="text-danger">*</span></label>
-                            <select class="form-select">
-                                <option value="">Sélectionner un employé</option>
-                                <option value="1">Jean Dupont</option>
-                                <option value="2">Marie Martin</option>
-                                <option value="3">Paul Dubois</option>
-                                <option value="4">Julie Lefèvre</option>
-                                <option value="5">Thomas Bernard</option>
-                                <option value="6">Sarah Rakoto</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" value="{{ "now"|date('Y-m-d') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold">Heure Début <span class="text-danger">*</span></label>
-                            <input type="time" class="form-control" value="08:00">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold">Heure Fin <span class="text-danger">*</span></label>
-                            <input type="time" class="form-control" value="17:00">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold">Type <span class="text-danger">*</span></label>
-                            <select class="form-select">
-                                <option value="travail" selected>Travail</option>
-                                <option value="conge">Congé</option>
-                                <option value="formation">Formation</option>
-                                <option value="repos">Repos</option>
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label fw-semibold">Commentaire</label>
-                            <textarea class="form-control" rows="3" placeholder="Informations complémentaires sur ce shift..."></textarea>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" checked>
-                                <label class="form-check-label fw-semibold">Notifier l'employé</label>
-                                <br>
-                                <small class="text-muted">Un email sera envoyé à l'employé pour l'informer de ce changement</small>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <button class="btn btn-success">
-                                <i class="bi bi-check2 me-1"></i>Enregistrer le planning
-                            </button>
-                            <button class="btn btn-outline-secondary ms-2">
-                                <i class="bi bi-arrow-counterclockwise me-1"></i>Annuler
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+        <div class="d-flex gap-2">
+            <a href="{{ path('app_manager_planning', {week: prevWeek|date('Y-m-d'), q: search, role: role}) }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            <a href="{{ path('app_manager_planning', {q: search, role: role}) }}" class="btn btn-outline-secondary btn-sm">
+                Aujourd'hui
+            </a>
+            <a href="{{ path('app_manager_planning', {week: nextWeek|date('Y-m-d'), q: search, role: role}) }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+            {% if canEdit %}
+                <button type="submit" class="btn btn-success btn-sm">
+                    <i class="bi bi-save me-1"></i>Enregistrer
+                </button>
+            {% endif %}
         </div>
 
     </div>
+
+    <!-- TABLEAU -->
+    <div class="card border-0 shadow-sm rounded-4">
+    <div class="table-responsive">
+    <table class="table table-bordered align-middle mb-0" style="font-size: 12px;">
+        <thead class="bg-light">
+            <tr>
+                <th style="width: 150px;">Employé</th>
+                {% for day in days %}<th class="text-center">{{ day|slice(0,3)|capitalize }}</th>{% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for employe in employees %}
+        <tr>
+            <td class="fw-semibold">{{ employe.prenom }} {{ employe.nom }}</td>
+            {% for day in days %}
+                {% set p = planningMap[employe.id][day]?? null %}
+                <td class="p-1 {{ not canEdit? 'bg-light' }}">
+                    <div class="d-flex flex-column gap-1">
+
+                        {# HACK: Si disabled on envoie quand meme la valeur avec un hidden #}
+                        {% if not canEdit %}
+                            <input type="hidden" name="planning[{{ employe.id }}][{{ day }}][isDayOff]" value="{{ p and p.isDayOff? '1' : '0' }}">
+                        {% endif %}
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox"
+                                   name="planning[{{ employe.id }}][{{ day }}][isDayOff]" value="1"
+                                   {{ p and p.isDayOff? 'checked' }} {{ not canEdit? 'disabled' }}>
+                            <label class="form-check-label" style="font-size:10px">Jour d'off</label>
+                        </div>
+
+                        <label class="form-check-label" style="font-size:9px">Début</label>
+                        <input type="time" class="form-control form-control-sm {{ not canEdit? 'bg-light' }}"
+                               name="planning[{{ employe.id }}][{{ day }}][heureDebut]"
+                               value="{{ p and p.heureDebut? p.heureDebut|date('H:i') : '08:00' }}"
+                               {{ not canEdit? 'readonly' }}>
+
+                        <label class="form-check-label" style="font-size:9px">Fin</label>
+                        <input type="time" class="form-control form-control-sm {{ not canEdit? 'bg-light' }}"
+                               name="planning[{{ employe.id }}][{{ day }}][heureFin]"
+                               value="{{ p and p.heureFin? p.heureFin|date('H:i') : '17:00' }}"
+                               {{ not canEdit? 'readonly' }}>
+
+                        <label class="form-check-label" style="font-size:9px">Pause min</label>
+                        <input type="number" class="form-control form-control-sm {{ not canEdit? 'bg-light' }}"
+                               name="planning[{{ employe.id }}][{{ day }}][pauseMinutes]"
+                               value="{{ p? p.pauseMinutes : 60 }}" {{ not canEdit? 'readonly' }}>
+                    </div>
+                </td>
+            {% endfor %}
+        </tr>
+        {% else %}
+            <tr>
+                <td colspan="8" class="text-center py-5">
+                    <div class="py-4">
+                        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="bi bi-people text-muted fs-1"></i>
+                        </div>
+                        <h5 class="fw-bold">Aucun employé trouvé</h5>
+                        <p class="text-muted small">Commencez par ajouter votre premier employé</p>
+                        <a href="{{ path('app_admin_employee_new') }}" class="btn btn-primary">
+                            <i class="bi bi-person-plus me-1"></i>Ajouter un employé
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="card-footer bg-transparent border-0 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 py-3">
+        <div class="text-muted small">
+            <i class="bi bi-info-circle me-1"></i>
+            {{ employees.getTotalItemCount }} employés au total
+        </div>
+        <div>
+            {{ knp_pagination_render(employees) }}
+        </div>
+    </div>
+</form>
 </div>
-
-<!-- Style pour les onglets modernes -->
-<style>
-    .nav-tabs .nav-link {
-        color: #6c757d;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    .nav-tabs .nav-link:hover {
-        background-color: #f8f9fa;
-        color: #0d6efd;
-    }
-    .nav-tabs .nav-link.active {
-        background-color: #0d6efd;
-        color: #ffffff;
-        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
-    }
-    .nav-tabs .nav-link.active .badge {
-        background-color: rgba(255,255,255,0.25) !important;
-        color: #ffffff !important;
-    }
-    .tab-pane {
-        animation: fadeIn 0.3s ease;
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    .table-bordered td, .table-bordered th {
-        border-color: #e9ecef;
-    }
-</style>
 {% endblock %}
