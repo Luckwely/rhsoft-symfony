@@ -78,4 +78,23 @@ class PointageRepository extends ServiceEntityRepository
             ->getQuery()
             ->execute();
     }
+
+    public function countAbsencesByEmployeAndMonth($employee, int $mois, int $annee): int
+    {
+        // Créer les dates de début et de fin du mois
+        $dateDebut = new \DateTimeImmutable("$annee-$mois-01 00:00:00");
+        $dateFin = $dateDebut->modify('last day of this month 23:59:59');
+
+        return (int) $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->where('p.employee = :employee')
+            ->andWhere('p.statut = :statut')
+            ->andWhere('p.date BETWEEN :dateDebut AND :dateFin')
+            ->setParameter('employee', $employee)
+            ->setParameter('statut', 'absent') // Assurez-vous que la valeur correspond à votre base (ex: 'absent')
+            ->setParameter('dateDebut', $dateDebut)
+            ->setParameter('dateFin', $dateFin)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

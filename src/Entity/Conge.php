@@ -81,6 +81,12 @@ class Conge
     public function setValidePar(?User $validePar): static { $this->validePar = $validePar; return $this; }
     public function getValideLe(): ?\DateTimeImmutable { return $this->valideLe; }
     public function setValideLe(?\DateTimeImmutable $valideLe): static { $this->valideLe = $valideLe; return $this; }
+    public function setCreatedAt(?\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
     public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
     public function isValide(): bool { return $this->statut === self::STATUS_VALIDE; }
 }

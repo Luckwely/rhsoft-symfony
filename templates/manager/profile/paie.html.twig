@@ -1,0 +1,98 @@
+{% extends 'layouts/base_manager.html.twig' %}
+
+{% block title %}Mon Profil - Mes fiches de paie{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4 py-3">
+    <!-- HEADER -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">
+                <i class="bi bi-person-circle text-primary me-2"></i>Mon Profil
+            </h3>
+            <p class="text-muted mb-0">
+                <i class="bi bi-gear me-1"></i>Gérez vos informations et documents
+            </p>
+        </div>
+        <div class="d-flex gap-2 mt-3 mt-md-0">
+            <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 44px; height: 44px; font-size: 16px;">
+                {{ user.prenom|first }}{{ user.nom|first }}
+            </div>
+            <div class="d-flex flex-column justify-content-center">
+                <span class="fw-semibold">{{ user.prenom }} {{ user.nom }}</span>
+                <small class="text-muted">{{ user.poste ?? 'Manager' }}</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVIGATION PAR LIENS (SANS JS) -->
+    <ul class="nav nav-tabs border-0 gap-2 mb-4">
+        <li class="nav-item">
+            <a class="nav-link border-0 rounded-3 px-4 text-secondary" href="{{ path('app_manager_profile_solde') }}">
+                <i class="bi bi-calendar-check text-primary me-2"></i>Mon solde congé
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active border-0 rounded-3 px-4" href="{{ path('app_manager_profile_paie') }}">
+                <i class="bi bi-file-earmark-text text-white me-2"></i>Mes fiches de paie
+            </a>
+        </li>
+    </ul>
+
+    <!-- CONTENU UNIQUE: MES FICHES DE PAIE -->
+    <div>
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h5 class="fw-bold mb-0">
+                    <i class="bi bi-wallet2 text-success me-2"></i>Mes fiches de paie
+                </h5>
+                <button class="btn btn-outline-dark btn-sm">
+                    <i class="bi bi-download me-1"></i>Télécharger toutes
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle table-borderless mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-3 py-3">Mois</th>
+                                <th class="py-3 text-end">Salaire Brut</th>
+                                <th class="py-3 text-end">Cotisations</th>
+                                <th class="py-3 text-end">Salaire Net</th>
+                                <th class="py-3 text-center pe-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for paie in paies %}
+                                <tr>
+                                    <td class="ps-3"><span class="fw-semibold">{{ paie.mois }}</span></td>
+                                    <td class="text-end">{{ paie.salaireBrut }} €</td>
+                                    <td class="text-end text-danger">-{{ paie.cotisations }} €</td>
+                                    <td class="text-end fw-bold text-success">{{ paie.salaireNet }} €</td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-light border-0" title="Voir"><i class="bi bi-eye"></i></button>
+                                        <a href="#" class="btn btn-sm btn-outline-secondary" title="Télécharger PDF"><i class="bi bi-download me-1"></i>PDF</a>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">Aucune fiche de paie disponible.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center py-3">
+                <small class="text-muted"><i class="bi bi-info-circle me-1"></i>{{ paies|length }} fiche(s) de paie disponible(s)</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .nav-tabs .nav-link { color: #6c757d; font-weight: 500; transition: all 0.3s ease; }
+    .nav-tabs .nav-link:hover { background-color: #f8f9fa; color: #0d6efd; }
+    .nav-tabs .nav-link.active { background-color: #0d6efd; color: #ffffff; box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3); }
+</style>
+{% endblock %}
