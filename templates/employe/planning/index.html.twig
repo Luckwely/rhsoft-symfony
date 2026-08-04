@@ -166,29 +166,29 @@
                                 </tr>
                             </thead>
                             <tbody>
+                            {% for p in historique %}
                                 <tr>
-                                    <td class="ps-3"><span class="fw-semibold">21/10/2025</span></td>
-                                    <td class="text-center">08:02</td>
-                                    <td class="text-center">17:05</td>
-                                    <td class="text-center"><span class="fw-semibold">9h 03min</span></td>
+                                    <td class="ps-3"><span class="fw-semibold">{{ p.date|date('d/m/Y') }}</span></td>
+                                    <td class="text-center">{{ p.heureEntree ? p.heureEntree|date('H:i') : '--:--' }}</td>
+                                    <td class="text-center">{{ p.heureSortie ? p.heureSortie|date('H:i') : '--:--' }}</td>
+                                    <td class="text-center">
+                                        <span class="fw-semibold">
+                                            {# Add a simple macro or inline diff logic if needed #}
+                                            {{ p.heureEntree and p.heureSortie ? p.heureEntree.diff(p.heureSortie).format('%h0h %imin') : '--' }}
+                                        </span>
+                                    </td>
                                     <td class="text-center pe-3">
-                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Complet
+                                        <span class="badge bg-{{ p.statut == 'Retard' ? 'warning' : 'success' }}-subtle text-{{ p.statut == 'Retard' ? 'warning' : 'success' }} rounded-pill px-3 py-2">
+                                            <i class="bi bi-{{ p.statut == 'Retard' ? 'clock-history' : 'check-circle-fill' }} me-1"></i>{{ p.statut ?? 'Complet' }}
                                         </span>
                                     </td>
                                 </tr>
+                            {% else %}
                                 <tr>
-                                    <td class="ps-3"><span class="fw-semibold">20/10/2025</span></td>
-                                    <td class="text-center">08:15</td>
-                                    <td class="text-center">17:00</td>
-                                    <td class="text-center"><span class="fw-semibold">8h 45min</span></td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
-                                            <i class="bi bi-clock-history me-1"></i>Retard
-                                        </span>
-                                    </td>
+                                    <td colspan="5" class="text-center py-4 text-muted">Aucun historique disponible pour cette période.</td>
                                 </tr>
-                            </tbody>
+                            {% endfor %}
+                        </tbody>
                         </table>
                     </div>
                 </div>
@@ -226,42 +226,43 @@
                         </div>
                         <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-bordered text-center align-middle mb-0" style="border-color: #e9ecef;">
-                                    <thead class="bg-light">
-                                        <tr>
-                                            <th style="width: 120px;">Jour</th>
-                                            <th>Début</th>
-                                            <th>Fin</th>
-                                            <th>Pause</th>
-                                            <th>Statut</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="fw-semibold text-start ps-3">Lundi</td>
-                                            <td>08:00</td>
-                                            <td>17:00</td>
-                                            <td>12:00-13:00</td>
-                                            <td>
+                            <table class="table table-bordered text-center align-middle mb-0" style="border-color: #e9ecef;">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th style="width: 120px;">Jour</th>
+                                        <th>Début</th>
+                                        <th>Fin</th>
+                                        <th>Pause</th>
+                                        <th>Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for plan in planningsSemaine %}
+                                    <tr>
+                                        <td class="fw-semibold text-start ps-3">{{ plan.dayOfWeek|capitalize }}</td>
+                                        <td>{{ plan.heureDebut ? plan.heureDebut|date('H:i') : '--:--' }}</td>
+                                        <td>{{ plan.heureFin ? plan.heureFin|date('H:i') : '--:--' }}</td>
+                                        <td>{{ plan.pauseMinutes ? plan.pauseMinutes ~ ' min' : 'Aucune' }}</td>
+                                        <td>
+                                            {% if plan.isDayOff %}
+                                                <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
+                                                    <i class="bi bi-moon-fill me-1"></i>Repos
+                                                </span>
+                                            {% else %}
                                                 <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
                                                     <i class="bi bi-check-circle me-1"></i>Travail
                                                 </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="fw-semibold text-start ps-3">Mardi</td>
-                                            <td>08:00</td>
-                                            <td>17:00</td>
-                                            <td>12:00-13:00</td>
-                                            <td>
-                                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
-                                                    <i class="bi bi-check-circle me-1"></i>Travail
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4 text-muted">Aucun planning défini pour cette semaine.</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -269,53 +270,55 @@
                 <!-- RÉCAPITULATIF PLANNING -->
                 <div class="col-lg-4">
                     <div class="card border-0 shadow-sm rounded-4 mb-3">
-                        <div class="card-body p-4">
-                            <h5 class="fw-bold mb-3">
-                                <i class="bi bi-clipboard-data text-primary me-2"></i>Récapitulatif
+                        <div class="card border-0 shadow-sm p-4 mb-4">
+                            <h5 class="card-title fw-bold mb-3">
+                                <i class="bi bi-bar-chart-fill me-2 text-primary"></i>Récapitulatif
                             </h5>
-                            <div class="d-flex justify-content-between py-2 border-bottom">
-                                <span class="text-muted">Jours travaillés</span>
-                                <span class="fw-semibold">4</span>
-                            </div>
-                            <div class="d-flex justify-content-between py-2 border-bottom">
-                                <span class="text-muted">Jours de congé</span>
-                                <span class="fw-semibold">2</span>
-                            </div>
-                            <div class="d-flex justify-content-between py-2 border-bottom">
-                                <span class="text-muted">Jours de repos</span>
-                                <span class="fw-semibold">1</span>
-                            </div>
-                            <div class="d-flex justify-content-between py-2">
-                                <span class="text-muted">Total heures</span>
-                                <span class="fw-bold text-primary">40h</span>
-                            </div>
+                            <ul class="list-unstyled mb-0">
+                                <li class="d-flex justify-content-between py-2 border-bottom">
+                                    <span class="text-muted">Jours travaillés</span>
+                                    <span class="fw-semibold">{{ joursTravailles }}</span>
+                                </li>
+                                <li class="d-flex justify-content-between py-2 border-bottom">
+                                    <span class="text-muted">Jours de congé</span>
+                                    <span class="fw-semibold">{{ joursConges }}</span>
+                                </li>
+                                <li class="d-flex justify-content-between py-2 border-bottom">
+                                    <span class="text-muted">Jours de repos</span>
+                                    <span class="fw-semibold">{{ joursRepos }}</span>
+                                </li>
+                                <li class="d-flex justify-content-between py-2">
+                                    <span class="text-muted">Total heures</span>
+                                    <span class="fw-bold text-primary">{{ totalHeuresSemaine }}</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
 
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-body p-4">
                             <h5 class="fw-bold mb-3">
-                                <i class="bi bi-info-circle text-info me-2"></i>Mes horaires
+                                <i class="bi bi-info-circle text-info me-2"></i>Mes horaires (Aujourd'hui)
                             </h5>
                             <div class="d-flex align-items-center gap-3 mb-3 p-2 bg-light rounded-3">
                                 <i class="bi bi-clock text-primary fs-4"></i>
                                 <div>
                                     <small class="text-muted d-block">Heure de début</small>
-                                    <span class="fw-semibold">08:00</span>
+                                    <span class="fw-semibold">{{ planning and planning.heureDebut ? planning.heureDebut|date('H:i') : '--:--' }}</span>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-3 mb-3 p-2 bg-light rounded-3">
                                 <i class="bi bi-clock-fill text-danger fs-4"></i>
                                 <div>
                                     <small class="text-muted d-block">Heure de fin</small>
-                                    <span class="fw-semibold">17:00</span>
+                                    <span class="fw-semibold">{{ planning and planning.heureFin ? planning.heureFin|date('H:i') : '--:--' }}</span>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-3 p-2 bg-light rounded-3">
                                 <i class="bi bi-cup-hot text-warning fs-4"></i>
                                 <div>
-                                    <small class="text-muted d-block">Pause déjeuner</small>
-                                    <span class="fw-semibold">12:00 - 13:00</span>
+                                    <small class="text-muted d-block">Pause</small>
+                                    <span class="fw-semibold">{{ planning and planning.pauseMinutes ? planning.pauseMinutes ~ ' min' : 'Aucune' }}</span>
                                 </div>
                             </div>
                         </div>

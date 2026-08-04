@@ -93,6 +93,28 @@ class Pointage
         };
     }
 
+    public function getFormattedHeuresTravaillees(): string
+    {
+        if (!$this->heureEntree || !$this->heureSortie) {
+            return '0h 00min';
+        }
+
+        $diff = $this->heureSortie->diff($this->heureEntree);
+        $heures = $diff->h;
+        $minutes = $diff->i;
+
+        if ($this->pauseMinutes) {
+            $totalMinutes = ($heures * 60) + $minutes - $this->pauseMinutes;
+            if ($totalMinutes < 0) {
+                $totalMinutes = 0;
+            }
+            $heures = intdiv($totalMinutes, 60);
+            $minutes = $totalMinutes % 60;
+        }
+
+        return sprintf('%dh %02dmin', $heures, $minutes);
+    }
+
     // GETTERS SETTERS
     public function getId(): ?int { return $this->id; }
     public function getEmployee(): ?User { return $this->employee; }

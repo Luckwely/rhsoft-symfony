@@ -30,7 +30,7 @@ class EmployeeController extends AbstractController
 
         $entreprise = $this->getUser()->getEntreprise();
 
-        $mondayThisWeek = new \DateTime('monday this week');
+        $mondayThisWeek = new \DateTimeImmutable('monday this week');
         $plannings = $em->getRepository(Planning::class)->findBy([
             'entreprise' => $entreprise,
             'weekStart' => $mondayThisWeek

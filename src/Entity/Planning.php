@@ -23,7 +23,7 @@ class Planning
     #[ORM\Column(length: 20)]
     private ?string $dayOfWeek = null;
 
-    #[ORM\Column(name: 'week_start', type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: 'week_start', type: Types::DATE_IMMUTABLE)]
     private ?\DateTimeInterface $weekStart = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
