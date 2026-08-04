@@ -118,17 +118,17 @@
                                     </span>
                                 </td>
                                 <td>
-                                {% if 'ROLE_SUPER_ADMIN' in employee.roles %}
-                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Super Admin</span>
-                                {% elseif 'ROLE_ADMIN' in employee.roles %}
-                                    <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Admin</span>
-                                {% elseif 'ROLE_RH' in employee.roles %}
-                                    <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">RH</span>
-                                {% elseif 'ROLE_MANAGER' in employee.roles %}
-                                    <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Manager</span>
-                                {% else %}
-                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Employé</span>
-                                {% endif %}
+                                    {% if 'ROLE_SUPER_ADMIN' in employee.roles %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Super Admin</span>
+                                    {% elseif 'ROLE_ADMIN' in employee.roles %}
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Admin</span>
+                                    {% elseif 'ROLE_RH' in employee.roles %}
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">RH</span>
+                                    {% elseif 'ROLE_MANAGER' in employee.roles %}
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Manager</span>
+                                    {% else %}
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Employé</span>
+                                    {% endif %}
                                 </td>
                                 <td>
                                 {% if employee.isActive %}
@@ -136,7 +136,7 @@
                                         <i class="bi bi-check-circle-fill me-1"></i>Actif
                                     </span>
                                 {% else %}
-                                    <span class="badge rounded-pill bg-info-subtle text-info px-3 py-2">
+                                    <span class="badge rounded-pill bg-warning-subtle text-warning px-3 py-2">
                                         <i class="bi bi-clock-history me-1"></i>En attente
                                     </span>
                                 {% endif %}
@@ -150,7 +150,7 @@
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                         {% if not employee.isActive %}
-                                            <a href="{{ path('app_rh_resend', {id: employee.id}) }}" class="btn btn-sm btn-outline-info" title="Renvoyer l'invitation">
+                                            <a href="{{ path('app_rh_employee_resend', {id: employee.id}) }}" class="btn btn-sm btn-outline-info" title="Renvoyer l'invitation">
                                                 <i class="bi bi-send"></i>
                                             </a>
                                         {% endif %}
@@ -257,6 +257,9 @@
                                                             <strong>Planning Semaine {{ "now"|date('W') }}</strong>
                                                             <span class="text-muted small ms-2">({{ "now"|date('d/m/Y') }} - {{ "now"|date_modify("+6 days")|date('d/m/Y') }})</span>
                                                         </div>
+                                                        <a href="{{ path('app_rh_planning', {id: employee.id}) }}" class="btn btn-sm btn-outline-success">
+                                                            <i class="bi bi-pencil-square me-1"></i>Modifier
+                                                        </a>
                                                     </div>
                                                     <div class="table-responsive">
                                                         <table class="table table-sm table-hover mb-0">
@@ -265,6 +268,7 @@
                                                                     <th>Jour</th>
                                                                     <th>Shift</th>
                                                                     <th>Pause</th>
+                                                                    <th>Pausette</th>
                                                                     <th>Statut</th>
                                                                 </tr>
                                                             </thead>
@@ -298,11 +302,11 @@
                                                             {% set plannings = plannings|sort((a, b) => dayOrder[a.dayOfWeek] <=> dayOrder[b.dayOfWeek]) %}
 
                                                                 {% for p in plannings %}
-                                                                <tr class="{{ p.isDayOff ? 'table-info' : '' }}">
+                                                                <tr class="{{ p.isDayOff ? 'table-warning' : '' }}">
                                                                     <td><span class="fw-semibold">{{ p.dayOfWeek|capitalize }}</span></td>
                                                                     <td>
                                                                         {% if p.isDayOff %}
-                                                                            <span class="badge bg-info-subtle text-info rounded-pill"><i class="bi bi-calendar-x me-1"></i>Repos</span>
+                                                                            <span class="badge bg-warning-subtle text-warning rounded-pill"><i class="bi bi-calendar-x me-1"></i>Repos</span>
                                                                         {% else %}
                                                                             <span class="text-primary">{{ p.heureDebut|date('H:i') }} - {{ p.heureFin|date('H:i') }}</span>
                                                                         {% endif %}
@@ -321,24 +325,12 @@
                                                             {% else %}
                                                                 {# DONNEES FACTICES #}
                                                                 {% for day in days %}
-                                                                <tr>
-                                                                    <td><span class="fw-semibold">{{ day|capitalize }}</span></td>
-                                                                    <td>
-                                                                        {% if day in ['samedi', 'dimanche'] %}
-                                                                            <span class="badge bg-info-subtle text-info rounded-pill"><i class="bi bi-calendar-x me-1"></i>Repos</span>
-                                                                        {% else %}
-                                                                            <span class="text-primary">09:00 - 17:00</span>
-                                                                        {% endif %}
-                                                                    </td>
-                                                                    <td>{{ day in ['samedi', 'dimanche'] ? '-' : '60 min' }}</td>
-                                                                    <td>
-                                                                        {% if day in ['samedi', 'dimanche'] %}
-                                                                            <span class="badge bg-secondary-subtle text-secondary rounded-pill">Repos</span>
-                                                                        {% else %}
-                                                                            <span class="badge bg-success-subtle text-success rounded-pill">Présent</span>
-                                                                        {% endif %}
-                                                                    </td>
-                                                                </tr>
+                                                                    <tr>
+                                                                        <td><span class="fw-semibold">{{ day|capitalize }}</span></td>
+                                                                        <td><span class="text-muted">-</span></td>
+                                                                        <td><span class="text-muted">-</span></td>
+                                                                        <td><span class="badge bg-secondary-subtle text-secondary rounded-pill">Non défini</span></td>
+                                                                    </tr>
                                                                 {% endfor %}
                                                             {% endif %}
                                                             </tbody>
@@ -358,10 +350,6 @@
                                             <i class="bi bi-people text-muted fs-1"></i>
                                         </div>
                                         <h5 class="fw-bold">Aucun employé trouvé</h5>
-                                        <p class="text-muted small">Commencez par ajouter votre premier employé</p>
-                                        <a href="{{ path('app_rh_employee_new') }}" class="btn btn-primary">
-                                            <i class="bi bi-person-plus me-1"></i>Ajouter un employé
-                                        </a>
                                     </div>
                                 </td>
                             </tr>

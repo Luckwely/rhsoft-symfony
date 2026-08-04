@@ -1,31 +1,27 @@
-<?php
-
-namespace App\Controller\Rh;
+<?php namespace App\Controller\Rh;
 
 use App\Entity\Planning;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Knp\Component\Pager\PaginatorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
 
 #[Route('/rh')]
 #[IsGranted('ROLE_RH')]
 final class PlanningController extends AbstractController
 {
-    private array $days = [
-        'lundi',
-        'mardi',
-        'mercredi',
-        'jeudi',
-        'vendredi',
-        'samedi',
-        'dimanche'
-    ];
-
+    private function getWeekDays(\DateTime $weekStart): array
+    {
+        $days = [];
+        for ($i = 0; $i < 7; $i++) {
+            $days[] = (clone $weekStart)->modify("+$i days");
+        }
+        return $days;
+    }
 
     #[Route('/planning', name: 'app_rh_planning')]
     public function index(
@@ -35,7 +31,6 @@ final class PlanningController extends AbstractController
     ): Response
     {
         $entreprise = $this->getUser()->getEntreprise();
-        $today = new \DateTime('today');
         $mondayThisWeek = new \DateTime('monday this week');
         $mondayThisWeek->setTime(0,0,0);
 
@@ -45,7 +40,6 @@ final class PlanningController extends AbstractController
 
         $minDate = (clone $mondayThisWeek)->modify('-4 weeks');
         if($weekStart < $minDate) $weekStart = clone $minDate;
-
         $canEdit = $weekStart >= $mondayThisWeek;
 
         $queryBuilder = $em->getRepository(User::class)->createQueryBuilder('u')
@@ -55,21 +49,19 @@ final class PlanningController extends AbstractController
             ->setParameter('active', true)
             ->orderBy('u.nom', 'ASC');
 
-        // FILTRE RECHERCHE
         if ($search = $request->query->get('q')) {
-            $queryBuilder
-                ->andWhere('u.nom LIKE :search OR u.prenom LIKE :search OR u.email LIKE :search')
+            $queryBuilder->andWhere('u.nom LIKE :search OR u.prenom LIKE :search OR u.email LIKE :search')
                 ->setParameter('search', '%'.$search.'%');
         }
-
-        // FILTRE SERVICE/ROLE
         if ($role = $request->query->get('role')) {
-            $queryBuilder
-                ->andWhere('u.roles LIKE :role')
-                ->setParameter('role', '%"'.$role.'"%');
+            $queryBuilder->andWhere('u.roles LIKE :role')->setParameter('role', '%"'.$role.'"%');
         }
 
         $employees = $paginator->paginate($queryBuilder, $request->query->getInt('page', 1), 10);
+
+        // 7 objets DateTime
+        $days = $this->getWeekDays($weekStart);
+        $dayNames = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche']; // pour la BDD
 
         $plannings = $em->getRepository(Planning::class)->findBy([
             'entreprise' => $entreprise,
@@ -78,7 +70,7 @@ final class PlanningController extends AbstractController
 
         $planningMap = [];
         foreach($plannings as $p){
-            $planningMap[$p->getUser()->getId()][$p->getDayOfWeek()] = $p;
+            $planningMap[$p->getUser()->getId()][$p->getDayOfWeek()] = $p; // clé = 'lundi'
         }
 
         $prevWeek = (clone $weekStart)->modify('-7 days');
@@ -90,7 +82,8 @@ final class PlanningController extends AbstractController
             'weekStart' => $weekStart,
             'prevWeek' => $prevWeek,
             'nextWeek' => $nextWeek,
-            'days' => $this->days,
+            'days' => $days, // <- DateTime maintenant
+            'dayNames' => $dayNames, // <- pour les inputs
             'canEdit' => $canEdit,
             'search' => $search?? '',
             'role' => $role?? ''
@@ -106,47 +99,44 @@ final class PlanningController extends AbstractController
         $mondayThisWeek = new \DateTime('monday this week');
         $mondayThisWeek->setTime(0,0,0);
 
-
         if($weekStart < $mondayThisWeek){
             $this->addFlash('danger', 'Impossible de modifier une semaine passée');
             return $this->redirectToRoute('app_rh_planning', ['week' => $weekStart->format('Y-m-d')]);
         }
 
+        $dayNames = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
         $postData = $request->request->all('planning');
 
         foreach($postData as $userId => $daysData){
             $user = $em->getRepository(User::class)->find($userId);
-            if(!$user || $user->getEntreprise() !== $entreprise) continue;
+            if(!$user || $user->getEntreprise()!== $entreprise) continue;
 
-            foreach($this->days as $day){
-                $dayData = $daysData[$day]?? [];
-
+            foreach($dayNames as $index => $dayName){
+                $dayData = $daysData[$index]?? [];
                 $planning = $em->getRepository(Planning::class)->findOneBy([
-                    'user' => $user,
-                    'weekStart' => $weekStart,
-                    'dayOfWeek' => $day
+                    'user' => $user, 'weekStart' => $weekStart, 'dayOfWeek' => $dayName
                 ]);
 
+                $isNew = false;
                 if($planning && $planning->getStatus() === 'valide'){
-                    $newPlanning = new Planning();
-                    $newPlanning->setUser($user);
-                    $newPlanning->setEntreprise($entreprise);
-                    $newPlanning->setWeekStart($weekStart);
-                    $newPlanning->setDayOfWeek($day);
-                    $newPlanning->setStatus('brouillon');
-                    $planning = $newPlanning;
+                    $planning = new Planning(); // on duplique
+                    $isNew = true;
+                }
+                if(!$planning){
+                    $planning = new Planning(); // on crée
+                    $isNew = true;
                 }
 
-                if(!$planning){
-                    $planning = new Planning();
+                // Si c'est nouveau on doit tout setter
+                if($isNew){
                     $planning->setUser($user);
                     $planning->setEntreprise($entreprise);
                     $planning->setWeekStart($weekStart);
-                    $planning->setDayOfWeek($day);
+                    $planning->setDayOfWeek($dayName);
+                    $planning->setStatus('brouillon'); // <- VOILA LE FIX
                 }
 
                 $planning->setDayOff(isset($dayData['isDayOff']) && $dayData['isDayOff'] == '1');
-
                 if($planning->isDayOff()){
                     $planning->setHeureDebut(null);
                     $planning->setHeureFin(null);
@@ -154,16 +144,20 @@ final class PlanningController extends AbstractController
                     $planning->setHeureDebut(!empty($dayData['heureDebut'])? \DateTime::createFromFormat('H:i', $dayData['heureDebut']) : null);
                     $planning->setHeureFin(!empty($dayData['heureFin'])? \DateTime::createFromFormat('H:i', $dayData['heureFin']) : null);
                 }
-
-                $planning->setPauseMinutes($dayData['pauseMinutes']?? null);
+                $planning->setPauseMinutes(!empty($dayData['pauseMinutes']) ? (int)$dayData['pauseMinutes'] : null);
                 $planning->setComment($dayData['comment']?? null);
 
                 $em->persist($planning);
             }
         }
 
-        $em->flush();
-        $this->addFlash('success', 'Planning de la semaine enregistré');
+        try {
+            $em->flush();
+            $this->addFlash('success', 'Planning de la semaine enregistré');
+        } catch (\Exception $e) {
+            $this->addFlash('danger', 'Erreur BDD: '.$e->getMessage());
+        }
+
         return $this->redirectToRoute('app_rh_planning', ['week' => $weekStart->format('Y-m-d')]);
     }
 }

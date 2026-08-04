@@ -14,13 +14,6 @@
                 <i class="bi bi-person-circle me-1"></i>Gérez vos horaires et pointages
             </p>
         </div>
-        <div class="d-flex gap-2 mt-3 mt-md-0">
-            <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px; font-size: 14px;">JD</div>
-            <div class="d-flex flex-column justify-content-center">
-                <span class="fw-semibold">Jean Dupont</span>
-                <small class="text-muted">Développeur - Tech</small>
-            </div>
-        </div>
     </div>
 
     <!-- NAVIGATION ONGLETS BOOTSTRAP -->
@@ -67,27 +60,42 @@
     <div class="tab-content" id="employeTabsContent">
 
         <!-- ONGLET 1: POINTER ENTREE/SORTIE -->
-        <div class="tab-pane fade show active" id="tab-pointer" role="tabpanel" aria-labelledby="tab-pointer-btn">
+        <div class="tab-pane fade show active" id="tab-pointer" role="tabpanel">
             <div class="row g-4">
                 <!-- HORLOGE + BOUTONS -->
                 <div class="col-lg-6">
                     <div class="card border-0 shadow-sm rounded-4 text-center">
                         <div class="card-body p-4 p-md-5">
-                            <div class="display-1 fw-bold text-primary" id="clock" style="font-size: 4rem;">
-                                08:32:45
-                            </div>
+                            <div class="display-1 fw-bold text-primary" id="clock">00:00:00</div>
                             <div class="text-muted mb-4">{{ "now"|date("d/m/Y") }}</div>
-                            <div class="d-flex gap-3 justify-content-center flex-wrap">
-                                <button class="btn btn-success btn-lg px-5">
+
+                            {% if message %}
+                                <div class="alert alert-warning border-0 rounded-3 mb-3">
+                                    <i class="bi bi-exclamation-triangle me-2"></i> {{ message }}
+                                </div>
+                            {% endif %}
+
+                            <form method="POST" action="{{ path('app_employe_pointage_entree') }}" class="d-inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('pointer_entree') }}">
+                                <button type="submit" class="btn btn-success btn-lg px-5" {{ not canPointerEntree ? 'disabled' }}>
                                     <i class="bi bi-check-circle me-2"></i>Pointer Entrée
                                 </button>
-                                <button class="btn btn-danger btn-lg px-5">
+                            </form>
+
+                            <form method="POST" action="{{ path('app_employe_pointage_sortie') }}" class="d-inline ms-2">
+                                <input type="hidden" name="_token" value="{{ csrf_token('pointer_sortie') }}">
+                                <button type="submit" class="btn btn-danger btn-lg px-5" {{ not canPointerSortie ? 'disabled' }}>
                                     <i class="bi bi-x-circle me-2"></i>Pointer Sortie
                                 </button>
-                            </div>
+                            </form>
+
                             <div class="mt-4 alert alert-info border-0 rounded-3">
                                 <i class="bi bi-info-circle me-2"></i>
-                                Assurez-vous d'être sur votre lieu de travail avant de pointer
+                                {% if planning and planning.heureDebut %}
+                                    Horaire prévu: {{ planning.heureDebut|date('H:i') }} - {{ planning.heureFin|date('H:i') }}
+                                {% else %}
+                                    Aucun planning défini pour aujourd'hui
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -95,43 +103,26 @@
 
                 <!-- INFOS POINTAGE -->
                 <div class="col-lg-6">
-                    <div class="card border-0 shadow-sm rounded-4 mb-3">
-                        <div class="card-body p-4">
-                            <h5 class="fw-bold mb-3">
-                                <i class="bi bi-clock text-success me-2"></i>Dernière action
-                            </h5>
-                            <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3">
-                                <div class="bg-success-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
-                                    <i class="bi bi-arrow-right-circle text-success fs-4"></i>
-                                </div>
-                                <div>
-                                    <div class="fw-semibold">Entrée</div>
-                                    <small class="text-muted">08:02 aujourd'hui</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-body p-4">
                             <h5 class="fw-bold mb-3">
                                 <i class="bi bi-hourglass-split text-warning me-2"></i>Heures travaillées aujourd'hui
                             </h5>
                             <div class="text-center py-3">
-                                <div class="display-4 fw-bold text-primary">3h 15min</div>
+                                <div class="display-4 fw-bold text-primary">{{ heuresTravaillees }}</div>
                                 <small class="text-muted">Temps de travail effectif</small>
                             </div>
                             <div class="row g-2 mt-2">
                                 <div class="col-6">
                                     <div class="bg-light rounded-3 p-2 text-center">
                                         <small class="text-muted">Entrée</small>
-                                        <div class="fw-bold">08:02</div>
+                                        <div class="fw-bold">{{ pointage and pointage.heureEntree ? pointage.heureEntree|date('H:i') : '--:--' }}</div>
                                     </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="bg-light rounded-3 p-2 text-center">
                                         <small class="text-muted">Sortie</small>
-                                        <div class="fw-bold">--:--</div>
+                                        <div class="fw-bold">{{ pointage and pointage.heureSortie ? pointage.heureSortie|date('H:i') : '--:--' }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -194,94 +185,6 @@
                                     <td class="text-center pe-3">
                                         <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
                                             <i class="bi bi-clock-history me-1"></i>Retard
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3"><span class="fw-semibold">17/10/2025</span></td>
-                                    <td class="text-center">08:00</td>
-                                    <td class="text-center">16:55</td>
-                                    <td class="text-center"><span class="fw-semibold">8h 55min</span></td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Complet
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3"><span class="fw-semibold">16/10/2025</span></td>
-                                    <td class="text-center">09:00</td>
-                                    <td class="text-center">18:30</td>
-                                    <td class="text-center"><span class="fw-semibold">9h 30min</span></td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                            <i class="bi bi-clock me-1"></i>Heures sup
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3"><span class="fw-semibold">15/10/2025</span></td>
-                                    <td class="text-center">--:--</td>
-                                    <td class="text-center">--:--</td>
-                                    <td class="text-center">--</td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
-                                            <i class="bi bi-x-circle-fill me-1"></i>Absent
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3"><span class="fw-semibold">14/10/2025</span></td>
-                                    <td class="text-center">08:00</td>
-                                    <td class="text-center">17:00</td>
-                                    <td class="text-center"><span class="fw-semibold">9h 00min</span></td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Complet
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3"><span class="fw-semibold">13/10/2025</span></td>
-                                    <td class="text-center">08:05</td>
-                                    <td class="text-center">17:10</td>
-                                    <td class="text-center"><span class="fw-semibold">9h 05min</span></td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Complet
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3"><span class="fw-semibold">10/10/2025</span></td>
-                                    <td class="text-center">08:30</td>
-                                    <td class="text-center">17:00</td>
-                                    <td class="text-center"><span class="fw-semibold">8h 30min</span></td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
-                                            <i class="bi bi-clock-history me-1"></i>Retard
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3"><span class="fw-semibold">09/10/2025</span></td>
-                                    <td class="text-center">08:00</td>
-                                    <td class="text-center">17:00</td>
-                                    <td class="text-center"><span class="fw-semibold">9h 00min</span></td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Complet
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3"><span class="fw-semibold">08/10/2025</span></td>
-                                    <td class="text-center">08:00</td>
-                                    <td class="text-center">16:00</td>
-                                    <td class="text-center"><span class="fw-semibold">8h 00min</span></td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-info-subtle text-info rounded-pill px-3 py-2">
-                                            <i class="bi bi-calendar-check me-1"></i>Congé
                                         </span>
                                     </td>
                                 </tr>
@@ -353,61 +256,6 @@
                                             <td>
                                                 <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
                                                     <i class="bi bi-check-circle me-1"></i>Travail
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="fw-semibold text-start ps-3">Mercredi</td>
-                                            <td>--:--</td>
-                                            <td>--:--</td>
-                                            <td>--:--</td>
-                                            <td>
-                                                <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
-                                                    <i class="bi bi-calendar-x me-1"></i>Congé
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="fw-semibold text-start ps-3">Jeudi</td>
-                                            <td>--:--</td>
-                                            <td>--:--</td>
-                                            <td>--:--</td>
-                                            <td>
-                                                <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
-                                                    <i class="bi bi-calendar-x me-1"></i>Congé
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="fw-semibold text-start ps-3">Vendredi</td>
-                                            <td>08:00</td>
-                                            <td>16:00</td>
-                                            <td>12:00-13:00</td>
-                                            <td>
-                                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
-                                                    <i class="bi bi-check-circle me-1"></i>Travail
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="fw-semibold text-start ps-3">Samedi</td>
-                                            <td>--:--</td>
-                                            <td>--:--</td>
-                                            <td>--:--</td>
-                                            <td>
-                                                <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
-                                                    <i class="bi bi-moon me-1"></i>Repos
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="fw-semibold text-start ps-3">Dimanche</td>
-                                            <td>--:--</td>
-                                            <td>--:--</td>
-                                            <td>--:--</td>
-                                            <td>
-                                                <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
-                                                    <i class="bi bi-moon me-1"></i>Repos
                                                 </span>
                                             </td>
                                         </tr>
@@ -512,7 +360,6 @@
 </style>
 
 <script>
-// Horloge en temps réel
 document.addEventListener('DOMContentLoaded', function() {
     function updateClock() {
         const now = new Date();

@@ -1,22 +1,16 @@
 {% extends 'layouts/base_rh.html.twig' %}
-
 {% block title %}Candidatures - {{ offre.titre }}{% endblock %}
 
 {% block body %}
 <div class="container-fluid py-4">
-
     <!-- En-tête -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
         <div>
-            <h4 class="fw-bold mb-1">
-                Candidatures pour :
-            </h4>
-            <p class="text-muted small mb-0">
-                <i class="bi bi-database me-1"></i>{{ offre.titre }}
-            </p>
+            <h4 class="fw-bold mb-1">Candidatures pour :</h4>
+            <p class="text-muted small mb-0"><i class="bi bi-database me-1"></i>{{ offre.titre }}</p>
         </div>
         <div class="d-flex gap-2 mt-3 mt-md-0">
-            <a href="{{ path('app_rh_recrutement') }}" class="btn btn-primary">
+            <a href="{{ path('app_rh_offre') }}" class="btn btn-primary">
                 <i class="bi bi-arrow-left me-1"></i>Retour aux offres
             </a>
         </div>
@@ -53,12 +47,14 @@
                                 {% endif %}
                             </td>
                             <td class="text-center">
-                                {# Bouton Accepter -> Redirige vers formulaire employé pré-rempli #}
-                                <a href="{{ path('rh_candidature_accepter', {id: candidature.id}) }}" class="btn btn-sm btn-success rounded-pill px-3 me-1" title="Accepter et embaucher">
-                                    <i class="bi bi-check-circle-fill me-1"></i>
+                                {# Bouton Accepter #}
+                                <a href="{{ path('rh_candidature_accepter', {id: candidature.id}) }}"
+                                   class="btn btn-sm btn-success rounded-pill px-3 me-1"
+                                   title="Accepter et embaucher">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Accepter
                                 </a>
 
-                                {# Bouton Refuser -> Supprime (RGPD compliant) #}
+                                {# Bouton Refuser #}
                                 <button type="button"
                                         class="btn btn-sm btn-outline-danger rounded-pill px-3"
                                         title="Refuser"
@@ -66,63 +62,58 @@
                                         data-bs-target="#confirmRefuseModal"
                                         data-url="{{ path('rh_candidature_refuser', {id: candidature.id}) }}"
                                         data-nom="{{ candidature.nom }}">
-                                    <i class="bi bi-x-circle-fill me-1"></i>
+                                    <i class="bi bi-x-circle-fill me-1"></i> Refuser
                                 </button>
                             </td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">Aucune candidature pour le moment pour cette offre.</td>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                <i class="bi bi-inbox"></i> Aucune candidature en attente pour cette offre.
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
                 </table>
-                <!-- Modal de confirmation de refus moderne -->
-                <div class="modal fade" id="confirmRefuseModal" tabindex="-1" aria-labelledby="confirmRefuseModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content border-0 shadow">
-                            <div class="modal-header bg-danger text-white">
-                                <h5 class="modal-title" id="confirmRefuseModalLabel">
-                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmer le refus
-                                </h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body py-4">
-                                <p class="mb-1">Êtes-vous sûr de vouloir refuser et supprimer la candidature de <strong id="candidateName" class="text-dark"></strong> ?</p>
-                                <p class="text-muted small mb-0">Cette action est définitive et conforme aux règles RGPD.</p>
-                            </div>
-                            <div class="modal-footer bg-light">
-                                <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Annuler</button>
-                                <a id="confirmRefuseBtn" href="#" class="btn btn-danger btn-sm px-3">Confirmer le refus</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 </div>
-    <!-- Script JavaScript pour injecter dynamiquement le lien et le nom -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const confirmRefuseModal = document.getElementById('confirmRefuseModal');
-            if (confirmRefuseModal) {
-                confirmRefuseModal.addEventListener('show.bs.modal', function (event) {
-                    // Bouton qui a déclenché la modale
-                    const button = event.relatedTarget;
 
-                    // Extraire les données
-                    const url = button.getAttribute('data-url');
-                    const nom = button.getAttribute('data-nom');
+<!-- Modal de confirmation de refus -->
+<div class="modal fade" id="confirmRefuseModal" tabindex="-1" aria-labelledby="confirmRefuseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmRefuseModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmer le refus
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="mb-1">Êtes-vous sûr de vouloir refuser la candidature de <strong id="candidateName" class="text-dark"></strong> ?</p>
+                <p class="text-muted small mb-0">La candidature sera archivée avec le statut "Refusée".</p>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Annuler</button>
+                <a id="confirmRefuseBtn" href="#" class="btn btn-danger btn-sm px-3">Confirmer le refus</a>
+            </div>
+        </div>
+    </div>
+</div>
 
-                    // Mettre à jour le contenu de la modale
-                    const modalNameElement = confirmRefuseModal.querySelector('#candidateName');
-                    const confirmBtnElement = confirmRefuseModal.querySelector('#confirmRefuseBtn');
-
-                    modalNameElement.textContent = nom;
-                    confirmBtnElement.setAttribute('href', url);
-                });
-            }
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const confirmRefuseModal = document.getElementById('confirmRefuseModal');
+    if (confirmRefuseModal) {
+        confirmRefuseModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const url = button.getAttribute('data-url');
+            const nom = button.getAttribute('data-nom');
+            confirmRefuseModal.querySelector('#candidateName').textContent = nom;
+            confirmRefuseModal.querySelector('#confirmRefuseBtn').setAttribute('href', url);
         });
-    </script>
+    }
+});
+</script>
 {% endblock %}

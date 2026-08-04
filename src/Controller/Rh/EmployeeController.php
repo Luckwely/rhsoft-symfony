@@ -7,7 +7,7 @@ use App\Entity\Planning;
 use App\Form\EmployeeFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Mime\Email;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,9 +41,9 @@ final class EmployeeController extends AbstractController
 
         $queryBuilder = $em->getRepository(User::class)->createQueryBuilder('u')
             ->where('u.entreprise = :entreprise')
-            ->andWhere('u.is_active = :active')
-            ->setParameter('entreprise', $entreprise)
-            ->setParameter('active', true);
+            //->andWhere('u.is_active = :active')
+            ->setParameter('entreprise', $entreprise);
+            //->setParameter('active', true);
 
         // RECHERCHE
         if ($search = $request->query->get('q')) {
@@ -88,7 +88,7 @@ final class EmployeeController extends AbstractController
         }
 
         $form = $this->createForm(EmployeeFormType::class, $user);
-        
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

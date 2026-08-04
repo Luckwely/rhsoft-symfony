@@ -1,5 +1,4 @@
-<?php
-namespace App\Controller\Rh;
+<?php namespace App\Controller\Rh;
 
 use App\Entity\Offre;
 use App\Form\OffreType;
@@ -11,14 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/rh')]
-#[IsGranted('ROLE_RH')]
+#[Route('/rh/offres')]
 class RecrutementController extends AbstractController
 {
-    // 1. LISTE : SEULEMENT LES OFFRES DE SON ENTREPRISE
-    #[Route('/offres', name: 'app_rh_recrutement')]
+    #[Route('/', name: 'app_rh_offre')]
     public function index(OffreRepository $offreRepository, Security $security): Response
     {
         $entreprise = $security->getUser()->getEntreprise();
@@ -27,56 +23,57 @@ class RecrutementController extends AbstractController
         ]);
     }
 
-    // 2. CREER + EDIT
-    #[Route('/offres/new', name: 'app_rh_offre_new')]
-    #[Route('/offres/{id}/edit', name: 'app_rh_offre_edit')]
+    #[Route('/new', name: 'app_rh_offre_new')]
+    #[Route('/{id}/edit', name: 'app_rh_offre_edit')]
     public function form(Request $request, EntityManagerInterface $em, Offre $offre = null, Security $security): Response
     {
         $offre = $offre ?? new Offre();
-
         if (!$offre->getId()) {
             $offre->setEntreprise($security->getUser()->getEntreprise());
         }
-
-        // SECURITE
         if ($offre->getEntreprise() !== $security->getUser()->getEntreprise()) {
             throw $this->createAccessDeniedException('Vous ne pouvez pas éditer cette offre.');
         }
-
         $form = $this->createForm(OffreType::class, $offre);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($offre);
             $em->flush();
-            return $this->redirectToRoute('app_rh_recrutement');
+            return $this->redirectToRoute('app_rh_offre');
         }
-
         return $this->render('rh/recrutement/form.html.twig', [
             'form' => $form->createView(),
             'offre' => $offre,
         ]);
     }
 
-    #[Route('/offres/{id}/candidatures', name: 'app_rh_offre_candidatures')]
+    #[Route('/{id}/candidatures', name: 'app_rh_offre_candidatures')]
     public function candidatures(Offre $offre, Security $security): Response
     {
-        // Security check to make sure the offer belongs to the logged-in admin's company
         if ($offre->getEntreprise() !== $security->getUser()->getEntreprise()) {
             throw $this->createAccessDeniedException('Accès refusé.');
         }
 
+        // FILTRER: uniquement les candidatures en attente
+        $candidaturesEnAttente = $offre->getCandidatures()->filter(
+            fn(Candidature $c) => $c->getStatut() === 'en_attente'
+        );
+
         return $this->render('rh/recrutement/candidatures.html.twig', [
             'offre' => $offre,
-            'candidatures' => $offre->getCandidatures(),
+            'candidatures' => $candidaturesEnAttente,
         ]);
     }
-    #[Route('/offres/candidature/{id}/accepter', name: 'rh_candidature_accepter')]
-    public function accepterCandidature(Candidature $candidature, Security $security): Response
+
+    #[Route('/candidature/{id}/accepter', name: 'rh_candidature_accepter')]
+    public function accepterCandidature(Candidature $candidature, EntityManagerInterface $em, Security $security): Response
     {
         if ($candidature->getOffre()->getEntreprise() !== $security->getUser()->getEntreprise()) {
             throw $this->createAccessDeniedException();
         }
+
+        $candidature->setStatut('acceptee'); // <- MARQUE COMME ACCEPTEE
+        $em->flush(); // <- IMPORTANT: flush avant redirection
 
         return $this->redirectToRoute('app_rh_employee_embauche', [
             'nom' => $candidature->getNom(),
@@ -85,19 +82,17 @@ class RecrutementController extends AbstractController
         ]);
     }
 
-    #[Route('/offres/candidature/{id}/refuser', name: 'rh_candidature_refuser')]
+    #[Route('/candidature/{id}/refuser', name: 'rh_candidature_refuser')]
     public function refuserCandidature(Candidature $candidature, EntityManagerInterface $em, Security $security): Response
     {
         if ($candidature->getOffre()->getEntreprise() !== $security->getUser()->getEntreprise()) {
             throw $this->createAccessDeniedException();
         }
 
-        $offreId = $candidature->getOffre()->getId();
-
-        $em->remove($candidature);
+        $candidature->setStatut('refusee'); // <- AU LIEU DE SUPPRIMER
         $em->flush();
 
-        $this->addFlash('success', 'La candidature a été refusée et supprimée.');
-        return $this->redirectToRoute('app_rh_offre_candidatures', ['id' => $offreId]);
+        $this->addFlash('success', 'La candidature a été refusée.');
+        return $this->redirectToRoute('app_rh_offre_candidatures', ['id' => $candidature->getOffre()->getId()]);
     }
 }

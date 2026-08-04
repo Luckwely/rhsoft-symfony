@@ -8,14 +8,12 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/employe')]
-#[IsGranted('ROLE_USER')]
+#[IsGranted('ROLE_EMPLOYE')] 
 final class ProfileController extends AbstractController
 {
-    #[Route('/employe/profile', name: 'app_employe_profile')]
+    #[Route('/profile', name: 'app_employe_profile')]
     public function index(): Response
     {
-        return $this->render('employe/profile/index.html.twig', [
-            'controller_name' => 'Employe/ProfileController',
-        ]);
+        return $this->render('employe/profile/index.html.twig');
     }
 }

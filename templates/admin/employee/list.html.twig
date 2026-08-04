@@ -132,7 +132,7 @@
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                         {% if not employee.isActive %}
-                                            <a href="{{ path('app_employee_resend', {id: employee.id}) }}" class="btn btn-sm btn-outline-info" title="Renvoyer l'invitation">
+                                            <a href="{{ path('app_admin_employee_resend', {id: employee.id}) }}" class="btn btn-sm btn-outline-info" title="Renvoyer l'invitation">
                                                 <i class="bi bi-send"></i>
                                             </a>
                                         {% endif %}
@@ -310,24 +310,12 @@
                                                             {% else %}
                                                                 {# DONNEES FACTICES #}
                                                                 {% for day in days %}
-                                                                <tr>
-                                                                    <td><span class="fw-semibold">{{ day|capitalize }}</span></td>
-                                                                    <td>
-                                                                        {% if day in ['samedi', 'dimanche'] %}
-                                                                            <span class="badge bg-warning-subtle text-warning rounded-pill"><i class="bi bi-calendar-x me-1"></i>Repos</span>
-                                                                        {% else %}
-                                                                            <span class="text-primary">09:00 - 17:00</span>
-                                                                        {% endif %}
-                                                                    </td>
-                                                                    <td>{{ day in ['samedi', 'dimanche'] ? '-' : '60 min' }}</td>
-                                                                    <td>
-                                                                        {% if day in ['samedi', 'dimanche'] %}
-                                                                            <span class="badge bg-secondary-subtle text-secondary rounded-pill">Repos</span>
-                                                                        {% else %}
-                                                                            <span class="badge bg-success-subtle text-success rounded-pill">Présent</span>
-                                                                        {% endif %}
-                                                                    </td>
-                                                                </tr>
+                                                                    <tr>
+                                                                        <td><span class="fw-semibold">{{ day|capitalize }}</span></td>
+                                                                        <td><span class="text-muted">-</span></td>
+                                                                        <td><span class="text-muted">-</span></td>
+                                                                        <td><span class="badge bg-secondary-subtle text-secondary rounded-pill">Non défini</span></td>
+                                                                    </tr>
                                                                 {% endfor %}
                                                             {% endif %}
                                                             </tbody>

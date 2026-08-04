@@ -42,9 +42,9 @@ class EmployeeController extends AbstractController
 
         $queryBuilder = $em->getRepository(User::class)->createQueryBuilder('u')
             ->where('u.entreprise = :entreprise')
-            ->andWhere('u.is_active = :active')
-            ->setParameter('entreprise', $entreprise)
-            ->setParameter('active', true);
+            //->andWhere('u.is_active = :active')
+            ->setParameter('entreprise', $entreprise);
+            //->setParameter('active', true);
 
         // RECHERCHE
         if ($search = $request->query->get('q')) {
@@ -178,7 +178,7 @@ class EmployeeController extends AbstractController
 
         return $this->render('admin/employee/edit.html.twig', [
             'employee' => $employee,
-            'form' => $form->createView(), // <-- IL MANQUAIT CETTE LIGNE
+            'form' => $form->createView(),
         ]);
     }
 
