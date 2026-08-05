@@ -4,61 +4,61 @@ namespace App\Entity;
 use App\Repository\PlanningRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: PlanningRepository::class)]
 #[ORM\UniqueConstraint(name: 'unique_planning_per_day', columns: ['user_id', 'week_start', 'day_of_week'])]
 class Planning
 {
-    #[ORM\Id] #[ORM\GeneratedValue] #[ORM\Column]
-    private ?int $id = null;
+    public const TYPE_TRAVAIL = 'travail';
+    public const TYPE_REPOS = 'repos';
+    public const TYPE_CONGE = 'conge';
+    public const TYPE_FERIE = 'ferie';
+    public const STATUT_BROUILLON = 'brouillon';
+    public const STATUT_VALIDE = 'valide';
+    public const STATUT_ARCHIVE = 'archive';
 
-    #[ORM\ManyToOne(inversedBy: 'plannings')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
+    #[ORM\Id] #[ORM\GeneratedValue] #[ORM\Column] private ?int $id = null;
+    #[ORM\ManyToOne(inversedBy: 'plannings')] #[ORM\JoinColumn(nullable: false)] private ?User $user = null;
+    #[ORM\ManyToOne(inversedBy: 'plannings')] #[ORM\JoinColumn(nullable: false)] private ?Entreprise $entreprise = null;
+    #[ORM\Column(length: 20)] private ?string $dayOfWeek = null;
+    #[ORM\Column(name: 'week_start', type: Types::DATE_IMMUTABLE)] private ?\DateTimeInterface $weekStart = null;
+    #[ORM\Column(type: Types::TIME_IMMUTABLE, nullable: true)] private ?\DateTimeInterface $heureDebut = null;
+    #[ORM\Column(type: Types::TIME_IMMUTABLE, nullable: true)] private ?\DateTimeInterface $heureFin = null;
+    #[ORM\Column(nullable: true)] private ?int $pauseMinutes = null;
+    #[ORM\Column(length: 20)] private ?string $typeJour = self::TYPE_TRAVAIL;
+    #[ORM\Column(type: Types::TEXT, nullable: true)] private ?string $comment = null;
+    #[ORM\Column(length: 20)] private ?string $status = self::STATUT_BROUILLON;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)] private ?\DateTimeImmutable $createdAt = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)] private ?\DateTimeImmutable $validatedAt = null;
+    #[ORM\ManyToOne] private ?User $validatedBy = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Entreprise $entreprise = null;
+    public function __construct() { $this->createdAt = new \DateTimeImmutable(); }
 
-    #[ORM\Column(length: 20)]
-    private ?string $dayOfWeek = null;
+    // HELPERS
+    public function isTravail(): bool { return $this->typeJour === self::TYPE_TRAVAIL; }
+    public function isDayOff(): bool { return $this->typeJour === self::TYPE_REPOS; }
+    public function isConge(): bool { return $this->typeJour === self::TYPE_CONGE; }
+    public function isFerie(): bool { return $this->typeJour === self::TYPE_FERIE; }
 
-    #[ORM\Column(name: 'week_start', type: Types::DATE_IMMUTABLE)]
-    private ?\DateTimeInterface $weekStart = null;
-
-    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $heureDebut = null;
-
-    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $heureFin = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?int $pauseMinutes = null;
-
-    #[ORM\Column]
-    private ?bool $isDayOff = false;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $comment = null;
-
-    // ===== POUR HISTORIQUE =====
-    #[ORM\Column(length: 20)]
-    private ?string $status = 'brouillon'; // brouillon, valide, archive
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    private ?\DateTimeImmutable $validatedAt = null; // Quand on "valide" la semaine
-
-    #[ORM\ManyToOne] // Qui a validé
-    private ?User $validatedBy = null;
-
-    public function __construct() {
-        $this->createdAt = new \DateTimeImmutable();
+    public function getDureeMinutes(): int
+    {
+        if(!$this->isTravail() || !$this->heureDebut || !$this->heureFin) return 0;
+        $diff = ($this->heureFin->getTimestamp() - $this->heureDebut->getTimestamp()) / 60;
+        return max(0, $diff - ($this->pauseMinutes ?? 0));
     }
 
-    // GETTERS SETTERS...
+    #[Assert\Callback]
+    public function validate(ExecutionContextInterface $context): void
+    {
+        if ($this->typeJour !== self::TYPE_TRAVAIL && ($this->heureDebut || $this->heureFin)) {
+            $context->buildViolation('Un jour de repos/congé/férié ne doit pas avoir d\'horaires')
+                ->atPath('heureDebut')->addViolation();
+        }
+    }
+
+    // GETTERS SETTERS
     public function getId(): ?int { return $this->id; }
     public function getUser(): ?User { return $this->user; }
     public function setUser(?User $user): static { $this->user = $user; return $this; }
@@ -74,8 +74,8 @@ class Planning
     public function setHeureFin(?\DateTimeInterface $heureFin): static { $this->heureFin = $heureFin; return $this; }
     public function getPauseMinutes(): ?int { return $this->pauseMinutes; }
     public function setPauseMinutes(?int $pauseMinutes): static { $this->pauseMinutes = $pauseMinutes; return $this; }
-    public function isDayOff(): ?bool { return $this->isDayOff; }
-    public function setDayOff(bool $isDayOff): static { $this->isDayOff = $isDayOff; return $this; }
+    public function getTypeJour(): ?string { return $this->typeJour; }
+    public function setTypeJour(string $typeJour): static { $this->typeJour = $typeJour; return $this; }
     public function getComment(): ?string { return $this->comment; }
     public function setComment(?string $comment): static { $this->comment = $comment; return $this; }
     public function getStatus(): ?string { return $this->status; }
