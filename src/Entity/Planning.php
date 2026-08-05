@@ -42,6 +42,12 @@ class Planning
     public function isConge(): bool { return $this->typeJour === self::TYPE_CONGE; }
     public function isFerie(): bool { return $this->typeJour === self::TYPE_FERIE; }
 
+    public function setDayOff(bool $dayOff): static
+    {
+        $this->typeJour = $dayOff ? self::TYPE_REPOS : self::TYPE_TRAVAIL;
+        return $this;
+    }
+
     public function getDureeMinutes(): int
     {
         if(!$this->isTravail() || !$this->heureDebut || !$this->heureFin) return 0;

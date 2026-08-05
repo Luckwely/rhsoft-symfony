@@ -78,13 +78,13 @@
                         <label class="form-check-label" style="font-size:9px">Début</label>
                         <input type="time" class="form-control form-control-sm {{ not canEdit? 'bg-light' }}"
                                name="planning[{{ employe.id }}][{{ day }}][heureDebut]"
-                               value="{{ p and p.heureDebut? p.heureDebut|date('H:i') : '08:00' }}"
+                               value="{{ p and p.heureDebut? p.heureDebut|date('H:i') : '' }}"
                                {{ not canEdit? 'readonly' }}>
 
                         <label class="form-check-label" style="font-size:9px">Fin</label>
                         <input type="time" class="form-control form-control-sm {{ not canEdit? 'bg-light' }}"
                                name="planning[{{ employe.id }}][{{ day }}][heureFin]"
-                               value="{{ p and p.heureFin? p.heureFin|date('H:i') : '17:00' }}"
+                               value="{{ p and p.heureFin? p.heureFin|date('H:i') : '' }}"
                                {{ not canEdit? 'readonly' }}>
 
                         <label class="form-check-label" style="font-size:9px">Pause min</label>

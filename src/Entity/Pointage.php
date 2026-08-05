@@ -59,25 +59,46 @@ class Pointage
     #[ORM\Column(type: 'integer', options: ['default' => 60])]
     private ?int $pausePrevueMinutes = 60;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $pauseDurationMinutes = 0;
+
+    #[ORM\Column(type: Types::TIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $heureDebutPause = null;
+
+    #[ORM\Column(type: Types::TIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $heureFinPause = null;
+
     // ===== GETTERS CALCULÉS POUR LE TWIG =====
     public function getHeuresTravaillees(): float
     {
-        if (!$this->heureEntree || !$this->heureSortie) return 0;
-        $diff = $this->heureSortie->diff($this->heureEntree);
-        $heures = $diff->h + ($diff->i / 60);
-        return round(max(0, $heures - ($this->pauseMinutes / 60)), 2);
+        if (!$this->heureEntree || !$this->heureSortie) {
+            return 0.0;
+        }
+
+        $diffSeconds = $this->heureSortie->getTimestamp() - $this->heureEntree->getTimestamp();
+        $pauseMinutes = $this->pauseDurationMinutes ?? $this->pauseMinutes ?? 0;
+        $totalMinutes = max(0, (int)($diffSeconds / 60) - $pauseMinutes);
+
+        return round($totalMinutes / 60, 2);
     }
 
     public function getHeuresSup(): float
     {
-        $heuresContract = $this->employee?->getHeuresContractuelles() ?? 8.0;
+        // Make sure your User entity has this method, or fall back safely to 8.0
+        $heuresContract = method_exists($this->employee, 'getHeuresContractuelles')
+            ? ($this->employee->getHeuresContractuelles() ?? 8.0)
+            : 8.0;
+
         $heures = $this->getHeuresTravaillees();
-        return $heures > $heuresContract ? round($heures - $heuresContract, 2) : 0;
+        return $heures > $heuresContract ? round($heures - $heuresContract, 2) : 0.0;
     }
 
     public function getMinutesRetard(): int
     {
-        if(!$this->heureEntree || !$this->heurePrevueDebut) return 0;
+        if (!$this->heureEntree || !$this->heurePrevueDebut) {
+            return 0;
+        }
+
         $retard = $this->heureEntree->getTimestamp() - $this->heurePrevueDebut->getTimestamp();
         return $retard > 0 ? (int)($retard / 60) : 0;
     }
@@ -99,23 +120,27 @@ class Pointage
             return '0h 00min';
         }
 
-        $diff = $this->heureSortie->diff($this->heureEntree);
-        $heures = $diff->h;
-        $minutes = $diff->i;
+        $diffSeconds = $this->heureSortie->getTimestamp() - $this->heureEntree->getTimestamp();
+        $totalMinutes = max(0, (int)($diffSeconds / 60) - $this->pauseMinutes);
 
-        if ($this->pauseMinutes) {
-            $totalMinutes = ($heures * 60) + $minutes - $this->pauseMinutes;
-            if ($totalMinutes < 0) {
-                $totalMinutes = 0;
-            }
-            $heures = intdiv($totalMinutes, 60);
-            $minutes = $totalMinutes % 60;
-        }
+        $heures = intdiv($totalMinutes, 60);
+        $minutes = $totalMinutes % 60;
 
         return sprintf('%dh %02dmin', $heures, $minutes);
     }
 
     // GETTERS SETTERS
+    public function getHeureDebutPause(): ?\DateTimeImmutable { return $this->heureDebutPause; }
+    public function setHeureDebutPause(?\DateTimeImmutable $heureDebutPause): static { $this->heureDebutPause = $heureDebutPause; return $this; }
+
+    public function getHeureFinPause(): ?\DateTimeImmutable { return $this->heureFinPause; }
+    public function setHeureFinPause(?\DateTimeImmutable $heureFinPause): static { $this->heureFinPause = $heureFinPause; return $this; }
+
+    // Helper pour savoir si l'employé est actuellement en pause
+    public function isOnPause(): bool
+    {
+        return $this->heureDebutPause !== null && $this->heureFinPause === null;
+    }
     public function getId(): ?int { return $this->id; }
     public function getEmployee(): ?User { return $this->employee; }
     public function setEmployee(?User $employee): static { $this->employee = $employee; return $this; }
@@ -143,6 +168,10 @@ class Pointage
 
     public function getPausePrevueMinutes(): ?int { return $this->pausePrevueMinutes; }
     public function setPausePrevueMinutes(?int $pausePrevueMinutes): static { $this->pausePrevueMinutes = $pausePrevueMinutes; return $this; }
+
+    public function getPauseDurationMinutes(): ?int { return $this->pauseDurationMinutes; }
+    public function setPauseDurationMinutes(?int $pauseDurationMinutes): static { $this->pauseDurationMinutes = $pauseDurationMinutes; return $this; }
+
     public function getCorrigeLe(): ?\DateTimeImmutable { return $this->corrigeLe; }
     public function setCorrigeLe(?\DateTimeImmutable $corrigeLe): static { $this->corrigeLe = $corrigeLe; return $this; }
 }

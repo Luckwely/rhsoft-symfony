@@ -52,4 +52,28 @@ final class PlanningController extends AbstractController
         }
         return $this->redirectToRoute('app_employe_planning');
     }
+
+    #[Route('/pause/debut', name: 'app_employe_pause_debut', methods: ['POST'])]
+    public function debutPause(Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        if ($this->isCsrfTokenValid('pause_debut', $request->request->get('_token'))) {
+            $this->planningService->pointerDebutPause($this->getUser());
+            $this->addFlash('success', 'Pause débutée à '.(new \DateTime())->format('H:i'));
+        }
+
+        return $this->redirectToRoute('app_employe_planning');
+    }
+
+    #[Route('/pause/fin', name: 'app_employe_pause_fin', methods: ['POST'])]
+    public function finPause(Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        if ($this->isCsrfTokenValid('pause_fin', $request->request->get('_token'))) {
+            $this->planningService->pointerFinPause($this->getUser());
+            $this->addFlash('success', 'Pause terminée à '.(new \DateTime())->format('H:i'));
+        }
+
+        return $this->redirectToRoute('app_employe_planning');
+    }
 }
