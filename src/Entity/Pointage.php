@@ -131,10 +131,10 @@ class Pointage
 
     // GETTERS SETTERS
     public function getHeureDebutPause(): ?\DateTimeImmutable { return $this->heureDebutPause; }
-    public function setHeureDebutPause(?\DateTimeImmutable $heureDebutPause): static { $this->heureDebutPause = $heureDebutPause; return $this; }
+    public function setHeureDebutPause(?\DateTimeInterface $heureDebutPause): static { $this->heureDebutPause = $heureDebutPause ? \DateTimeImmutable::createFromInterface($heureDebutPause) : null; return $this; }
 
     public function getHeureFinPause(): ?\DateTimeImmutable { return $this->heureFinPause; }
-    public function setHeureFinPause(?\DateTimeImmutable $heureFinPause): static { $this->heureFinPause = $heureFinPause; return $this; }
+    public function setHeureFinPause(?\DateTimeInterface $heureFinPause): static { $this->heureFinPause = $heureFinPause ? \DateTimeImmutable::createFromInterface($heureFinPause) : null; return $this; }
 
     // Helper pour savoir si l'employé est actuellement en pause
     public function isOnPause(): bool
@@ -147,11 +147,11 @@ class Pointage
     public function getEntreprise(): ?Entreprise { return $this->entreprise; }
     public function setEntreprise(?Entreprise $entreprise): static { $this->entreprise = $entreprise; return $this; }
     public function getDate(): ?\DateTimeImmutable { return $this->date; }
-    public function setDate(\DateTimeImmutable $date): static { $this->date = $date; return $this; }
+    public function setDate(?\DateTimeInterface $date): static { $this->date = $date ? \DateTimeImmutable::createFromInterface($date) : null; return $this; }
     public function getHeureEntree(): ?\DateTimeImmutable { return $this->heureEntree; }
-    public function setHeureEntree(?\DateTimeImmutable $heureEntree): static { $this->heureEntree = $heureEntree; return $this; }
+    public function setHeureEntree(?\DateTimeInterface $heureEntree): static { $this->heureEntree = $heureEntree ? \DateTimeImmutable::createFromInterface($heureEntree) : null; return $this; }
     public function getHeureSortie(): ?\DateTimeImmutable { return $this->heureSortie; }
-    public function setHeureSortie(?\DateTimeImmutable $heureSortie): static { $this->heureSortie = $heureSortie; return $this; }
+    public function setHeureSortie(?\DateTimeInterface $heureSortie): static { $this->heureSortie = $heureSortie ? \DateTimeImmutable::createFromInterface($heureSortie) : null; return $this; }
     public function getPauseMinutes(): ?int { return $this->pauseMinutes; }
     public function setPauseMinutes(int $pauseMinutes): static { $this->pauseMinutes = $pauseMinutes; return $this; }
     public function getStatut(): ?string { return $this->statut; }
@@ -161,10 +161,10 @@ class Pointage
     public function getCorrigePar(): ?User { return $this->corrigePar; }
     public function setCorrigePar(?User $corrigePar): static { $this->corrigePar = $corrigePar; return $this; }
     public function getHeurePrevueDebut(): ?\DateTimeImmutable { return $this->heurePrevueDebut; }
-    public function setHeurePrevueDebut(?\DateTimeImmutable $heurePrevueDebut): static { $this->heurePrevueDebut = $heurePrevueDebut; return $this; }
+    public function setHeurePrevueDebut(?\DateTimeInterface $heurePrevueDebut): static { $this->heurePrevueDebut = $heurePrevueDebut ? \DateTimeImmutable::createFromInterface($heurePrevueDebut) : null; return $this; }
 
     public function getHeurePrevueFin(): ?\DateTimeImmutable { return $this->heurePrevueFin; }
-    public function setHeurePrevueFin(?\DateTimeImmutable $heurePrevueFin): static { $this->heurePrevueFin = $heurePrevueFin; return $this; }
+    public function setHeurePrevueFin(?\DateTimeInterface $heurePrevueFin): static { $this->heurePrevueFin = $heurePrevueFin ? \DateTimeImmutable::createFromInterface($heurePrevueFin) : null; return $this; }
 
     public function getPausePrevueMinutes(): ?int { return $this->pausePrevueMinutes; }
     public function setPausePrevueMinutes(?int $pausePrevueMinutes): static { $this->pausePrevueMinutes = $pausePrevueMinutes; return $this; }
@@ -173,7 +173,7 @@ class Pointage
     public function setPauseDurationMinutes(?int $pauseDurationMinutes): static { $this->pauseDurationMinutes = $pauseDurationMinutes; return $this; }
 
     public function getCorrigeLe(): ?\DateTimeImmutable { return $this->corrigeLe; }
-    public function setCorrigeLe(?\DateTimeImmutable $corrigeLe): static { $this->corrigeLe = $corrigeLe; return $this; }
+    public function setCorrigeLe(?\DateTimeInterface $corrigeLe): static { $this->corrigeLe = $corrigeLe ? \DateTimeImmutable::createFromInterface($corrigeLe) : null; return $this; }
 }
 
 

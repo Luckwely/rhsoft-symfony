@@ -68,9 +68,9 @@ class Conge
     public function getTypeConge(): ?TypeConge { return $this->typeConge; }
     public function setTypeConge(?TypeConge $typeConge): static { $this->typeConge = $typeConge; return $this; }
     public function getDateDebut(): ?\DateTimeImmutable { return $this->dateDebut; }
-    public function setDateDebut(\DateTimeImmutable $dateDebut): static { $this->dateDebut = $dateDebut; return $this; }
+    public function setDateDebut(?\DateTimeInterface $dateDebut): static { $this->dateDebut = $dateDebut ? \DateTimeImmutable::createFromInterface($dateDebut) : null; return $this; }
     public function getDateFin(): ?\DateTimeImmutable { return $this->dateFin; }
-    public function setDateFin(\DateTimeImmutable $dateFin): static { $this->dateFin = $dateFin; return $this; }
+    public function setDateFin(?\DateTimeInterface $dateFin): static { $this->dateFin = $dateFin ? \DateTimeImmutable::createFromInterface($dateFin) : null; return $this; }
     public function getNbJours(): ?float { return $this->nbJours; }
     public function setNbJours(float $nbJours): static { $this->nbJours = $nbJours; return $this; }
     public function getStatut(): ?string { return $this->statut; } // <-- FIX statut
@@ -80,10 +80,10 @@ class Conge
     public function getValidePar(): ?User { return $this->validePar; }
     public function setValidePar(?User $validePar): static { $this->validePar = $validePar; return $this; }
     public function getValideLe(): ?\DateTimeImmutable { return $this->valideLe; }
-    public function setValideLe(?\DateTimeImmutable $valideLe): static { $this->valideLe = $valideLe; return $this; }
-    public function setCreatedAt(?\DateTimeImmutable $createdAt): static
+    public function setValideLe(?\DateTimeInterface $valideLe): static { $this->valideLe = $valideLe ? \DateTimeImmutable::createFromInterface($valideLe) : null; return $this; }
+    public function setCreatedAt(?\DateTimeInterface $createdAt): static
     {
-        $this->createdAt = $createdAt;
+        $this->createdAt = $createdAt ? \DateTimeImmutable::createFromInterface($createdAt) : null;
 
         return $this;
     }

@@ -416,8 +416,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->invitationExpiresAt;
         }
 
-    public function setInvitationExpiresAt(?\DateTimeImmutable $invitationExpiresAt): static {
-        $this->invitationExpiresAt = $invitationExpiresAt; return $this;
+    public function setInvitationExpiresAt(?\DateTimeInterface $invitationExpiresAt): static {
+        $this->invitationExpiresAt = $invitationExpiresAt ? \DateTimeImmutable::createFromInterface($invitationExpiresAt) : null; return $this;
     }
 
     public function getAdresse(): ?string {

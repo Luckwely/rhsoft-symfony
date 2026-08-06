@@ -24,11 +24,13 @@ class CongeType extends AbstractType
             ])
             ->add('dateDebut', DateType::class, [
                 'widget' => 'single_text',
+                'input' => 'datetime_immutable',
                 'label' => 'Date de début',
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('dateFin', DateType::class, [
                 'widget' => 'single_text',
+                'input' => 'datetime_immutable',
                 'label' => 'Date de fin',
                 'attr' => ['class' => 'form-control'],
             ])

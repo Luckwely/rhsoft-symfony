@@ -66,7 +66,7 @@ class AvanceSalaire
     public function getStatut(): ?string { return $this->statut; }
     public function setStatut(string $statut): static { $this->statut = $statut; return $this; }
     public function getDateDemande(): ?\DateTimeImmutable { return $this->dateDemande; }
-    public function setDateDemande(\DateTimeImmutable $dateDemande): static { $this->dateDemande = $dateDemande; return $this; }
+    public function setDateDemande(?\DateTimeInterface $dateDemande): static { $this->dateDemande = $dateDemande ? \DateTimeImmutable::createFromInterface($dateDemande) : null; return $this; }
     public function getValidePar(): ?User { return $this->validePar; }
     public function setValidePar(?User $validePar): static { $this->validePar = $validePar; return $this; }
 }

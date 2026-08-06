@@ -51,7 +51,7 @@ class Offre
     public function setStatus(string $status): static { $this->status = $status; return $this; }
 
     public function getDateExpiration(): ?\DateTimeImmutable { return $this->dateExpiration; }
-    public function setDateExpiration(?\DateTimeImmutable $dateExpiration): static { $this->dateExpiration = $dateExpiration; return $this; }
+    public function setDateExpiration(?\DateTimeInterface $dateExpiration): static { $this->dateExpiration = $dateExpiration ? \DateTimeImmutable::createFromInterface($dateExpiration) : null; return $this; }
 
     public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; } // <-- OK MAINTENANT
 

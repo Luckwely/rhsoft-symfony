@@ -73,11 +73,11 @@ class Planning
     public function getDayOfWeek(): ?string { return $this->dayOfWeek; }
     public function setDayOfWeek(string $dayOfWeek): static { $this->dayOfWeek = $dayOfWeek; return $this; }
     public function getWeekStart(): ?\DateTimeInterface { return $this->weekStart; }
-    public function setWeekStart(\DateTimeInterface $weekStart): static { $this->weekStart = $weekStart; return $this; }
+    public function setWeekStart(?\DateTimeInterface $weekStart): static { $this->weekStart = $weekStart ? \DateTimeImmutable::createFromInterface($weekStart) : null; return $this; }
     public function getHeureDebut(): ?\DateTimeInterface { return $this->heureDebut; }
-    public function setHeureDebut(?\DateTimeInterface $heureDebut): static { $this->heureDebut = $heureDebut; return $this; }
+    public function setHeureDebut(?\DateTimeInterface $heureDebut): static { $this->heureDebut = $heureDebut ? \DateTimeImmutable::createFromInterface($heureDebut) : null; return $this; }
     public function getHeureFin(): ?\DateTimeInterface { return $this->heureFin; }
-    public function setHeureFin(?\DateTimeInterface $heureFin): static { $this->heureFin = $heureFin; return $this; }
+    public function setHeureFin(?\DateTimeInterface $heureFin): static { $this->heureFin = $heureFin ? \DateTimeImmutable::createFromInterface($heureFin) : null; return $this; }
     public function getPauseMinutes(): ?int { return $this->pauseMinutes; }
     public function setPauseMinutes(?int $pauseMinutes): static { $this->pauseMinutes = $pauseMinutes; return $this; }
     public function getTypeJour(): ?string { return $this->typeJour; }
@@ -87,9 +87,9 @@ class Planning
     public function getStatus(): ?string { return $this->status; }
     public function setStatus(string $status): static { $this->status = $status; return $this; }
     public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static { $this->createdAt = $createdAt; return $this; }
+    public function setCreatedAt(?\DateTimeInterface $createdAt): static { $this->createdAt = $createdAt ? \DateTimeImmutable::createFromInterface($createdAt) : null; return $this; }
     public function getValidatedAt(): ?\DateTimeImmutable { return $this->validatedAt; }
-    public function setValidatedAt(?\DateTimeImmutable $validatedAt): static { $this->validatedAt = $validatedAt; return $this; }
+    public function setValidatedAt(?\DateTimeInterface $validatedAt): static { $this->validatedAt = $validatedAt ? \DateTimeImmutable::createFromInterface($validatedAt) : null; return $this; }
     public function getValidatedBy(): ?User { return $this->validatedBy; }
     public function setValidatedBy(?User $validatedBy): static { $this->validatedBy = $validatedBy; return $this; }
 }
