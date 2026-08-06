@@ -70,12 +70,6 @@
                             </div>
 
                             <div class="mb-3">
-                                {{ form_label(form.dateDemande, 'Date souhaitée', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-                                {{ form_widget(form.dateDemande, {'attr': {'class': 'form-control'}}) }}
-                                {{ form_errors(form.dateDemande) }}
-                            </div>
-
-                            <div class="mb-3">
                                 {{ form_label(form.commentaire, 'Commentaire (optionnel)', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                                 {{ form_widget(form.commentaire, {'attr': {'class': 'form-control', 'rows': '3', 'placeholder': 'Précisions complémentaires...'}}) }}
                                 {{ form_errors(form.commentaire) }}

@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Form\Employe;
+namespace App\Form;
 
 use App\Entity\AvanceSalaire;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -19,10 +18,10 @@ class AvanceSalaireType extends AbstractType
     {
         $builder
             ->add('montant', MoneyType::class, [
-                'currency' => false, 
+                'currency' => false,
                 'constraints' => [
-                    new GreaterThanOrEqual(['value' => 50]),
-                    new LessThanOrEqual(['value' => 800]),
+                    new GreaterThanOrEqual(50),
+                    new LessThanOrEqual(800),
                 ],
             ])
             ->add('motif', ChoiceType::class, [
@@ -35,10 +34,6 @@ class AvanceSalaireType extends AbstractType
                     'Autre' => 'autre',
                 ],
                 'placeholder' => 'Sélectionner un motif',
-            ])
-            ->add('dateDemande', DateType::class, [
-                'widget' => 'single_text',
-                'input' => 'datetime_immutable',
             ])
             ->add('commentaire', TextareaType::class, [
                 'required' => false,

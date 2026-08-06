@@ -10,6 +10,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Entity\Demission;
+use App\Form\Employe\DemissionType;
+use App\Repository\DemissionRepository;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/employe')]
@@ -26,13 +29,15 @@ final class DemandesController extends AbstractController
         $user = $this->getUser();
 
         $avance = new AvanceSalaire();
+        $avance->setEmploye($this->getUser()); // Assign current employee
         $form = $this->createForm(AvanceSalaireType::class, $avance);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $avance->setEmployee($user);
+            $avance->setDateDemande(new \DateTimeImmutable());
             $avance->setEntreprise($user->getEntreprise()); // Assuming your User entity has getEntreprise()
-            $avance->setStatut(AvanceSalaire::STATUS_DEMANDE);
+            $avance->setStatut('en_attente');
 
             $entityManager->persist($avance);
             $entityManager->flush();
@@ -51,11 +56,39 @@ final class DemandesController extends AbstractController
         ]);
     }
 
-    #[Route('/demission', name: 'app_employe_demandes_demission')]
-    public function demission(): Response
+    #[Route('/demission', name: 'app_employe_demandes_demission', methods: ['GET', 'POST'])]
+    public function demission(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        DemissionRepository $demissionRepository
+    ): Response
     {
+        $user = $this->getUser();
+
+        $demission = new Demission();
+        $form = $this->createForm(DemissionType::class, $demission);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $demission->setEmployee($user);
+            $demission->setEntreprise($user->getEntreprise());
+            $demission->setDateDemande(new \DateTimeImmutable());
+            $demission->setStatut('en_attente');
+
+            $entityManager->persist($demission);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Votre lettre de démission a été envoyée avec succès.');
+
+            return $this->redirectToRoute('app_employe_demandes_demission');
+        }
+
+        // Fetch history for the connected user
+        $demissionsPrecedentes = $demissionRepository->findBy(['employee' => $user], ['dateDemande' => 'DESC']);
+
         return $this->render('employe/demandes/demission.html.twig', [
-            'controller_name' => 'Employe/DemandesController',
+            'form' => $form->createView(),
+            'demissionsPrecedentes' => $demissionsPrecedentes,
         ]);
     }
 }

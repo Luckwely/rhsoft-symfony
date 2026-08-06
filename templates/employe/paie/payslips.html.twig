@@ -1,0 +1,56 @@
+{% extends 'layouts/base_employe.html.twig' %}
+
+{% block title %}Mes Fiches de Paie{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Mes Fiches de Paie</h1>
+
+    {# Year Selector #}
+    <div class="mb-3">
+        <label for="yearSelect">Année :</label>
+        <select id="yearSelect" class="form-select w-auto d-inline-block" onchange="window.location.href=this.value">
+            {% for year in availableYears %}
+                <option value="{{ path('app_employee_payslips', {year: year}) }}" {% if year == selectedYear %}selected{% endif %}>
+                    {{ year }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    {# Display Payslips Table #}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Mois</th>
+                <th>Année</th>
+                <th>Salaire Brut</th>
+                <th>Salaire Net</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payslip in payslips %}
+                <tr>
+                    <td>{{ payslip.mois }}</td>
+                    <td>{{ payslip.annee }}</td>
+                    <td>{{ payslip.salaireBrut }} €</td>
+                    <td>{{ payslip.salaireNet }} €</td>
+                    <td>{{ payslip.status }}</td>
+                    <td>
+                        {# Update route name if different for downloading #}
+                        <a href="{{ path('app_employee_payslip_download', {id: payslip.id}) }}" class="btn btn-sm btn-primary">
+                            Télécharger
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="text-center">Aucune fiche de paie trouvée pour l'année {{ selectedYear }}.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
