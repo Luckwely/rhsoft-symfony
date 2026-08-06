@@ -43,7 +43,7 @@ final class DemandesController extends AbstractController
         }
 
         // Fetch past requests for the logged-in user
-        $demandesPrecedentes = $avanceRepository->findBy(['user' => $user], ['dateDemande' => 'DESC']);
+        $demandesPrecedentes = $avanceRepository->findBy(['employee' => $user], ['dateDemande' => 'DESC']);
 
         return $this->render('employe/demandes/avance.html.twig', [
             'form' => $form->createView(),

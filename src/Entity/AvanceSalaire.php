@@ -47,6 +47,21 @@ class AvanceSalaire
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $commentaire = null;
+
+    // Add these getters and setters:
+    public function getCommentaire(): ?string
+    {
+        return $this->commentaire;
+    }
+
+    public function setCommentaire(?string $commentaire): static
+    {
+        $this->commentaire = $commentaire;
+        return $this;
+    }
+
     public function __construct()
     {
         $this->dateDemande = new \DateTimeImmutable();

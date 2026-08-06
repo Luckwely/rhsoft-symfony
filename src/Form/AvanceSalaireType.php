@@ -19,7 +19,7 @@ class AvanceSalaireType extends AbstractType
     {
         $builder
             ->add('montant', MoneyType::class, [
-                'currency' => 'EUR',
+                'currency' => false, 
                 'constraints' => [
                     new GreaterThanOrEqual(['value' => 50]),
                     new LessThanOrEqual(['value' => 800]),

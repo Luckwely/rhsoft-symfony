@@ -56,6 +56,7 @@
                                 {{ form_label(form.montant, 'Montant demandé *', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                                 <div class="input-group">
                                     <span class="input-group-text">€</span>
+                                    {# We use form_widget without extra markup if MoneyType handles the text wrapper, or strip the addon if MoneyType outputs its own symbol #}
                                     {{ form_widget(form.montant, {'attr': {'class': 'form-control', 'placeholder': '500', 'min': '50', 'max': '800', 'step': '10'}}) }}
                                 </div>
                                 <small class="text-muted">Montant maximum autorisé: 800 €</small>
@@ -69,15 +70,15 @@
                             </div>
 
                             <div class="mb-3">
-                                {{ form_label(form.dateSouhaitee, 'Date souhaitée', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-                                {{ form_widget(form.dateSouhaitee, {'attr': {'class': 'form-control'}}) }}
-                                {{ form_errors(form.dateSouhaitee) }}
-                            </div>
-
-                            <div class="mb-3">
                                 {{ form_label(form.dateDemande, 'Date souhaitée', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                                 {{ form_widget(form.dateDemande, {'attr': {'class': 'form-control'}}) }}
                                 {{ form_errors(form.dateDemande) }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.commentaire, 'Commentaire (optionnel)', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                                {{ form_widget(form.commentaire, {'attr': {'class': 'form-control', 'rows': '3', 'placeholder': 'Précisions complémentaires...'}}) }}
+                                {{ form_errors(form.commentaire) }}
                             </div>
 
                             <button type="submit" class="btn btn-primary w-100">
@@ -132,16 +133,16 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% forelse demandesPrecedentes as item %}
+                                    {% for item in demandesPrecedentes %}
                                         <tr>
                                             <td class="ps-3 fw-semibold">{{ item.montant }} €</td>
                                             <td>{{ item.dateDemande ? item.dateDemande|date('d/m/Y') : '-' }}</td>
                                             <td class="text-center pe-3">
-                                                {% if item.statut == 'Approuvé' %}
+                                                {% if item.statut == 'valide' %}
                                                     <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
                                                         <i class="bi bi-check-circle-fill me-1"></i>Approuvé
                                                     </span>
-                                                {% elseif item.statut == 'Refusé' %}
+                                                {% elseif item.statut == 'refuse' %}
                                                     <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
                                                         <i class="bi bi-x-circle-fill me-1"></i>Refusé
                                                     </span>
@@ -152,11 +153,11 @@
                                                 {% endif %}
                                             </td>
                                         </tr>
-                                    {% empty %}
+                                    {% else %}
                                         <tr>
                                             <td colspan="3" class="text-center py-3 text-muted">Aucune demande enregistrée.</td>
                                         </tr>
-                                    {% endforelse %}
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
