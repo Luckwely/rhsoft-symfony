@@ -155,7 +155,7 @@ class EmployeeFormType extends AbstractType
                     return $rolesArray? $rolesArray[0] : null;
                 },
                 function ($roleString) {
-                    return $roleString? [$roleString] : ['ROLE_USER'];
+                    return $roleString? [$roleString] : ['ROLE_ADMIN'];
                 }
             ));
     }
