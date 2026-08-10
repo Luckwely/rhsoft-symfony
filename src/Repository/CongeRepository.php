@@ -63,4 +63,16 @@ class CongeRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    public function countPendingByEntreprise(Entreprise $entreprise): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.entreprise = :entreprise')
+            ->andWhere('c.statut = :statut')
+            ->setParameter('entreprise', $entreprise)
+            ->setParameter('statut', Conge::STATUS_DEMANDE)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

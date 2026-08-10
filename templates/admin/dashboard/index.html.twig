@@ -27,7 +27,7 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <span class="text-muted small text-uppercase fw-semibold">Effectif Total</span>
-                            <h2 class="fw-bold mb-0 mt-1">142</h2>
+                            <h2 class="fw-bold mb-0 mt-1">{{ dashboard.totalEmployees|default(0) }}</h2>
                         </div>
                         <div class="bg-primary bg-opacity-10 rounded-3 p-3">
                             <i class="bi bi-people-fill text-primary fs-4"></i>
@@ -42,7 +42,7 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <span class="text-muted small text-uppercase fw-semibold">Présents Aujourd'hui</span>
-                            <h2 class="fw-bold mb-0 mt-1">128 / 142</h2>
+                            <h2 class="fw-bold mb-0 mt-1">{{ dashboard.presentToday|default(0) }} / {{ dashboard.totalEmployees|default(0) }}</h2>
                         </div>
                         <div class="bg-success bg-opacity-10 rounded-3 p-3">
                             <i class="bi bi-person-check text-success fs-4"></i>
@@ -57,7 +57,7 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <span class="text-muted small text-uppercase fw-semibold">Congés En Attente</span>
-                            <h2 class="fw-bold mb-0 mt-1">8</h2>
+                            <h2 class="fw-bold mb-0 mt-1">{{ dashboard.pendingLeaves|default(0) }}</h2>
                         </div>
                         <div class="bg-warning bg-opacity-10 rounded-3 p-3">
                             <i class="bi bi-calendar-check text-warning fs-4"></i>
@@ -72,7 +72,7 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <span class="text-muted small text-uppercase fw-semibold">Masse Salariale</span>
-                            <h2 class="fw-bold mb-0 mt-1">45 200 €</h2>
+                            <h2 class="fw-bold mb-0 mt-1">{{ dashboard.payrollMass|default(0)|number_format(2, ',', ' ') }} €</h2>
                         </div>
                         <div class="bg-info bg-opacity-10 rounded-3 p-3">
                             <i class="bi bi-currency-euro text-info fs-4"></i>
@@ -190,7 +190,7 @@
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fw-semibold small">Contrats qui expirent</span>
-                                <span class="badge bg-danger">3</span>
+                                <span class="badge bg-danger">{{ dashboard.alertContractsExpiring|default(0) }}</span>
                             </div>
                             <small class="text-muted">Moins de 30 jours</small>
                         </div>
@@ -202,7 +202,7 @@
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fw-semibold small">Périodes d'essai</span>
-                                <span class="badge bg-warning text-dark">2</span>
+                                <span class="badge bg-warning text-dark">{{ dashboard.alertProbation|default(0) }}</span>
                             </div>
                             <small class="text-muted">Qui se terminent</small>
                         </div>
@@ -214,7 +214,7 @@
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fw-semibold small">Entretiens annuels</span>
-                                <span class="badge bg-info">5</span>
+                                <span class="badge bg-info">{{ dashboard.alertAnnualReviews|default(0) }}</span>
                             </div>
                             <small class="text-muted">À planifier</small>
                         </div>
@@ -240,11 +240,12 @@
                         </h5>
                         <small class="text-muted">Effectif par département</small>
                     </div>
-                    <div class="d-flex gap-2">
-                        <span class="badge bg-primary bg-opacity-10 text-primary">RH: 12</span>
-                        <span class="badge bg-success bg-opacity-10 text-success">Tech: 45</span>
-                        <span class="badge bg-warning bg-opacity-10 text-warning">Commercial: 60</span>
-                        <span class="badge bg-info bg-opacity-10 text-info">Compta: 25</span>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for service in dashboard.services %}
+                            <span class="badge bg-primary bg-opacity-10 text-primary">{{ service.service }}: {{ service.total }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary">Aucun service défini</span>
+                        {% endfor %}
                     </div>
                 </div>
                 <div class="card-body">
@@ -282,158 +283,37 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 32px; height: 32px; font-size: 12px;">JD</div>
-                                            <div>
-                                                <div class="fw-semibold small">Jean Dupont</div>
-                                                <div class="text-muted small">Développeur</div>
+                                {% for pointage in dashboard.recentPointages %}
+                                    {% set employee = pointage.employee %}
+                                    <tr>
+                                        <td class="ps-3">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 32px; height: 32px; font-size: 12px;">
+                                                    {{ ((employee.prenom|default('')|slice(0,1) ~ employee.nom|default('')|slice(0,1))|upper)|default('--') }}
+                                                </div>
+                                                <div>
+                                                    <div class="fw-semibold small">{{ employee.prenom ~ ' ' ~ employee.nom }}</div>
+                                                    <div class="text-muted small">{{ employee.poste ?: employee.service ?: 'N/A' }}</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td>Tech</td>
-                                    <td class="text-center">08:30</td>
-                                    <td class="text-center">17:45</td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-success bg-opacity-10 text-success">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Présent
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-success rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 32px; height: 32px; font-size: 12px;">ML</div>
-                                            <div>
-                                                <div class="fw-semibold small">Marie Laurent</div>
-                                                <div class="text-muted small">Commerciale</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>Commercial</td>
-                                    <td class="text-center">08:45</td>
-                                    <td class="text-center">18:00</td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-success bg-opacity-10 text-success">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Présent
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 32px; height: 32px; font-size: 12px;">PC</div>
-                                            <div>
-                                                <div class="fw-semibold small">Pierre Chen</div>
-                                                <div class="text-muted small">Développeur</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>Tech</td>
-                                    <td class="text-center">09:15</td>
-                                    <td class="text-center">-</td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-warning bg-opacity-10 text-warning">
-                                            <i class="bi bi-exclamation-triangle me-1"></i>En Retard
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-info rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 32px; height: 32px; font-size: 12px;">SB</div>
-                                            <div>
-                                                <div class="fw-semibold small">Sophie Bernard</div>
-                                                <div class="text-muted small">RH</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>RH</td>
-                                    <td class="text-center">-</td>
-                                    <td class="text-center">-</td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-danger bg-opacity-10 text-danger">
-                                            <i class="bi bi-x-circle-fill me-1"></i>Absent
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-danger rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 32px; height: 32px; font-size: 12px;">TG</div>
-                                            <div>
-                                                <div class="fw-semibold small">Thomas Girard</div>
-                                                <div class="text-muted small">Commercial</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>Commercial</td>
-                                    <td class="text-center">08:20</td>
-                                    <td class="text-center">18:30</td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-success bg-opacity-10 text-success">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Présent
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 32px; height: 32px; font-size: 12px;">CL</div>
-                                            <div>
-                                                <div class="fw-semibold small">Céline Lefèvre</div>
-                                                <div class="text-muted small">Comptable</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>Compta</td>
-                                    <td class="text-center">08:00</td>
-                                    <td class="text-center">17:00</td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-success bg-opacity-10 text-success">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Présent
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold" style="width: 32px; height: 32px; font-size: 12px;">NL</div>
-                                            <div>
-                                                <div class="fw-semibold small">Nicolas Laurent</div>
-                                                <div class="text-muted small">Développeur</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>Tech</td>
-                                    <td class="text-center">08:10</td>
-                                    <td class="text-center">16:50</td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-success bg-opacity-10 text-success">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Présent
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-warning fw-bold" style="width: 32px; height: 32px; font-size: 12px;">ED</div>
-                                            <div>
-                                                <div class="fw-semibold small">Émilie Dubois</div>
-                                                <div class="text-muted small">Commerciale</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>Commercial</td>
-                                    <td class="text-center">09:30</td>
-                                    <td class="text-center">-</td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-warning bg-opacity-10 text-warning">
-                                            <i class="bi bi-exclamation-triangle me-1"></i>En Retard
-                                        </span>
-                                    </td>
-                                </tr>
+                                        </td>
+                                        <td>{{ employee.service ?: 'N/A' }}</td>
+                                        <td class="text-center">{{ pointage.heureEntree ? pointage.heureEntree|date('H:i') : '-' }}</td>
+                                        <td class="text-center">{{ pointage.heureSortie ? pointage.heureSortie|date('H:i') : '-' }}</td>
+                                        <td class="text-center pe-3">
+                                            {% set statut = pointage.statut|default('inconnu') %}
+                                            {% set badgeClass = statut == 'present' ? 'bg-success bg-opacity-10 text-success' : statut == 'retard' ? 'bg-warning bg-opacity-10 text-warning' : statut == 'absent' ? 'bg-danger bg-opacity-10 text-danger' : 'bg-secondary bg-opacity-10 text-secondary' %}
+                                            {% set icon = statut == 'present' ? 'check-circle-fill' : statut == 'retard' ? 'exclamation-triangle' : statut == 'absent' ? 'x-circle-fill' : 'dash' %}
+                                            <span class="badge {{ badgeClass }}">
+                                                <i class="bi bi-{{ icon }} me-1"></i>{{ pointage.statutLabel() }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">Aucun pointage récent trouvé</td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -478,20 +358,24 @@ document.addEventListener('DOMContentLoaded', function() {
     new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['RH', 'Tech', 'Commercial', 'Compta'],
+            labels: {{ dashboard.serviceLabels|default([])|json_encode()|raw }},
             datasets: [{
-                data: [12, 45, 60, 25],
+                data: {{ dashboard.serviceCounts|default([])|json_encode()|raw }},
                 backgroundColor: [
                     'rgba(13, 110, 253, 0.8)',
                     'rgba(25, 135, 84, 0.8)',
                     'rgba(255, 193, 7, 0.8)',
-                    'rgba(13, 202, 240, 0.8)'
+                    'rgba(13, 202, 240, 0.8)',
+                    'rgba(220, 53, 69, 0.8)',
+                    'rgba(108, 117, 125, 0.8)'
                 ],
                 borderColor: [
                     '#0d6efd',
                     '#198754',
                     '#ffc107',
-                    '#0dcaf0'
+                    '#0dcaf0',
+                    '#dc3545',
+                    '#6c757d'
                 ],
                 borderWidth: 2,
                 hoverOffset: 8

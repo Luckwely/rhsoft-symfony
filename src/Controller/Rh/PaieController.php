@@ -2,9 +2,12 @@
 
 namespace App\Controller\Rh;
 
-use App\Entity\Employe; 
+use App\Entity\Employe;
+use App\Entity\Paie;
 use App\Repository\PaieRepository;
+use App\Repository\PointageRepository;
 use App\Service\PaieCalculatorService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -35,7 +38,7 @@ final class PaieController extends AbstractController
     }
 
     #[Route('/calculer/{id}', name: 'app_rh_paie_calculer', methods: ['POST'])]
-    public function calculer(Employe $employe, PaieCalculatorService $calculator, PointageRepository $pointageRepository): Response
+    public function calculer(Employe $employe, PaieCalculatorService $calculator, PointageRepository $pointageRepository, EntityManagerInterface $em): Response
     {
         // 1. Définir la période (par exemple, le mois en cours)
         $mois = (int) date('m');
@@ -58,9 +61,20 @@ final class PaieController extends AbstractController
         // 4. Calculer la paie
         $resultatPaie = $calculator->calculerPaie($dataInput);
 
-        // TODO: Enregistrer $resultatPaie dans votre entité BulletinPaie ou Paie
+        // 5. Enregistrer le résultat dans l'entité Paie
+        $paie = new Paie();
+        $paie->setEmployee($employe)
+            ->setMois($mois)
+            ->setAnnee($annee)
+            ->setSalaireBrut($resultatPaie['salaire_brut'])
+            ->setCotisations(sprintf('%.2f', $resultatPaie['cnaps'] + $resultatPaie['ostie']))
+            ->setSalaireNet($resultatPaie['salaire_net'])
+            ->setStatus('calculée');
 
-        $this->addFlash('success', 'Paie calculée automatiquement avec succès !');
+        $em->persist($paie);
+        $em->flush();
+
+        $this->addFlash('success', 'Paie calculée et enregistrée avec succès !');
 
         return $this->redirectToRoute('app_rh_paie_preparer');
     }

@@ -29,7 +29,7 @@ final class DemandesController extends AbstractController
         $user = $this->getUser();
 
         $avance = new AvanceSalaire();
-        $avance->setEmploye($this->getUser()); // Assign current employee
+        $avance->setEmployee($this->getUser()); // Assign current employee
         $form = $this->createForm(AvanceSalaireType::class, $avance);
         $form->handleRequest($request);
 

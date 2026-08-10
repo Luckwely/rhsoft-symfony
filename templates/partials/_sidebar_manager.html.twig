@@ -24,6 +24,11 @@
 <!-- Navigation Menu -->
 <nav class="nav nav-pills flex-column mb-auto gap-1">
     {% set current_route = app.request.attributes.get('_route')|default('') %}
+    <a href="{{ path('app_manager_dashboard') }}"
+        class="nav-link {% if current_route == 'app_manager_dashboard' %}active{% endif %}">
+        <i class="bi bi-speedometer2 me-2"></i>
+        Tableau de bord
+    </a>
     <a href="{{ path('app_manager_profile_solde') }}"
         class="nav-link {% if current_route == 'app_manager_profile_solde' or current_route starts with 'app_manager_profile_' %}active{% endif %}">
         <i class="bi bi-person-circle me-2"></i>
