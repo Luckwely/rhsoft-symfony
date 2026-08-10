@@ -46,6 +46,6 @@ class SecurityController extends AbstractController
             return $this->redirectToRoute('app_manager_dashboard');
         }
 
-        return $this->redirectToRoute('app_employe_dashboard'); // ROLE_USER par défaut
+        return $this->redirectToRoute('app_employe_profile'); // ROLE_USER par défaut
     }
 }

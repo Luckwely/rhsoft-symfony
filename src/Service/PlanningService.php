@@ -184,19 +184,53 @@ class PlanningService
         return $pt->getHeureEntree() > $heureLimite ? (int)(($pt->getHeureEntree()->getTimestamp() - $heureLimite->getTimestamp()) / 60) : 0;
     }
 
+    //private function calculateMinutesTravail(?Pointage $p): float
+    //{
+    //    if (!$p || !$p->getHeureEntree()) {
+    //        return 0;
+    //    }
+    //
+    //    $sortie = $p->getHeureSortie() ?? new \DateTimeImmutable();
+     //   $workedMinutes = ($sortie->getTimestamp() - $p->getHeureEntree()->getTimestamp()) / 60;
+    //    $pauseMinutes = $this->getPauseDurationMinutes($p);
+
+    //    return max(0, $workedMinutes - $pauseMinutes);
+    //}
+
     private function calculateMinutesTravail(?Pointage $p): float
     {
         if (!$p || !$p->getHeureEntree()) {
             return 0;
         }
 
-        $sortie = $p->getHeureSortie() ?? new \DateTimeImmutable();
+        $today = new \DateTimeImmutable('today');
+        $pointageDate = $p->getDate() ? $p->getDate()->setTime(0, 0, 0) : null;
+
+        // If there is no exit time:
+        if (!$p->getHeureSortie()) {
+            // If the pointage is NOT from today (e.g. an old forgotten shift),
+            // do NOT use "now" as the exit time, otherwise it counts months of elapsed time!
+            if ($pointageDate && $pointageDate < $today) {
+                return 0;
+            }
+
+            // If it IS today, use current time for live tracking
+            $sortie = new \DateTimeImmutable();
+        } else {
+            $sortie = $p->getHeureSortie();
+        }
+
         $workedMinutes = ($sortie->getTimestamp() - $p->getHeureEntree()->getTimestamp()) / 60;
+
+        // Safety cap: A single normal work shift cannot exceed 24 hours (1440 minutes)
+        if ($workedMinutes > 1440 || $workedMinutes < 0) {
+            return 0;
+        }
+
         $pauseMinutes = $this->getPauseDurationMinutes($p);
 
         return max(0, $workedMinutes - $pauseMinutes);
     }
-
     private function getPauseDurationMinutes(?Pointage $p): int
     {
         if (!$p) {
