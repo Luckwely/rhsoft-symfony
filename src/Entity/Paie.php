@@ -16,7 +16,7 @@ class Paie
 
     #[ORM\ManyToOne(inversedBy: 'paies')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $employee = null; // <-- Added employee relation
+    private ?User $employee = null;
 
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $mois = null;
@@ -25,7 +25,7 @@ class Paie
     private ?int $annee = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?string $salaireBrut = null; // Renamed or added depending on your fields
+    private ?string $salaireBrut = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $cotisations = null;
@@ -35,6 +35,54 @@ class Paie
 
     #[ORM\Column(length: 255)]
     private ?string $status = null;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $masseSalariale = null;
+
+    // 1. Simule getStartDate() en combinant l'année et le mois (utilisé pour IntlDateFormatter)
+    public function getStartDate(): ?\DateTimeInterface
+    {
+        if ($this->annee && $this->mois) {
+            return new \DateTimeImmutable("{$this->annee}-{$this->mois}-01");
+        }
+        return null;
+    }
+
+    // 2. Alias pour getGrossAmount() pointant vers salaireBrut
+    public function getGrossAmount(): ?float
+    {
+        return $this->salaireBrut !== null ? (float) $this->salaireBrut : null;
+    }
+
+    // 3. Alias pour getDeductions() pointant vers cotisations
+    public function getDeductions(): ?float
+    {
+        return $this->cotisations !== null ? (float) $this->cotisations : null;
+    }
+
+    // --- Remplacement de la colonne en doublon par une méthode virtuelle ---
+    public function getNetAmount(): ?float
+    {
+        return $this->salaireNet !== null ? (float) $this->salaireNet : null;
+    }
+
+    public function setNetAmount(?float $netAmount): static
+    {
+        $this->salaireNet = $netAmount !== null ? (string) $netAmount : null;
+        return $this;
+    }
+    // ---------------------------------------------------------------------
+
+    public function getMasseSalariale(): ?float
+    {
+        return $this->masseSalariale;
+    }
+
+    public function setMasseSalariale(?float $masseSalariale): self
+    {
+        $this->masseSalariale = $masseSalariale;
+        return $this;
+    }
 
     public function getId(): ?int { return $this->id; }
 

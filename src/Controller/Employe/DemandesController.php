@@ -3,7 +3,7 @@
 namespace App\Controller\Employe;
 
 use App\Entity\AvanceSalaire;
-use App\Form\Employe\AvanceSalaireType;
+use App\Form\AvanceSalaireType;
 use App\Repository\AvanceSalaireRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

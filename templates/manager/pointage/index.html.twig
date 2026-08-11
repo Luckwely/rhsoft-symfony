@@ -121,7 +121,7 @@
                     <select name="service" class="form-select form-select-sm">
                         <option value="">Tous les services</option>
                         {% for s in services %}
-                            <option value="{{ s }}" {{ service == s ? 'selected' : '' }}>{{ s|capitalize }}</option>
+                            <option value="{{ s.service }}" {{ service == s.service ? 'selected' : '' }}>{{ s.service|capitalize }}</option>
                         {% endfor %}
                     </select>
                 </div>

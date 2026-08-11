@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Repository;
 
 use App\Entity\Demission;
@@ -33,46 +32,44 @@ class DemissionRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    public function getMonthlyDeparturesByEntreprise(Entreprise $entreprise, int $months): array
+    public function getMonthlyDeparturesByEntreprise(
+        Entreprise $entreprise,
+        int $months = 6
+    ): array
     {
         $today = new \DateTimeImmutable('today');
         $fromDate = (clone $today)->modify(sprintf('-%d months', $months - 1))->modify('first day of this month 00:00:00');
 
-        return $this->createQueryBuilder('d')
-            ->select('YEAR(d.dateDepart) AS annee', 'MONTH(d.dateDepart) AS mois', 'COUNT(d.id) AS total')
+        // 1. On récupère les démissions à partir de la date calculée
+        $demissions = $this->createQueryBuilder('d')
             ->where('d.entreprise = :entreprise')
             ->andWhere('d.dateDepart >= :fromDate')
             ->setParameter('entreprise', $entreprise)
             ->setParameter('fromDate', $fromDate)
-            ->groupBy('annee', 'mois')
-            ->orderBy('annee', 'ASC')
-            ->addOrderBy('mois', 'ASC')
+            ->orderBy('d.dateDepart', 'ASC')
             ->getQuery()
-            ->getArrayResult();
+            ->getResult();
+
+        // 2. On groupe et compte par année/mois en PHP pour éviter les fonctions SQL non supportées par défaut
+        $groupedData = [];
+        foreach ($demissions as $demission) {
+            if ($demission->getDateDepart()) {
+                $annee = (int) $demission->getDateDepart()->format('Y');
+                $mois = (int) $demission->getDateDepart()->format('n');
+
+                $key = $annee . '-' . $mois;
+
+                if (!isset($groupedData[$key])) {
+                    $groupedData[$key] = [
+                        'annee' => $annee,
+                        'mois' => $mois,
+                        'total' => 0
+                    ];
+                }
+                $groupedData[$key]['total']++;
+            }
+        }
+
+        return array_values($groupedData);
     }
-
-//    /**
-//     * @return Demission[] Returns an array of Demission objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('d')
-//            ->andWhere('d.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('d.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Demission
-//    {
-//        return $this->createQueryBuilder('d')
-//            ->andWhere('d.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

@@ -16,33 +16,33 @@ class PointageFixtures extends Fixture implements DependentFixtureInterface
         $faker = Factory::create('fr_FR');
         $statuts = ['present', 'retard', 'absent', 'conge'];
 
-        // On suppose que nous avons 9 utilisateurs créés dans UserFixtures (indexes 1 à 9)
+        // On suppose que vos UserFixtures ont généré 9 utilisateurs (index 1 à 9)
         for ($userIndex = 1; $userIndex <= 9; $userIndex++) {
             /** @var User $employee */
             $employee = $this->getReference('user_' . $userIndex, User::class);
             $entreprise = $employee->getEntreprise();
 
-            // Création de 5 pointages (jours différents) pour chaque employé
+            // Création de 5 pointages sur des jours distincts pour chaque employé
             for ($i = 0; $i < 5; $i++) {
                 $pointage = new Pointage();
 
                 $pointage->setEmployee($employee);
                 $pointage->setEntreprise($entreprise);
 
-                // Date du pointage (ex: les 5 derniers jours)
-                $dateImmutable = \DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-10 days', 'now'));
+                // Utilisation d'un décalage fixe ($i) pour garantir des dates uniques par utilisateur
+                $dateImmutable = new \DateTimeImmutable("-$i days");
                 $pointage->setDate($dateImmutable);
 
                 $statut = $faker->randomElement($statuts);
                 $pointage->setStatut($statut);
 
                 if ($statut !== 'absent') {
-                    // Heures prévues
+                    // Horaires prévus
                     $pointage->setHeurePrevueDebut(new \DateTimeImmutable('08:00:00'));
                     $pointage->setHeurePrevueFin(new \DateTimeImmutable('17:00:00'));
                     $pointage->setPausePrevueMinutes(60);
 
-                    // Heures réelles d'entrée et sortie
+                    // Horaires réels d'entrée et sortie
                     $heureEntree = $statut === 'retard' ? '09:15:00' : '08:00:00';
                     $pointage->setHeureEntree(new \DateTimeImmutable($heureEntree));
                     $pointage->setHeureSortie(new \DateTimeImmutable('17:00:00'));
@@ -54,12 +54,13 @@ class PointageFixtures extends Fixture implements DependentFixtureInterface
                     $valide = $faker->boolean(80);
                     $pointage->setValide($valide);
 
+                    // Si le pointage est validé et en retard, on ajoute un motif et un admin correcteur
                     if ($valide && $statut === 'retard') {
                         $pointage->setMotifCorrection('Retard toléré pour transport en commun.');
-                        // On peut lier un admin (ex: user_1)
+                        /** @var User $admin */
                         $admin = $this->getReference('user_1', User::class);
                         $pointage->setCorrigePar($admin);
-                        $pointage->setCorrigeLe(\DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-5 days', 'now')));
+                        $pointage->setCorrigeLe(new \DateTimeImmutable('-1 day'));
                     }
                 }
 

@@ -84,4 +84,14 @@ class AvanceSalaire
     public function setDateDemande(?\DateTimeInterface $dateDemande): static { $this->dateDemande = $dateDemande ? \DateTimeImmutable::createFromInterface($dateDemande) : null; return $this; }
     public function getValidePar(): ?User { return $this->validePar; }
     public function setValidePar(?User $validePar): static { $this->validePar = $validePar; return $this; }
+    public function getDateRemboursement(): ?\DateTimeImmutable
+    {
+        return $this->dateRemboursement;
+    }
+
+    public function setDateRemboursement(?\DateTimeInterface $dateRemboursement): static
+    {
+        $this->dateRemboursement = $dateRemboursement ? \DateTimeImmutable::createFromInterface($dateRemboursement) : null;
+        return $this;
+    }
 }

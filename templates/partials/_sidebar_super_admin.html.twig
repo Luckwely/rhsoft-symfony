@@ -1,8 +1,24 @@
-<!-- Logo -->
-<div class="d-flex align-items-center mb-4 pb-3 border-bottom border-secondary">
-	<a href="{{ path('app_super_admin_dashboard') }}" class="sidebar-logo d-flex align-items-center text-xl">
-		<span class="">RHSOFT</span>
-	</a>
+<!-- Logo & Role Header -->
+<div class="d-flex align-items-center justify-content-between gap-2 mb-4 pb-3 border-bottom border-secondary px-2" style="min-width: 0;">
+    <!-- Logo -->
+    <a href="{{ path('app_rh_dashboard') }}" class="sidebar-logo d-flex align-items-center text-decoration-none flex-shrink-0 overflow-hidden">
+        <img src="{{ asset('uploads/home/logo.png') }}" alt="RH Soft Pro Logo" style="display: block; max-height: 38px; width: auto; max-width: 100%; object-fit: contain;">
+    </a>
+
+    <!-- User Role Badge -->
+    <div class="ms-auto flex-shrink-0">
+        {% if 'ROLE_SUPER_ADMIN' in app.user.roles %}
+            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Super Admin</span>
+        {% elseif 'ROLE_ADMIN' in app.user.roles %}
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Admin</span>
+        {% elseif 'ROLE_RH' in app.user.roles %}
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">RH</span>
+        {% elseif 'ROLE_MANAGER' in app.user.roles %}
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Manager</span>
+        {% else %}
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Employé</span>
+        {% endif %}
+    </div>
 </div>
 
 <!-- Navigation Menu -->

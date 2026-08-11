@@ -60,8 +60,21 @@ class Conge
         $this->createdAt = new \DateTimeImmutable();
     }
 
+    // --- Alias pour que Twig puisse utiliser `conge.duree` sans créer de colonne inutile en BDD ---
+    public function getDuree(): ?float
+    {
+        return $this->nbJours;
+    }
+
+    public function setDuree(?float $duree): static
+    {
+        $this->nbJours = $duree;
+        return $this;
+    }
+    // -----------------------------------------------------------------------------------------
+
     public function getId(): ?int { return $this->id; }
-    public function getEmployee(): ?User { return $this->employee; } // <-- FIX employee
+    public function getEmployee(): ?User { return $this->employee; }
     public function setEmployee(?User $employee): static { $this->employee = $employee; return $this; }
     public function getEntreprise(): ?Entreprise { return $this->entreprise; }
     public function setEntreprise(?Entreprise $entreprise): static { $this->entreprise = $entreprise; return $this; }
@@ -73,7 +86,7 @@ class Conge
     public function setDateFin(?\DateTimeInterface $dateFin): static { $this->dateFin = $dateFin ? \DateTimeImmutable::createFromInterface($dateFin) : null; return $this; }
     public function getNbJours(): ?float { return $this->nbJours; }
     public function setNbJours(float $nbJours): static { $this->nbJours = $nbJours; return $this; }
-    public function getStatut(): ?string { return $this->statut; } // <-- FIX statut
+    public function getStatut(): ?string { return $this->statut; }
     public function setStatut(string $statut): static { $this->statut = $statut; return $this; }
     public function getMotif(): ?string { return $this->motif; }
     public function setMotif(?string $motif): static { $this->motif = $motif; return $this; }
@@ -84,7 +97,6 @@ class Conge
     public function setCreatedAt(?\DateTimeInterface $createdAt): static
     {
         $this->createdAt = $createdAt ? \DateTimeImmutable::createFromInterface($createdAt) : null;
-
         return $this;
     }
     public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }

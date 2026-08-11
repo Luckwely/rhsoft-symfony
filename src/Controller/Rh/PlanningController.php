@@ -14,7 +14,7 @@ use Knp\Component\Pager\PaginatorInterface;
 #[IsGranted('ROLE_RH')]
 final class PlanningController extends AbstractController
 {
-    private function getWeekDays(\DateTime $weekStart): array
+    private function getWeekDays(\DateTimeImmutable $weekStart): array
     {
         $days = [];
         for ($i = 0; $i < 7; $i++) {
@@ -31,12 +31,10 @@ final class PlanningController extends AbstractController
     ): Response
     {
         $entreprise = $this->getUser()->getEntreprise();
-        $mondayThisWeek = new \DateTime('monday this week');
-        $mondayThisWeek->setTime(0,0,0);
+        $mondayThisWeek = (new \DateTimeImmutable('monday this week'))->setTime(0,0,0);
 
         $weekParam = $request->query->get('week');
-        $weekStart = $weekParam? new \DateTime($weekParam) : clone $mondayThisWeek;
-        $weekStart->setTime(0,0,0);
+        $weekStart = $weekParam ? (new \DateTimeImmutable($weekParam))->setTime(0, 0, 0) : clone $mondayThisWeek;
 
         $minDate = (clone $mondayThisWeek)->modify('-4 weeks');
         if($weekStart < $minDate) $weekStart = clone $minDate;
@@ -94,10 +92,8 @@ final class PlanningController extends AbstractController
     public function save(Request $request, EntityManagerInterface $em): Response
     {
         $entreprise = $this->getUser()->getEntreprise();
-        $weekStart = new \DateTime($request->request->get('week_start'));
-        $weekStart->setTime(0,0,0);
-        $mondayThisWeek = new \DateTime('monday this week');
-        $mondayThisWeek->setTime(0,0,0);
+        $weekStart  = (new \DateTimeImmutable($request->request->get('week_start')))->setTime(0, 0, 0);
+        $mondayThisWeek = (new \DateTimeImmutable('monday this week'))->setTime(0,0,0);
 
         if($weekStart < $mondayThisWeek){
             $this->addFlash('danger', 'Impossible de modifier une semaine passée');
@@ -141,8 +137,8 @@ final class PlanningController extends AbstractController
                     $planning->setHeureDebut(null);
                     $planning->setHeureFin(null);
                 } else {
-                    $planning->setHeureDebut(!empty($dayData['heureDebut'])? \DateTime::createFromFormat('H:i', $dayData['heureDebut']) : null);
-                    $planning->setHeureFin(!empty($dayData['heureFin'])? \DateTime::createFromFormat('H:i', $dayData['heureFin']) : null);
+                    $planning->setHeureDebut(!empty($dayData['heureDebut'])? \DateTimeImmutable::createFromFormat('H:i', $dayData['heureDebut']) : null);
+                    $planning->setHeureFin(!empty($dayData['heureFin'])? \DateTimeImmutable::createFromFormat('H:i', $dayData['heureFin']) : null);
                 }
                 $planning->setPauseMinutes(!empty($dayData['pauseMinutes']) ? (int)$dayData['pauseMinutes'] : null);
                 $planning->setComment($dayData['comment']?? null);

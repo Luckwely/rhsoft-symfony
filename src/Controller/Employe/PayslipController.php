@@ -2,6 +2,7 @@
 
 namespace App\Controller\Employe;
 
+use App\Entity\Paie;
 use App\Repository\PayslipRepository;
 use App\Service\Contract\PayslipMetricsCalculatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -36,5 +37,18 @@ final class PayslipController extends AbstractController
             'selectedYear' => $selectedYear,
             'availableYears' => $availableYears,
         ]);
+    }
+
+    #[Route('/mes-fiches-de-paie/download/{id}', name: 'app_employee_payslip_download', methods: ['GET'])]
+    public function download(Paie $payslip): Response
+    {
+        // Sécurité : vérifier que la fiche appartient bien à l'employé connecté
+        if ($payslip->getEmployee() !== $this->getUser()) {
+            throw $this->createAccessDeniedException("Vous n'êtes pas autorisé à accéder à cette fiche de paie.");
+        }
+
+        // TODO: Implémenter la logique de téléchargement PDF (ex: Dompdf ou TwigToPdf)
+        // Pour l'instant, un retour simple pour valider le fonctionnement de la route :
+        return new Response('Téléchargement de la fiche de paie n° ' . $payslip->getId());
     }
 }
