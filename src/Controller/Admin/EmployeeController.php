@@ -94,7 +94,6 @@ class EmployeeController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            // On set ce qui n'est pas dans le form
             $user->setEntreprise($entreprise);
             $user->setIsActive(false);
             $user->setIsVerified(false);
@@ -129,7 +128,11 @@ class EmployeeController extends AbstractController
                 ->from('no-reply@rhsoft.mg')
                 ->to($user->getEmail())
                 ->subject('Invitation RhSoft - Rejoignez votre entreprise')
-                ->html($this->renderView('emails/invitation.html.twig', ['user' => $user, 'url' => $url ]));
+                ->html($this->renderView('emails/invitation.html.twig', [
+                    'user' => $user,
+                    'url' => $url
+                ]));
+
 
             try {
                 $mailer->send($email);
@@ -147,7 +150,11 @@ class EmployeeController extends AbstractController
     }
 
     #[Route('/employees/{id}/edit', name: 'app_admin_employee_edit')]
-    public function edit(Request $request, User $employee, EntityManagerInterface $em): Response
+    public function edit(
+        Request $request,
+        User $employee,
+        EntityManagerInterface $em
+    ): Response
     {
         $form = $this->createForm(EmployeeFormType::class, $employee);
         $form->handleRequest($request);
@@ -190,7 +197,7 @@ class EmployeeController extends AbstractController
     ): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        if ($user->getEntreprise() !== $this->getUser()->getEntreprise()) { // <-- FIRST
+        if ($user->getEntreprise() !== $this->getUser()->getEntreprise()) {
             throw $this->createAccessDeniedException('Cet employé n\'appartient pas à votre entreprise.');
         }
         if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
@@ -237,7 +244,10 @@ class EmployeeController extends AbstractController
     }
 
     #[Route('/employees/bulk-delete', name: 'app_admin_employee_bulk_delete', methods: ['POST'])]
-    public function bulkDelete(Request $request, EntityManagerInterface $em): Response
+    public function bulkDelete(
+        Request $request,
+        EntityManagerInterface $em
+    ): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         if ($this->isCsrfTokenValid('bulk-delete', $request->request->get('_token'))) {
@@ -255,9 +265,13 @@ class EmployeeController extends AbstractController
     }
 
     #[Route('/employees/{id}/update-role', name: 'admin_user_update_role', methods: ['POST'])]
-    public function updateRole(Request $request, User $user, EntityManagerInterface $em): Response
+    public function updateRole(
+        Request $request,
+        User $user,
+        EntityManagerInterface $em
+    ): Response
     {
-        // Multi-tenant security check
+
         if ($user->getEntreprise() !== $this->getUser()->getEntreprise()) {
             throw $this->createAccessDeniedException('Cet employé n\'appartient pas à votre entreprise.');
         }
@@ -266,14 +280,14 @@ class EmployeeController extends AbstractController
         $token = $request->request->get('token');
         if (!$this->isCsrfTokenValid('role_user_' . $user->getId(), $token)) {
             $this->addFlash('danger', 'Jeton CSRF invalide.');
-            return $this->redirectToRoute('app_admin_employee'); // Or your settings route name
+            return $this->redirectToRoute('app_admin_employee');
         }
 
         $newRole = $request->request->get('role');
         $allowedRoles = ['ROLE_EMPLOYE', 'ROLE_MANAGER', 'ROLE_RH', 'ROLE_ADMIN'];
 
         if (in_array($newRole, $allowedRoles)) {
-            // Update the array-based role property
+
             $user->setRoles([$newRole]);
             $em->flush();
 
@@ -282,7 +296,7 @@ class EmployeeController extends AbstractController
             $this->addFlash('danger', 'Rôle non valide.');
         }
 
-        // Redirect back to wherever your users table is displayed (e.g., settings or employee list)
+
         return $this->redirectToRoute('app_admin_employee');
     }
 }

@@ -90,7 +90,10 @@ final class PlanningController extends AbstractController
     }
 
     #[Route('/planning/save', name: 'app_admin_planning_save', methods: ['POST'])]
-    public function save(Request $request, EntityManagerInterface $em): Response
+    public function save(
+        Request $request,
+        EntityManagerInterface $em
+    ): Response
     {
         $entreprise = $this->getUser()->getEntreprise();
         $weekParam = $request->request->get('week_start');
@@ -102,7 +105,15 @@ final class PlanningController extends AbstractController
             return $this->redirectToRoute('app_admin_planning', ['week' => $weekStart->format('Y-m-d')]);
         }
 
-        $dayNames = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+        $dayNames = [
+            'lundi',
+            'mardi',
+            'mercredi',
+            'jeudi',
+            'vendredi',
+            'samedi',
+            'dimanche'
+        ];
         $postData = $request->request->all('planning');
 
         foreach ($postData as $userId => $daysData) {
@@ -152,6 +163,7 @@ final class PlanningController extends AbstractController
             }
         }
 
+        
         try {
             $em->flush();
             $this->addFlash('success', 'Planning de la semaine enregistré');

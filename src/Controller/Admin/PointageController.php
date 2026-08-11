@@ -53,14 +53,18 @@ final class PointageController extends AbstractController
     }
 
     #[Route('/pointage/corriger/{id}', name: 'app_pointage_corriger', methods: ['POST'])]
-    public function corriger(Request $request, Pointage $pointage, EntityManagerInterface $em): Response
+    public function corriger(
+        Request $request,
+        Pointage $pointage,
+        EntityManagerInterface $em
+    ): Response
     {
         if($pointage->isValide()) {
             $this->addFlash('danger', 'Journée déjà validée. Impossible de modifier.');
             return $this->redirectToRoute('app_admin_pointage', ['date' => $request->request->get('date')]);
         }
 
-        $heureEntree = $request->request->get('heureEntree'); // format H:i
+        $heureEntree = $request->request->get('heureEntree');
         $heureSortie = $request->request->get('heureSortie');
         $date = $pointage->getDate()->format('Y-m-d');
 
@@ -73,7 +77,7 @@ final class PointageController extends AbstractController
 
         $pointage->setMotifCorrection($request->request->get('motif'));
         $pointage->setCorrigePar($this->getUser());
-        $pointage->setCorrigeLe(new \DateTimeImmutable()); // <-- Immutable
+        $pointage->setCorrigeLe(new \DateTimeImmutable());
         $pointage->setStatut($pointage->getMinutesRetard() > 0 ? 'retard' : 'present'); // auto
 
         $em->flush();
@@ -83,10 +87,14 @@ final class PointageController extends AbstractController
     }
 
     #[Route('/pointage/valider/{date}', name: 'app_pointage_valider')]
-    public function valider(\DateTimeImmutable $date, PointageRepository $repo, EntityManagerInterface $em): Response // <-- Immutable
+    public function valider(
+        \DateTimeImmutable $date,
+        PointageRepository $repo,
+        EntityManagerInterface $em
+    ): Response
     {
         $entreprise = $this->getUser()->getEntreprise();
-        $repo->validerJournee($date, $entreprise); // <-- passe l'entreprise
+        $repo->validerJournee($date, $entreprise);
 
         $this->addFlash('success', 'Journée du '.$date->format('d/m/Y').' validée');
         return $this->redirectToRoute('app_admin_pointage', ['date' => $date->format('Y-m-d')]);
@@ -101,13 +109,26 @@ final class PointageController extends AbstractController
     }
 
     #[Route('/pointage/generer', name: 'app_pointage_generer', methods: ['POST'])]
-    public function generer(Request $request, EntityManagerInterface $em, PlanningRepository $planningRepo, PointageRepository $pointageRepo): Response
+    public function generer(
+        Request $request,
+        EntityManagerInterface $em,
+        PlanningRepository $planningRepo,
+        PointageRepository $pointageRepo
+    ): Response
     {
         $date = new \DateTimeImmutable($request->request->get('date', 'today'));
         $entreprise = $this->getUser()->getEntreprise();
 
         $weekStart = $date->modify('monday this week');
-        $jours = ['monday'=>'lundi', 'tuesday'=>'mardi', 'wednesday'=>'mercredi', 'thursday'=>'jeudi', 'friday'=>'vendredi', 'saturday'=>'samedi', 'sunday'=>'dimanche'];
+        $jours = [
+            'monday'=>'lundi',
+            'tuesday'=>'mardi',
+            'wednesday'=>'mercredi',
+            'thursday'=>'jeudi',
+            'friday'=>'vendredi',
+            'saturday'=>'samedi',
+            'sunday'=>'dimanche'
+        ];
         $dayOfWeekFr = $jours[strtolower($date->format('l'))];
 
         $plannings = $planningRepo->findBy([
@@ -137,6 +158,8 @@ final class PointageController extends AbstractController
         }
         $em->flush();
         $this->addFlash('success', "$created pointages générés pour le ".$date->format('d/m/Y'));
-        return $this->redirectToRoute('app_admin_pointage', ['date' => $date->format('Y-m-d')]);
+        return $this->redirectToRoute('app_admin_pointage', [
+            'date' => $date->format('Y-m-d')
+        ]);
     }
 }

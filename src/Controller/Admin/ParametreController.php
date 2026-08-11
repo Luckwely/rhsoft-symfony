@@ -15,7 +15,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ParametreController extends AbstractController
 {
     #[Route('/parametre', name: 'app_admin_parametre', methods: ['GET', 'POST'])]
-    public function index(Request $request, EntityManagerInterface $entityManager): Response
+    public function index(
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -30,7 +33,8 @@ final class ParametreController extends AbstractController
         if ($request->isMethod('POST')) {
             $actionType = $request->request->get('action_type');
 
-            if ($actionType === 'entreprise') {
+            if ($actionType === 'entreprise')
+            {
                 $entreprise->setNom($request->request->get('nom'));
                 $entreprise->setAdresse($request->request->get('adresse'));
                 $entreprise->setTel($request->request->get('telephone'));
@@ -39,9 +43,9 @@ final class ParametreController extends AbstractController
                 $entityManager->flush();
                 $this->addFlash('success', 'Informations de l\'entreprise mises à jour avec succès.');
             }
-            elseif ($actionType === 'pointage') {
+            elseif ($actionType === 'pointage')
+            {
                 $entreprise->setToleranceRetard((int) $request->request->get('tolerance_retard'));
-
                 $entityManager->flush();
                 $this->addFlash('success', 'Règles de pointage mises à jour avec succès.');
             }
@@ -49,7 +53,6 @@ final class ParametreController extends AbstractController
             return $this->redirectToRoute('app_admin_parametre');
         }
 
-        // Fetch users belonging to this specific company for the "Utilisateurs" tab
         $users = $entityManager->getRepository(User::class)->findBy(['entreprise' => $entreprise]);
 
         return $this->render('admin/parametre/index.html.twig', [
@@ -59,7 +62,11 @@ final class ParametreController extends AbstractController
     }
 
     #[Route('/user/{id}/toggle-suspend', name: 'admin_user_toggle_suspend', methods: ['POST'])]
-    public function toggleSuspend(User $targetUser, Request $request, EntityManagerInterface $entityManager): Response
+    public function toggleSuspend(
+        User $targetUser,
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response
     {
         $token = $request->request->get('token');
         if (!$this->isCsrfTokenValid('suspend_user_' . $targetUser->getId(), $token)) {
@@ -79,23 +86,30 @@ final class ParametreController extends AbstractController
     }
 
     #[Route('/user/{id}/update-role', name: 'admin_user_update_role', methods: ['POST'])]
-    public function updateRole(Request $request, User $user, EntityManagerInterface $em): Response
+    public function updateRole(
+        Request $request,
+        User $user,
+        EntityManagerInterface $em
+    ): Response
     {
-        // 1. Multi-tenant security check
+
         if ($user->getEntreprise() !== $this->getUser()->getEntreprise()) {
             throw $this->createAccessDeniedException('Cet utilisateur n\'appartient pas à votre entreprise.');
         }
 
-        // 2. CSRF Token validation matching the Twig form token
         $token = $request->request->get('token');
         if (!$this->isCsrfTokenValid('role_user_' . $user->getId(), $token)) {
             $this->addFlash('danger', 'Jeton CSRF invalide.');
-            return $this->redirectToRoute('app_admin_parametres'); // Replace with your actual settings route name
+            return $this->redirectToRoute('app_admin_parametres');
         }
 
-        // 3. Update the array role
         $newRole = $request->request->get('role');
-        $allowedRoles = ['ROLE_EMPLOYE', 'ROLE_MANAGER', 'ROLE_RH', 'ROLE_ADMIN'];
+        $allowedRoles = [
+            'ROLE_EMPLOYE',
+            'ROLE_MANAGER',
+            'ROLE_RH',
+            'ROLE_ADMIN'
+        ];
 
         if (in_array($newRole, $allowedRoles)) {
             $user->setRoles([$newRole]);
@@ -106,7 +120,6 @@ final class ParametreController extends AbstractController
             $this->addFlash('danger', 'Rôle non valide.');
         }
 
-        // 4. Redirect back to the settings page
-        return $this->redirectToRoute('app_admin_parametre'); // Replace with your actual settings route name
+        return $this->redirectToRoute('app_admin_parametre'); 
     }
 }

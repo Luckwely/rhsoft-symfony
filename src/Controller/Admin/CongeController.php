@@ -15,31 +15,34 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class CongeController extends AbstractController
 {
-    #[Route('/', name: 'app_admin_conge')] // Fixed route name mismatch
+    #[Route('/', name: 'app_admin_conge')]
     public function index(CongeRepository $congeRepo): Response
     {
         $user = $this->getUser();
 
-        // Safety check if user is linked to an enterprise
+        // check if user is linked to an enterprise
         if (!$user || !$user->getEntreprise()) {
             throw $this->createAccessDeniedException('Aucune entreprise associée à votre compte.');
         }
 
         return $this->render('admin/conge/index.html.twig', [
-            'conges' => $congeRepo->findBy(['entreprise' => $user->getEntreprise()], ['createdAt' => 'DESC']),
+            'conges' => $congeRepo->findBy(
+                ['entreprise' => $user->getEntreprise()],
+                ['createdAt' => 'DESC']
+            ),
         ]);
     }
 
-    #[Route('/{id}/valider', name: 'app_admin_conge_valider', methods: ['POST'])] // Restricted to POST + CSRF recommended
-    public function valider(Request $request, Conge $conge, EntityManagerInterface $em): Response
+    #[Route('/{id}/valider', name: 'app_admin_conge_valider', methods: ['POST'])]
+    public function valider(
+        Request $request, Conge $conge,
+        EntityManagerInterface $em
+    ): Response
     {
-        // Multi-tenant security check: Ensure conge belongs to admin's company
+
         if ($conge->getEntreprise() !== $this->getUser()->getEntreprise()) {
             throw $this->createAccessDeniedException('Action non autorisée.');
         }
-
-        // Optional: CSRF token validation check if using forms/tokens in twig
-        // if ($this->isCsrfTokenValid('valider_conge_'.$conge->getId(), $request->request->get('_token'))) { ... }
 
         $conge->setStatut(Conge::STATUS_VALIDE);
         $conge->setValidePar($this->getUser());
@@ -51,9 +54,13 @@ class CongeController extends AbstractController
     }
 
     #[Route('/{id}/refuser', name: 'app_admin_conge_refuser', methods: ['POST'])] // Restricted to POST
-    public function refuser(Request $request, Conge $conge, EntityManagerInterface $em): Response
+    public function refuser(
+        Request $request,
+        Conge $conge,
+        EntityManagerInterface $em
+    ): Response
     {
-        // Multi-tenant security check
+
         if ($conge->getEntreprise() !== $this->getUser()->getEntreprise()) {
             throw $this->createAccessDeniedException('Action non autorisée.');
         }

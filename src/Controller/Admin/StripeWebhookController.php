@@ -14,7 +14,10 @@ use Symfony\Component\Routing\Attribute\Route;
 class StripeWebhookController extends AbstractController
 {
     #[Route('/stripe/webhook', name: 'app_stripe_webhook', methods: ['POST'])]
-    public function webhook(Request $request, EntityManagerInterface $em): Response
+    public function webhook(
+        Request $request,
+        EntityManagerInterface $em
+    ): Response
     {
         $endpointSecret = $_ENV['STRIPE_WEBHOOK_SECRET'];
         $payload = $request->getContent();

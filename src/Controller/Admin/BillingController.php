@@ -18,7 +18,10 @@ class BillingController extends AbstractController
     ) {}
 
     #[Route('/billing/success', name: 'app_billing_success')]
-    public function success(Request $request, EntityManagerInterface $em): Response
+    public function success(
+        Request $request,
+        EntityManagerInterface $em
+    ): Response
     {
         $plan = $request->query->get('plan');
 
@@ -44,7 +47,6 @@ class BillingController extends AbstractController
         return $this->redirectToRoute('app_pricing');
     }
 
-    // 2. DYNAMIC ROUTE LAST
     #[Route('/billing/{plan}', name: 'app_billing', requirements: ['plan' => 'premium|vip'])]
     public function billing(string $plan): Response
     {
@@ -67,6 +69,7 @@ class BillingController extends AbstractController
                 'email' => $user->getEmail(),
                 'name' => $entreprise->getNom(),
             ]);
+            
             $entreprise->setStripeCustomerId($customer->id);
             $this->em->flush();
         }

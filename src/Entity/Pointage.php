@@ -174,6 +174,11 @@ class Pointage
 
     public function getCorrigeLe(): ?\DateTimeImmutable { return $this->corrigeLe; }
     public function setCorrigeLe(?\DateTimeInterface $corrigeLe): static { $this->corrigeLe = $corrigeLe ? \DateTimeImmutable::createFromInterface($corrigeLe) : null; return $this; }
+    public function setMotifCorrection(?string $motifCorrection): static
+    {
+        $this->motifCorrection = $motifCorrection;
+        return $this;
+    }
 }
 
 
