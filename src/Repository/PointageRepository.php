@@ -42,7 +42,7 @@ class PointageRepository extends ServiceEntityRepository
 
     public function getStatsByDate(\DateTimeImmutable $date, Entreprise $entreprise): array
     {
-        $qb = $this->createQueryBuilder('p')
+        $results = $this->createQueryBuilder('p')
             ->select('p.statut, COUNT(p.id) as total')
             ->where('p.date = :date')->setParameter('date', $date)
             ->andWhere('p.entreprise = :entreprise')->setParameter('entreprise', $entreprise)
@@ -51,7 +51,7 @@ class PointageRepository extends ServiceEntityRepository
             ->getResult();
 
         $stats = ['present' => 0, 'retard' => 0, 'absent' => 0, 'conge' => 0];
-        foreach ($qb as $row) {
+        foreach ($results as $row) {
             $stats[$row['statut']] = (int)$row['total'];
         }
         return $stats;
@@ -96,5 +96,37 @@ class PointageRepository extends ServiceEntityRepository
             ->setParameter('dateFin', $dateFin)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    public function countAbsencesByEntrepriseAndMonth(Entreprise $entreprise, int $mois, int $annee): int
+    {
+        $dateDebut = new \DateTimeImmutable(sprintf('%04d-%02d-01 00:00:00', $annee, $mois));
+        $dateFin = $dateDebut->modify('last day of this month 23:59:59');
+
+        return (int) $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->where('p.entreprise = :entreprise')
+            ->andWhere('p.statut = :statut')
+            ->andWhere('p.date BETWEEN :dateDebut AND :dateFin')
+            ->setParameter('entreprise', $entreprise)
+            ->setParameter('statut', 'absent')
+            ->setParameter('dateDebut', $dateDebut)
+            ->setParameter('dateFin', $dateFin)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function findLatestByEntreprise(Entreprise $entreprise, int $limit = 8): array
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.employee', 'u')
+            ->addSelect('u')
+            ->where('p.entreprise = :entreprise')
+            ->setParameter('entreprise', $entreprise)
+            ->orderBy('p.date', 'DESC')
+            ->addOrderBy('p.heureEntree', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 }

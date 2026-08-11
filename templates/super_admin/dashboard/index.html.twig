@@ -31,7 +31,7 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <span class="text-muted small text-uppercase fw-semibold">CA du Mois</span>
-                            <h2 class="display-6 fw-bold mb-0">24 580 €</h2>
+                            <h2 class="display-6 fw-bold mb-0">{{ dashboard.caMonth|default(0)|number_format(0, ',', ' ') }} €</h2>
 
                         </div>
                         <div class="bg-success bg-opacity-10 rounded-3 p-3">
@@ -49,7 +49,7 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <span class="text-muted small text-uppercase fw-semibold">Entreprises Actives</span>
-                            <h2 class="display-6 fw-bold mb-0">142</h2>
+                            <h2 class="display-6 fw-bold mb-0">{{ dashboard.activeCompanies|default(0) }}</h2>
                         </div>
                         <div class="bg-primary bg-opacity-10 rounded-3 p-3">
                             <i class="bi bi-buildings text-primary fs-2"></i>
@@ -66,7 +66,7 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <span class="text-muted small text-uppercase fw-semibold">Utilisateurs Actifs</span>
-                            <h2 class="display-6 fw-bold mb-0">1 204</h2>
+                            <h2 class="display-6 fw-bold mb-0">{{ dashboard.totalUsers|default(0) }}</h2>
                         </div>
                         <div class="bg-info bg-opacity-10 rounded-3 p-3">
                             <i class="bi bi-people text-info fs-2"></i>
@@ -241,28 +241,28 @@
                             <div class="bg-primary bg-opacity-10 rounded-3 p-3">
                                 <i class="bi bi-building text-primary fs-3 d-block mb-1"></i>
                                 <div class="small text-muted">Total Entreprises</div>
-                                <span class="fw-bold">247</span>
+                                <span class="fw-bold">{{ dashboard.totalCompanies|default(0) }}</span>
                             </div>
                         </div>
                         <div class="col-6 col-md-3">
                             <div class="bg-success bg-opacity-10 rounded-3 p-3">
                                 <i class="bi bi-people text-success fs-3 d-block mb-1"></i>
                                 <div class="small text-muted">Total Utilisateurs</div>
-                                <span class="fw-bold">3 847</span>
+                                <span class="fw-bold">{{ dashboard.totalUsers|default(0) }}</span>
                             </div>
                         </div>
                         <div class="col-6 col-md-3">
                             <div class="bg-warning bg-opacity-10 rounded-3 p-3">
                                 <i class="bi bi-credit-card text-warning fs-3 d-block mb-1"></i>
                                 <div class="small text-muted">Abonnements Actifs</div>
-                                <span class="fw-bold">189</span>
+                                <span class="fw-bold">{{ dashboard.activeSubscriptions|default(0) }}</span>
                             </div>
                         </div>
                         <div class="col-6 col-md-3">
                             <div class="bg-info bg-opacity-10 rounded-3 p-3">
                                 <i class="bi bi-clock text-info fs-3 d-block mb-1"></i>
-                                <div class="small text-muted">En Attente</div>
-                                <span class="fw-bold">23</span>
+                                <div class="small text-muted">Essais en cours</div>
+                                <span class="fw-bold">{{ dashboard.trialCompanies|default(0) }}</span>
                             </div>
                         </div>
                     </div>
@@ -280,8 +280,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Données du graphique
     const ctx = document.getElementById('chartCA').getContext('2d');
 
-    const months = ['Fév 2026', 'Mar 2026', 'Avr 2026', 'Mai 2026', 'Juin 2026', 'Juil 2026'];
-    const values = [18500, 19200, 20800, 21500, 23100, 24580];
+    const months = {{ dashboard.chartLabels|default([])|json_encode()|raw }};
+    const values = {{ dashboard.chartValues|default([])|json_encode()|raw }};
 
     const gradient = ctx.createLinearGradient(0, 0, 0, 250);
     gradient.addColorStop(0, 'rgba(13, 110, 253, 0.3)');

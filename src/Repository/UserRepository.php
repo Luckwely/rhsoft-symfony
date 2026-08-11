@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
-use App\Entity\Entreprise; 
+use App\Entity\Entreprise;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -66,6 +66,91 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->orderBy('u.service', 'ASC')
             ->getQuery()
             ->getArrayResult();
+    }
+
+    public function countByEntreprise(Entreprise $entreprise): int
+    {
+        return $this->count(['entreprise' => $entreprise]);
+    }
+
+    public function countByServiceAndEntreprise(Entreprise $entreprise): array
+    {
+        return $this->createQueryBuilder('u')
+            ->select('u.service AS service', 'COUNT(u.id) AS total')
+            ->where('u.entreprise = :entreprise')
+            ->andWhere('u.service IS NOT NULL')
+            ->setParameter('entreprise', $entreprise)
+            ->groupBy('u.service')
+            ->orderBy('total', 'DESC')
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+    public function countContractsExpiringSoon(Entreprise $entreprise, int $days = 30): int
+    {
+        $today = new \DateTimeImmutable('today');
+        $future = (clone $today)->modify("+{$days} days");
+
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.entreprise = :entreprise')
+            ->andWhere('u.dateSortie IS NOT NULL')
+            ->andWhere('u.dateSortie BETWEEN :today AND :future')
+            ->setParameter('entreprise', $entreprise)
+            ->setParameter('today', $today)
+            ->setParameter('future', $future)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countProbationEnding(Entreprise $entreprise, int $probationDays = 90, int $windowDays = 30): int
+    {
+        $today = new \DateTimeImmutable('today');
+        $start = (clone $today)->modify(sprintf('-%d days', $probationDays));
+        $end = (clone $today)->modify(sprintf('-%d days', $probationDays - $windowDays));
+
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.entreprise = :entreprise')
+            ->andWhere('u.dateEmbauche IS NOT NULL')
+            ->andWhere('u.dateEmbauche BETWEEN :start AND :end')
+            ->setParameter('entreprise', $entreprise)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countEmployeesForAnnualReview(Entreprise $entreprise, int $years = 1): int
+    {
+        $limitDate = (new \DateTimeImmutable('today'))->modify(sprintf('-%d years', $years));
+
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.entreprise = :entreprise')
+            ->andWhere('u.dateEmbauche IS NOT NULL')
+            ->andWhere('u.dateSortie IS NULL')
+            ->andWhere('u.dateEmbauche <= :limitDate')
+            ->setParameter('entreprise', $entreprise)
+            ->setParameter('limitDate', $limitDate)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countHiresByEntrepriseAndYear(Entreprise $entreprise, int $year): int
+    {
+        $from = new \DateTimeImmutable(sprintf('%d-01-01 00:00:00', $year));
+        $to = new \DateTimeImmutable(sprintf('%d-12-31 23:59:59', $year));
+
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.entreprise = :entreprise')
+            ->andWhere('u.dateEmbauche BETWEEN :from AND :to')
+            ->setParameter('entreprise', $entreprise)
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     //    /**

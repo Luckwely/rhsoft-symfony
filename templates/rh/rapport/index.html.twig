@@ -15,11 +15,10 @@
             </p>
         </div>
         <div class="d-flex gap-2 mt-3 mt-lg-0">
-            <select class="form-select form-select-sm" style="width: 150px;">
-                <option value="2025" selected>2025</option>
-                <option value="2024">2024</option>
-                <option value="2023">2023</option>
-            </select>
+            <form method="get" class="d-flex gap-2 align-items-center">
+                <input type="number" name="year" min="2000" max="2100" class="form-control form-control-sm" style="width: 100px;" value="{{ reportData.year }}">
+                <button type="submit" class="btn btn-outline-dark btn-sm">Année</button>
+            </form>
             <button class="btn btn-outline-dark btn-sm">
                 <i class="bi bi-download me-1"></i>Exporter PDF
             </button>
@@ -65,8 +64,8 @@
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-body p-3 p-md-4">
                             <span class="text-muted small text-uppercase fw-semibold">Taux Turnover</span>
-                            <div class="fs-3 fw-bold text-primary">2.1%</div>
-                            <small class="text-success"><i class="bi bi-arrow-down me-1"></i>-0.4% vs mois dernier</small>
+                            <div class="fs-3 fw-bold text-primary">{{ reportData.turnoverRate }}%</div>
+                            <small class="text-muted">Année {{ reportData.year }}</small>
                         </div>
                     </div>
                 </div>
@@ -74,8 +73,8 @@
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-body p-3 p-md-4">
                             <span class="text-muted small text-uppercase fw-semibold">Arrivées</span>
-                            <div class="fs-3 fw-bold text-success">8</div>
-                            <small class="text-muted">Ce mois</small>
+                            <div class="fs-3 fw-bold text-success">{{ reportData.hires }}</div>
+                            <small class="text-muted">Année {{ reportData.year }}</small>
                         </div>
                     </div>
                 </div>
@@ -83,8 +82,8 @@
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-body p-3 p-md-4">
                             <span class="text-muted small text-uppercase fw-semibold">Départs</span>
-                            <div class="fs-3 fw-bold text-danger">5</div>
-                            <small class="text-muted">Ce mois</small>
+                            <div class="fs-3 fw-bold text-danger">{{ reportData.departures }}</div>
+                            <small class="text-muted">Année {{ reportData.year }}</small>
                         </div>
                     </div>
                 </div>
@@ -92,8 +91,8 @@
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-body p-3 p-md-4">
                             <span class="text-muted small text-uppercase fw-semibold">Effectif Moyen</span>
-                            <div class="fs-3 fw-bold">142</div>
-                            <small class="text-muted">2025</small>
+                            <div class="fs-3 fw-bold">{{ reportData.totalEmployees }}</div>
+                            <small class="text-muted">Année {{ reportData.year }}</small>
                         </div>
                     </div>
                 </div>
@@ -122,7 +121,7 @@
                             <h5 class="fw-bold mb-0">
                                 <i class="bi bi-pie-chart text-primary me-2"></i>Départs par motif
                             </h5>
-                            <small class="text-muted">5 départs analysés</small>
+                            <small class="text-muted">Analyse du turnover</small>
                         </div>
                         <div class="card-body d-flex align-items-center justify-content-center">
                             <canvas id="departMotifChart" height="180"></canvas>
@@ -312,10 +311,10 @@ document.addEventListener('DOMContentLoaded', function() {
     new Chart(ctx1, {
         type: 'line',
         data: {
-            labels: ['Mai', 'Juin', 'Juillet', 'Août', 'Sept', 'Oct'],
+            labels: {{ reportData.chartLabels|json_encode|raw }},
             datasets: [{
                 label: 'Taux Turnover %',
-                data: [2.8, 2.5, 2.9, 2.3, 2.5, 2.1],
+                data: {{ reportData.chartValues|json_encode|raw }},
                 borderColor: '#0d6efd',
                 backgroundColor: gradient1,
                 borderWidth: 3,
