@@ -24,13 +24,35 @@ class BillingController extends AbstractController
     ): Response
     {
         $plan = $request->query->get('plan');
+        $sessionId = $request->query->get('session_id');
 
-        if (!in_array($plan, ['premium', 'vip'])) {
+        if (!in_array($plan, ['premium', 'vip'], true)) {
             throw $this->createNotFoundException('Plan introuvable');
+        }
+
+        if (!$sessionId) {
+            $this->addFlash('danger', 'Paiement introuvable ou non confirmé.');
+            return $this->redirectToRoute('app_pricing');
         }
 
         $user = $this->getUser();
         $entreprise = $user->getEntreprise();
+
+        // Vérifie auprès de Stripe que la session correspond bien à cette entreprise
+        // et que le paiement a réellement été effectué, avant d'activer quoi que ce soit.
+        Stripe::setApiKey($this->stripeSecret);
+        try {
+            $session = Session::retrieve($sessionId);
+        } catch (\Exception $e) {
+            $this->addFlash('danger', 'Impossible de vérifier le paiement.');
+            return $this->redirectToRoute('app_pricing');
+        }
+
+        if ($session->payment_status !== 'paid' || $session->customer !== $entreprise->getStripeCustomerId()) {
+            $this->addFlash('danger', 'Le paiement n\'a pas pu être confirmé.');
+            return $this->redirectToRoute('app_pricing');
+        }
+
         $entreprise->setStatus('active');
         $entreprise->setPlan($plan);
         $entreprise->setDateFinAbonnement(new \DateTime($plan === 'vip' ? '+1 year' : '+1 month'));

@@ -150,8 +150,8 @@ final class PlanningController extends AbstractController
                     $planning->setHeureFin(!empty($dayData['heureFin'])? \DateTimeImmutable::createFromFormat('H:i', $dayData['heureFin']) : null);
                 }
 
-                $planning->setPauseMinutes($dayData['pauseMinutes']?? null);
-                $planning->setComment($dayData['comment']?? null);
+                $planning->setPauseMinutes(!empty($dayData['pauseMinutes']) ? (int)$dayData['pauseMinutes'] : null);
+                $planning->setComment($dayData['comment'] ?? null);
 
                 $em->persist($planning);
             }

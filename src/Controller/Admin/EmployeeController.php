@@ -264,7 +264,7 @@ class EmployeeController extends AbstractController
         return $this->redirectToRoute('app_admin_employee');
     }
 
-    #[Route('/employees/{id}/update-role', name: 'admin_user_update_role', methods: ['POST'])]
+    #[Route('/employees/{id}/update-role', name: 'admin_employee_update_role', methods: ['POST'])]
     public function updateRole(
         Request $request,
         User $user,

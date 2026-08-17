@@ -20,7 +20,8 @@ class PlanningType extends AbstractType
             ])
             ->add('isDayOff', CheckboxType::class, [
                 'required' => false,
-                'label' => 'Repos'
+                'label' => 'Repos',
+                'mapped' => false,
             ])
             ->add('heureDebut', TimeType::class, [
                 'widget' => 'single_text',
@@ -32,11 +33,13 @@ class PlanningType extends AbstractType
             ])
             ->add('pause', TimeType::class, [
                 'widget' => 'single_text',
-                'required' => false
+                'required' => false,
+                'mapped' => false,
             ])
             ->add('pausette', TimeType::class, [
                 'widget' => 'single_text',
-                'required' => false
+                'required' => false,
+                'mapped' => false,
             ])
         ;
     }

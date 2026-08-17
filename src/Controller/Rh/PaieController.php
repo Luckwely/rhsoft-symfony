@@ -2,7 +2,7 @@
 
 namespace App\Controller\Rh;
 
-use App\Entity\Employe;
+use App\Entity\User;
 use App\Entity\Paie;
 use App\Repository\PaieRepository;
 use App\Repository\PointageRepository;
@@ -38,8 +38,18 @@ final class PaieController extends AbstractController
     }
 
     #[Route('/calculer/{id}', name: 'app_rh_paie_calculer', methods: ['POST'])]
-    public function calculer(Employe $employe, PaieCalculatorService $calculator, PointageRepository $pointageRepository, EntityManagerInterface $em): Response
+    public function calculer(User $employe, PaieCalculatorService $calculator, PointageRepository $pointageRepository, EntityManagerInterface $em): Response
     {
+        if ($employe->getSalaireBase() === null) {
+            $this->addFlash('error', sprintf(
+                'Impossible de calculer la paie de %s %s : aucun salaire de base défini pour cet employé.',
+                $employe->getPrenom(),
+                $employe->getNom()
+            ));
+
+            return $this->redirectToRoute('app_rh_paie_preparer');
+        }
+
         // 1. Définir la période (par exemple, le mois en cours)
         $mois = (int) date('m');
         $annee = (int) date('Y');

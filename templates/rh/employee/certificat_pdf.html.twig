@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 14px; color: #212529; line-height: 1.7; }
+        .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #0d6efd; padding-bottom: 15px; }
+        .header .company { font-size: 18px; font-weight: bold; color: #0d6efd; }
+        h1 { font-size: 22px; text-align: center; text-transform: uppercase; margin: 30px 0; letter-spacing: 1px; }
+        .content { text-align: justify; margin: 0 40px; }
+        .signature { margin-top: 60px; text-align: right; padding-right: 40px; }
+        .footer { margin-top: 60px; font-size: 11px; color: #6c757d; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="company">{{ entreprise.nom }}</div>
+        {% if entreprise.adresse %}<div>{{ entreprise.adresse }}</div>{% endif %}
+        {% if entreprise.tel %}<div>{{ entreprise.tel }}</div>{% endif %}
+    </div>
+
+    <h1>Certificat de travail</h1>
+
+    <div class="content">
+        <p>
+            Je soussigné(e), représentant de la société <strong>{{ entreprise.nom }}</strong>,
+            certifie que <strong>{{ employee.prenom }} {{ employee.nom }}</strong>
+            a été employé(e) au sein de notre entreprise en qualité de
+            <strong>{{ employee.poste|default('employé(e)') }}</strong>,
+
+            {% if employee.dateEmbauche %}
+                du <strong>{{ employee.dateEmbauche|date('d/m/Y') }}</strong>
+            {% endif %}
+
+            {% if employee.dateSortie %}
+                au <strong>{{ employee.dateSortie|date('d/m/Y') }}</strong>.
+            {% else %}
+                à ce jour.
+            {% endif %}
+        </p>
+
+        <p>
+            Ce certificat est délivré à l'intéressé(e) pour servir et valoir ce que de droit.
+        </p>
+    </div>
+
+    <div class="signature">
+        <p>Fait à {{ entreprise.adresse|default('') }}, le {{ "now"|date('d/m/Y') }}</p>
+        <p>Pour {{ entreprise.nom }}</p>
+    </div>
+
+    <div class="footer">
+        Document généré le {{ "now"|date('d/m/Y à H:i') }}
+    </div>
+</body>
+</html>

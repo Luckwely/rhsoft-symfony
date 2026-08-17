@@ -96,6 +96,11 @@ class EmployeeFormType extends AbstractType
                 'multiple' => false,
                 'expanded' => false,
                 'placeholder' => 'Choisir un rôle',
+                'constraints' => [
+                    new NotBlank(
+                        message: 'Veuillez sélectionner un rôle'
+                    )
+                ]
             ])
             ->add('photo', FileType::class, [
                 'label' => 'Photo',
@@ -133,6 +138,15 @@ class EmployeeFormType extends AbstractType
                 'required' => false
             ])
 
+            ->add('salaireBase', NumberType::class, [
+                'label' => 'Salaire de base (Ar)',
+                'attr' => [
+                    'placeholder' => 'Salaire de base mensuel',
+                    'class' => 'form-control'
+                ],
+                'required' => false
+            ])
+
             ->add('cv', FileType::class, [
                 'label' => 'CV',
                 'attr' => [
@@ -155,7 +169,7 @@ class EmployeeFormType extends AbstractType
                     return $rolesArray? $rolesArray[0] : null;
                 },
                 function ($roleString) {
-                    return $roleString? [$roleString] : ['ROLE_ADMIN'];
+                    return $roleString? [$roleString] : ['ROLE_EMPLOYE'];
                 }
             ));
     }

@@ -269,13 +269,13 @@
                                                                 'dimanche'
                                                             ] %}
                                                             {% set dayOrder = {
-                                                                'monday': 1,
-                                                                'tuesday': 2,
-                                                                'wednesday': 3,
-                                                                'thursday': 4,
-                                                                'friday': 5,
-                                                                'saturday': 6,
-                                                                'sunday': 7
+                                                                'lundi': 1,
+                                                                'mardi': 2,
+                                                                'mercredi': 3,
+                                                                'jeudi': 4,
+                                                                'vendredi': 5,
+                                                                'samedi': 6,
+                                                                'dimanche': 7
                                                             } %} {# MAP POUR TRIER #}
                                                             {% set monday = "monday this week"|date('Y-m-d') %}
                                                             {% set plannings = employee.plannings|filter(
@@ -336,7 +336,7 @@
                                         </div>
                                         <h5 class="fw-bold">Aucun employé trouvé</h5>
                                         <p class="text-muted small">Commencez par ajouter votre premier employé</p>
-                                        <a href="{{ path('app_employee_new') }}" class="btn btn-primary">
+                                        <a href="{{ path('app_admin_employee_new') }}" class="btn btn-primary">
                                             <i class="bi bi-person-plus me-1"></i>Ajouter un employé
                                         </a>
                                     </div>

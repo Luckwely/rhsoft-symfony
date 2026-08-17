@@ -46,6 +46,10 @@ final class ModuleController extends AbstractController
         $module = $request->request->get('module'); // paie, pointage, rh
         $value = $request->request->get('value') === 'true';
 
+        if (!in_array($module, ['paie', 'pointage', 'rh'], true)) {
+            return new JsonResponse(['success' => false, 'error' => 'Module inconnu.'], 400);
+        }
+
         match($module) {
             'paie' => $entreprise->setModulePaie($value),
             'pointage' => $entreprise->setModulePointage($value),

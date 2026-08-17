@@ -15,7 +15,7 @@ class PlanningFixtures extends Fixture implements DependentFixtureInterface
     {
         $faker = Factory::create('fr_FR');
 
-        $daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+        $daysOfWeek = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'];
         $typesJour = [Planning::TYPE_TRAVAIL, Planning::TYPE_TRAVAIL, Planning::TYPE_TRAVAIL, Planning::TYPE_REPOS];
         $statuts = [Planning::STATUT_BROUILLON, Planning::STATUT_VALIDE];
 

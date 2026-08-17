@@ -81,6 +81,10 @@ final class DemandesController extends AbstractController
     #[Route('/avance/{id}/approuver', name: 'app_rh_avance_approuver', methods: ['POST'])]
     public function approuverAvance(AvanceSalaire $avance, EntityManagerInterface $em): Response
     {
+        if ($avance->getEntreprise() !== $this->getUser()->getEntreprise()) {
+            throw $this->createAccessDeniedException("Cette demande n'appartient pas à votre entreprise.");
+        }
+
         $avance->setStatut(AvanceSalaire::STATUS_VALIDE);
         $avance->setValidePar($this->getUser());
         $em->flush();
@@ -91,6 +95,10 @@ final class DemandesController extends AbstractController
     #[Route('/avance/{id}/rejeter', name: 'app_rh_avance_rejeter', methods: ['POST'])]
     public function rejeterAvance(Request $request, AvanceSalaire $avance, EntityManagerInterface $em): Response
     {
+        if ($avance->getEntreprise() !== $this->getUser()->getEntreprise()) {
+            throw $this->createAccessDeniedException("Cette demande n'appartient pas à votre entreprise.");
+        }
+
         $avance->setStatut(AvanceSalaire::STATUS_REFUSE);
         $avance->setMotif($request->request->get('motif', $avance->getMotif()));
         $em->flush();

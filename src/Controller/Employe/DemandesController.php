@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Demission;
-use App\Form\Employe\DemissionType;
+use App\Form\DemissionType;
 use App\Repository\DemissionRepository;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 

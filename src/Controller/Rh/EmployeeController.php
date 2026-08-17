@@ -5,6 +5,8 @@ namespace App\Controller\Rh;
 use App\Entity\User;
 use App\Entity\Planning;
 use App\Form\EmployeeFormType;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -15,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Twig\Environment;
 
 #[Route('/rh')]
 #[IsGranted('ROLE_RH')]
@@ -252,15 +255,32 @@ final class EmployeeController extends AbstractController
     }
 
     #[Route('/employees/{id}/certificat', name: 'app_rh_employee_certificat')]
-    public function certificat(User $user): Response
+    public function certificat(User $user, Environment $twig): Response
     {
         // Security check: ensure employee belongs to the RH's enterprise
         if ($user->getEntreprise() !== $this->getUser()->getEntreprise()) {
             throw $this->createAccessDeniedException('Cet employé n\'appartient pas à votre entreprise.');
         }
 
-        return $this->render('rh/employee/certificat_pdf.html.twig', [
-            'employee' => $user
+        $html = $twig->render('rh/employee/certificat_pdf.html.twig', [
+            'employee' => $user,
+            'entreprise' => $user->getEntreprise(),
+        ]);
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', false);
+        $options->set('defaultFont', 'Helvetica');
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        $filename = sprintf('certificat-travail-%s-%s.pdf', $user->getNom(), $user->getPrenom());
+
+        return new Response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $filename . '"',
         ]);
     }
 }

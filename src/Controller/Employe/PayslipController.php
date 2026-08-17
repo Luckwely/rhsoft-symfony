@@ -5,11 +5,14 @@ namespace App\Controller\Employe;
 use App\Entity\Paie;
 use App\Repository\PayslipRepository;
 use App\Service\Contract\PayslipMetricsCalculatorInterface;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Twig\Environment;
 
 #[Route('/employe')]
 #[IsGranted('ROLE_USER')]
@@ -40,15 +43,34 @@ final class PayslipController extends AbstractController
     }
 
     #[Route('/mes-fiches-de-paie/download/{id}', name: 'app_employee_payslip_download', methods: ['GET'])]
-    public function download(Paie $payslip): Response
+    public function download(Paie $payslip, Environment $twig): Response
     {
         // Sécurité : vérifier que la fiche appartient bien à l'employé connecté
-        if ($payslip->getEmployee() !== $this->getUser()) {
+        $employee = $payslip->getEmployee();
+        if ($employee !== $this->getUser()) {
             throw $this->createAccessDeniedException("Vous n'êtes pas autorisé à accéder à cette fiche de paie.");
         }
 
-        // TODO: Implémenter la logique de téléchargement PDF (ex: Dompdf ou TwigToPdf)
-        // Pour l'instant, un retour simple pour valider le fonctionnement de la route :
-        return new Response('Téléchargement de la fiche de paie n° ' . $payslip->getId());
+        $html = $twig->render('employe/paie/payslip_pdf.html.twig', [
+            'payslip' => $payslip,
+            'employee' => $employee,
+            'entreprise' => $employee->getEntreprise(),
+        ]);
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', false);
+        $options->set('defaultFont', 'Helvetica');
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        $filename = sprintf('fiche-de-paie-%02d-%d.pdf', $payslip->getMois(), $payslip->getAnnee());
+
+        return new Response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 }

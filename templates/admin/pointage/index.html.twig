@@ -24,13 +24,13 @@
                 <button type="submit" form="genererForm" class="btn btn-success btn-sm">
                     <i class="bi bi-magic me-1"></i>Générer
                 </button>
-                <a href="{{ path('app_pointage_valider', {date: date|date('Y-m-d')}) }}" class="btn btn-primary btn-sm">
+                <a href="{{ path('app_admin_pointage_valider', {date: date|date('Y-m-d')}) }}" class="btn btn-primary btn-sm">
                     <i class="bi bi-check2-circle me-1"></i>Valider
                 </a>
             {% endif %}
         </form>
     </div>
-    <form id="genererForm" method="POST" action="{{ path('app_pointage_generer') }}" class="d-none">
+    <form id="genererForm" method="POST" action="{{ path('app_admin_pointage_generer') }}" class="d-none">
         <input type="hidden" name="date" value="{{ date|date('Y-m-d') }}">
     </form>
 
@@ -319,7 +319,7 @@
     {% for pointage in pointages %}
     <div class="modal fade" id="modal{{ pointage.id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <form method="POST" action="{{ path('app_pointage_corriger', {id: pointage.id}) }}" class="modal-content border-0 rounded-4 shadow-lg">
+            <form method="POST" action="{{ path('app_admin_pointage_corriger', {id: pointage.id}) }}" class="modal-content border-0 rounded-4 shadow-lg">
                 <div class="modal-header border-0">
                     <h5 class="modal-title fw-bold">
                         <i class="bi bi-pencil-square text-primary me-2"></i>

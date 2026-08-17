@@ -21,7 +21,7 @@ class Planning
 
     #[ORM\Id] #[ORM\GeneratedValue] #[ORM\Column] private ?int $id = null;
     #[ORM\ManyToOne(inversedBy: 'plannings')] #[ORM\JoinColumn(nullable: false)] private ?User $user = null;
-    #[ORM\ManyToOne(inversedBy: 'plannings')] #[ORM\JoinColumn(nullable: false)] private ?Entreprise $entreprise = null;
+    #[ORM\ManyToOne] #[ORM\JoinColumn(nullable: false)] private ?Entreprise $entreprise = null;
     #[ORM\Column(length: 20)] private ?string $dayOfWeek = null;
     #[ORM\Column(name: 'week_start', type: Types::DATE_IMMUTABLE)] private ?\DateTimeInterface $weekStart = null;
     #[ORM\Column(type: Types::TIME_IMMUTABLE, nullable: true)] private ?\DateTimeInterface $heureDebut = null;

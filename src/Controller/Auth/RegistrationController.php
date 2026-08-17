@@ -179,7 +179,7 @@ class RegistrationController extends AbstractController
                 ]);
             }
 
-        return $this->redirectToRoute('app_dashboard'); // trial goes to dashboard
+        return $this->redirectToRoute('app_admin_dashboard'); // trial goes to dashboard
         //return $this->redirectToRoute('app_login');
     }
 

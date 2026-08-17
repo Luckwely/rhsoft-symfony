@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Entity\TypeConge;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,10 +55,12 @@ final class ParametreController extends AbstractController
         }
 
         $users = $entityManager->getRepository(User::class)->findBy(['entreprise' => $entreprise]);
+        $typesConge = $entityManager->getRepository(TypeConge::class)->findAll();
 
         return $this->render('admin/parametre/index.html.twig', [
             'entreprise' => $entreprise,
             'users' => $users,
+            'typesConge' => $typesConge,
         ]);
     }
 
@@ -100,7 +103,7 @@ final class ParametreController extends AbstractController
         $token = $request->request->get('token');
         if (!$this->isCsrfTokenValid('role_user_' . $user->getId(), $token)) {
             $this->addFlash('danger', 'Jeton CSRF invalide.');
-            return $this->redirectToRoute('app_admin_parametres');
+            return $this->redirectToRoute('app_admin_parametre');
         }
 
         $newRole = $request->request->get('role');

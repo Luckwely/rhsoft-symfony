@@ -231,9 +231,9 @@
                         <div class="card-body">
                             <p class="text-muted mb-3">Les types de congés de votre entreprise sont gérés dynamiquement via le module dédié.</p>
                             <ul class="list-group">
-                                {% for conge in entreprise.typeConge %}
+                                {% for typeConge in typesConge %}
                                     <li class="list-group-item border-0 bg-light mb-2 rounded-3">
-                                        <i class="bi bi-check-circle text-success me-2"></i>{{ conge.libelle ?? 'Congé' }}
+                                        <i class="bi bi-check-circle text-success me-2"></i>{{ typeConge.nom }}
                                     </li>
                                 {% else %}
                                     <li class="list-group-item border-0 text-muted">Aucun type de congé configuré pour le moment.</li>

@@ -125,14 +125,56 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Conge>
      */
-    #[ORM\OneToMany(targetEntity: Conge::class, mappedBy: 'employe')]
+    #[ORM\OneToMany(targetEntity: Conge::class, mappedBy: 'employee')]
     private Collection $conges;
+
+    /**
+     * @var Collection<int, Demission>
+     */
+    #[ORM\OneToMany(targetEntity: Demission::class, mappedBy: 'employee')]
+    private Collection $demissions;
+
+    /**
+     * @var Collection<int, Paie>
+     */
+    #[ORM\OneToMany(targetEntity: Paie::class, mappedBy: 'employee')]
+    private Collection $paies;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateSortie = null;
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $motifSortie = null;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $salaireBase = null;
+
+    #[ORM\Column(type: 'float', options: ['default' => 0])]
+    private ?float $panierRepas = 0;
+
+    #[ORM\Column(type: 'float', options: ['default' => 0])]
+    private ?float $transport = 0;
+
+    #[ORM\Column(type: 'float', options: ['default' => 0])]
+    private ?float $anciennete = 0;
+
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
+    private ?int $personnesACharge = 0;
+
+    public function getSalaireBase(): ?float { return $this->salaireBase; }
+    public function setSalaireBase(?float $salaireBase): static { $this->salaireBase = $salaireBase; return $this; }
+
+    public function getPanierRepas(): ?float { return $this->panierRepas; }
+    public function setPanierRepas(?float $panierRepas): static { $this->panierRepas = $panierRepas; return $this; }
+
+    public function getTransport(): ?float { return $this->transport; }
+    public function setTransport(?float $transport): static { $this->transport = $transport; return $this; }
+
+    public function getAnciennete(): ?float { return $this->anciennete; }
+    public function setAnciennete(?float $anciennete): static { $this->anciennete = $anciennete; return $this; }
+
+    public function getPersonnesACharge(): ?int { return $this->personnesACharge; }
+    public function setPersonnesACharge(?int $personnesACharge): static { $this->personnesACharge = $personnesACharge; return $this; }
 
     // GETTERS SETTERS
     public function getPoste(): ?string { return $this->poste; }
@@ -151,7 +193,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->pointages = new ArrayCollection();
         $this->CorrigePar = new ArrayCollection();
         $this->conges = new ArrayCollection();
+        $this->demissions = new ArrayCollection();
+        $this->paies = new ArrayCollection();
     }
+
 
     public function getDateSortie(): ?\DateTimeInterface
     {
@@ -541,7 +586,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->conges->contains($conge)) {
             $this->conges->add($conge);
-            $conge->setEmploye($this);
+            $conge->setEmployee($this);
         }
 
         return $this;
@@ -551,8 +596,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->conges->removeElement($conge)) {
             // set the owning side to null (unless already changed)
-            if ($conge->getEmploye() === $this) {
-                $conge->setEmploye(null);
+            if ($conge->getEmployee() === $this) {
+                $conge->setEmployee(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Demission>
+     */
+    public function getDemissions(): Collection
+    {
+        return $this->demissions;
+    }
+
+    public function addDemission(Demission $demission): static
+    {
+        if (!$this->demissions->contains($demission)) {
+            $this->demissions->add($demission);
+            $demission->setEmployee($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDemission(Demission $demission): static
+    {
+        if ($this->demissions->removeElement($demission)) {
+            if ($demission->getEmployee() === $this) {
+                $demission->setEmployee(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Paie>
+     */
+    public function getPaies(): Collection
+    {
+        return $this->paies;
+    }
+
+    public function addPaie(Paie $paie): static
+    {
+        if (!$this->paies->contains($paie)) {
+            $this->paies->add($paie);
+            $paie->setEmployee($this);
+        }
+
+        return $this;
+    }
+
+    public function removePaie(Paie $paie): static
+    {
+        if ($this->paies->removeElement($paie)) {
+            if ($paie->getEmployee() === $this) {
+                $paie->setEmployee(null);
             }
         }
 

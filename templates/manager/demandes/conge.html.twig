@@ -23,15 +23,15 @@
     <div class="card border-0 shadow-sm rounded-4">
         <!-- FILTRES -->
         <form method="get" class="d-flex gap-2 flex-wrap">
-            <select name="type" class="form-select form-select-sm" style="width: 200px;" onchange="this.form.submit()">
+            <select name="type" class="form-select form-select-sm" style="max-width: 200px; flex: 1 1 160px;" onchange="this.form.submit()">
                 <option value="">Tous les types</option>
                 {% for type in ['paye','rtt','maladie','sans_solde'] %}
                     <option value="{{ type }}" {{ currentType == type ? 'selected' : '' }}>{{ type|capitalize }}</option>
                 {% endfor %}
             </select>
-            <div class="position-relative">
+            <div class="position-relative" style="max-width: 250px; flex: 1 1 200px;">
                 <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                <input type="text" name="search" value="{{ currentSearch }}" class="form-control form-control-sm ps-5" placeholder="Rechercher un employé..." style="width: 250px;" onkeyup="if(event.key==='Enter'){this.form.submit()}">
+                <input type="text" name="search" value="{{ currentSearch }}" class="form-control form-control-sm ps-5" placeholder="Rechercher un employé..." onkeyup="if(event.key==='Enter'){this.form.submit()}">
             </div>
         </form>
 

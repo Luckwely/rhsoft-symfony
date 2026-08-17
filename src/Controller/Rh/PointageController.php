@@ -52,7 +52,7 @@ final class PointageController extends AbstractController
         ]);
     }
 
-    #[Route('/pointage/corriger/{id}', name: 'app_pointage_corriger', methods: ['POST'])]
+    #[Route('/pointage/corriger/{id}', name: 'app_rh_pointage_corriger', methods: ['POST'])]
     public function corriger(Request $request, Pointage $pointage, EntityManagerInterface $em): Response
     {
         if($pointage->isValide()) {
@@ -82,7 +82,7 @@ final class PointageController extends AbstractController
         return $this->redirectToRoute('app_rh_pointage', ['date' => $date]);
     }
 
-    #[Route('/pointage/valider/{date}', name: 'app_pointage_valider')]
+    #[Route('/pointage/valider/{date}', name: 'app_rh_pointage_valider')]
     public function valider(\DateTimeImmutable $date, PointageRepository $repo, EntityManagerInterface $em): Response // <-- Immutable
     {
         $entreprise = $this->getUser()->getEntreprise();
@@ -93,14 +93,14 @@ final class PointageController extends AbstractController
     }
 
 
-    #[Route('/pointage/export', name: 'app_pointage_export', methods: ['POST'])]
+    #[Route('/pointage/export', name: 'app_rh_pointage_export', methods: ['POST'])]
     public function export(Request $request): Response
     {
         $this->addFlash('info', 'Export en cours...');
         return $this->redirectToRoute('app_rh_pointage');
     }
 
-    #[Route('/pointage/generer', name: 'app_pointage_generer', methods: ['POST'])]
+    #[Route('/pointage/generer', name: 'app_rh_pointage_generer', methods: ['POST'])]
     public function generer(Request $request, EntityManagerInterface $em, PlanningRepository $planningRepo, PointageRepository $pointageRepo): Response
     {
         $date = new \DateTimeImmutable($request->request->get('date', 'today'));
