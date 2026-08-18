@@ -97,6 +97,21 @@ class PaieRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    public function sumSalaireBrutByEntrepriseAndYear(Entreprise $entreprise, int $annee): float
+    {
+        $result = $this->createQueryBuilder('p')
+            ->select('COALESCE(SUM(p.salaireBrut), 0) as total')
+            ->join('p.employee', 'u')
+            ->where('u.entreprise = :entreprise')
+            ->andWhere('p.annee = :annee')
+            ->setParameter('entreprise', $entreprise)
+            ->setParameter('annee', $annee)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return (float) $result;
+    }
+
 //    /**
 //     * @return Paie[] Returns an array of Paie objects
 //     */

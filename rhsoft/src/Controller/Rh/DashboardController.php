@@ -25,8 +25,10 @@ final class DashboardController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
+        $dashboardData = $this->dashboardService->getRhDashboardData($user);
+
         return $this->render('rh/dashboard/index.html.twig', [
-            'dashboard' => $this->dashboardService->getRhDashboardData($user),
+            'dashboard' => $dashboardData,
         ]);
     }
 }

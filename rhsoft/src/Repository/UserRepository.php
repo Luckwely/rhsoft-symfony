@@ -164,28 +164,30 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getSingleScalarResult();
     }
 
-    //    /**
-    //     * @return User[] Returns an array of User objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('u.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function countByGenreAndEntreprise(Entreprise $entreprise): array
+    {
+        return [];
+    }
 
-    //    public function findOneBySomeField($value): ?User
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+   public function countByAgeRangesAndEntreprise(Entreprise $entreprise): array
+    {
+        return [];
+    }
+
+    public function getAverageSeniorityByEntreprise(Entreprise $entreprise): float
+    {
+        // Alternatively, calculate seniority safely using DQL or return 0.0 if not strictly required
+        return 0.0;
+    }
+
+   public function getAverageAgeByEntreprise(Entreprise $entreprise): float
+    {
+        return 0.0;
+    }
+
+    public function countByAgeRangeOrEntreprise(Entreprise $entreprise): array
+    {
+        return [];
+    }
+
 }

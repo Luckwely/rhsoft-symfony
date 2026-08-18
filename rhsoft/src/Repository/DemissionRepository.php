@@ -72,4 +72,21 @@ class DemissionRepository extends ServiceEntityRepository
 
         return array_values($groupedData);
     }
+
+   public function countByMotifAndEntrepriseAndYear(Entreprise $entreprise, int $year): array
+    {
+        $from = new \DateTimeImmutable(sprintf('%d-01-01 00:00:00', $year));
+        $to = new \DateTimeImmutable(sprintf('%d-12-31 23:59:59', $year));
+
+        return $this->createQueryBuilder('d')
+            ->select('d.motif AS motif, COUNT(d.id) AS total')
+            ->where('d.entreprise = :entreprise')
+            ->andWhere('d.dateDepart BETWEEN :from AND :to')
+            ->setParameter('entreprise', $entreprise)
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->groupBy('d.motif')
+            ->getQuery()
+            ->getResult();
+    }
 }
