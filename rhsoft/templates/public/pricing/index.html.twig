@@ -1,0 +1,152 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Tarif{% endblock %}
+
+{% block body %}
+<div class="min-vh-100" style="background: linear-gradient(180deg, #0d6efd 0%, #0d6efd 40%, #f8f9fa 40%, #f8f9fa 100%);">
+    <div class="container py-5">
+        <!-- Page Header -->
+        <div class="text-center mb-5 pt-5">
+            <h1 class="fw-bold text-white display-5 mb-3">Choisissez le plan qui vous convient</h1>
+            <p class="text-white-50 lead">Commencez gratuitement. Passez au niveau supérieur à tout moment.</p>
+        </div>
+
+        <!-- Pricing Cards -->
+        <div class="row g-4 justify-content-center mt-3">
+            {% for key, plan in plans %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 border-0 shadow-lg rounded-4 overflow-hidden {% if plan.highlight %}border border-primary border-3{% endif %} position-relative">
+                    {% if plan.highlight %}
+                        <div class="position-absolute top-0 start-50 translate-middle" style="z-index: 10;">
+                        </div>
+                    {% endif %}
+
+                    <!-- Card Header -->
+                    <div class="card-header {% if plan.highlight %}bg-primary bg-gradient text-white{% else %}bg-light{% endif %} text-center py-4 border-0">
+                        <div class="mb-3">
+                            {% if key == 'essai' %}
+                                <div class="{% if plan.highlight %}bg-white bg-opacity-20{% else %}bg-primary bg-opacity-10{% endif %} rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                                    <i class="bi bi-rocket-takeoff {% if plan.highlight %}text-white{% else %}text-primary{% endif %} fs-1"></i>
+                                </div>
+                            {% elseif key == 'premium' %}
+                                <div class="{% if plan.highlight %}bg-white bg-opacity-20{% else %}bg-success bg-opacity-10{% endif %} rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                                    <i class="bi bi-briefcase-fill {% if plan.highlight %}text-white{% else %}text-success{% endif %} fs-1"></i>
+                                </div>
+                            {% elseif key == 'vip' %}
+                                <div class="{% if plan.highlight %}bg-white bg-opacity-20{% else %}bg-warning bg-opacity-10{% endif %} rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                                    <i class="bi bi-stars {% if plan.highlight %}text-white{% else %}text-warning{% endif %} fs-1"></i>
+                                </div>
+                            {% else %}
+                                <div class="{% if plan.highlight %}bg-white bg-opacity-20{% else %}bg-secondary bg-opacity-10{% endif %} rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                                    <i class="bi bi-box-seam {% if plan.highlight %}text-white{% else %}text-secondary{% endif %} fs-1"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <h3 class="fw-bold mb-0 {% if plan.highlight %}text-white{% else %}text-dark{% endif %}">{{ plan.name }}</h3>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body p-4 p-md-5 d-flex flex-column">
+                        <!-- Price -->
+                        <div class="text-center mb-4">
+                            <span class="display-4 fw-bold {% if plan.highlight %}text-primary{% else %}text-dark{% endif %}">{{ plan.price }}€</span>
+                            <span class="text-muted ms-1">{{ plan.period }}</span>
+                        </div>
+
+                        <!-- Features -->
+                        <ul class="list-unstyled mb-4 flex-grow-1">
+                            {% for feature in plan.features %}
+                            <li class="mb-3 d-flex align-items-start">
+                                <i class="bi bi-check-circle-fill text-primary me-2 mt-1 flex-shrink-0"></i>
+                                <span>{{ feature }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+
+                        <!-- CTA Button -->
+                        <div class="mt-auto">
+                            {% if app.user %}
+                                {# Logged in user #}
+                                {% if key == 'essai' %}
+                                    <a href="{{ path('app_admin_dashboard') }}" class="btn btn-outline-secondary btn-lg w-100 py-3 fw-semibold rounded-3 disabled">
+                                        <i class="bi bi-check-circle me-2"></i> Plan Actuel
+                                    </a>
+                                {% else %}
+                                    <a href="{{ path('app_billing', {plan: key}) }}" class="btn {% if plan.highlight %}btn-primary{% else %}btn-outline-primary{% endif %} btn-lg w-100 py-3 fw-semibold rounded-3">
+                                        <i class="bi bi-credit-card me-2"></i> S'abonner
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                {# Guest #}
+                                {% if key == 'essai' %}
+                                    <a href="{{ path('app_register', {plan: key}) }}" class="btn {% if plan.highlight %}btn-primary{% else %}btn-outline-primary{% endif %} btn-lg w-100 py-3 fw-semibold rounded-3">
+                                        <i class="bi bi-rocket-takeoff me-2"></i> Commencer
+                                    </a>
+                                {% else %}
+                                    <a href="{{ path('app_register', {plan: key}) }}" class="btn {% if plan.highlight %}btn-primary{% else %}btn-outline-primary{% endif %} btn-lg w-100 py-3 fw-semibold rounded-3">
+                                        <i class="bi bi-credit-card me-2"></i> S'abonner
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Trust Badge -->
+        <div class="text-center mt-5 pt-3">
+            <div class="bg-black bg-opacity-10 d-inline-block rounded-3 px-4 py-2">
+                <i class="bi bi-shield-check text-white me-2"></i>
+                <span class="text-white">Paiement sécurisé par Stripe. Annulation à tout moment.</span>
+            </div>
+        </div>
+
+        <!-- Footer Features -->
+        <div class="row g-4 mt-4 justify-content-center">
+            <div class="col-md-3 col-6">
+                <div class="text-center text-black">
+                    <div class="bg-white bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                        <i class="bi bi-clock-history fs-4"></i>
+                    </div>
+                    <p class="small mb-0">Annulation à tout moment</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="text-center text-black">
+                    <div class="bg-white bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                        <i class="bi bi-shield-lock fs-4"></i>
+                    </div>
+                    <p class="small mb-0">Paiement sécurisé</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="text-center text-black">
+                    <div class="bg-white bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                        <i class="bi bi-headset fs-4"></i>
+                    </div>
+                    <p class="small mb-0">Support 24/7</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="text-center text-black">
+                    <div class="bg-white bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                        <i class="bi bi-arrow-repeat fs-4"></i>
+                    </div>
+                    <p class="small mb-0">Sans engagement</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Link -->
+        <div class="text-center mt-4 pt-2">
+            <p class="text-black small">
+                <i class="bi bi-question-circle me-1"></i>
+                Des questions sur nos offres ?
+                <a href="#" class="text-primary fw-semibold text-decoration-none">Consultez notre FAQ</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

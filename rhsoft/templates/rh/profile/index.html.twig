@@ -1,0 +1,5 @@
+{% extends 'layouts/base_rh.html.twig' %}
+{% block title %}Mon Profil{% endblock %}
+{% block body %}
+    {% include 'partials/_profile_content.html.twig' with {'parametreRouteName': 'app_rh_parametre', 'profileRouteName': 'app_rh_profile'} %}
+{% endblock %}

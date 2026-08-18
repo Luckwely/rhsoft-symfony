@@ -1,0 +1,323 @@
+{% extends 'layouts/base_employe.html.twig' %}
+
+{% block title %}Mes Congés{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4 py-3">
+    <!-- HEADER -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">
+                Mes Congés
+            </h3>
+            <p class="text-muted mb-0">
+                Gérez vos demandes de congés
+            </p>
+        </div>
+    </div>
+
+    <!-- FLASH MESSAGES -->
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <!-- NAVIGATION ONGLETS BOOTSTRAP -->
+    <ul class="nav nav-tabs border-0 gap-2 mb-4" id="congeTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active border-0 rounded-3 px-4"
+                    id="tab-demander-btn"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-demander"
+                    type="button"
+                    role="tab"
+                    aria-controls="tab-demander"
+                    aria-selected="true">
+                <i class="bi bi-pencil-square text-success me-2"></i>Demander
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link border-0 rounded-3 px-4"
+                    id="tab-solde-btn"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-solde"
+                    type="button"
+                    role="tab"
+                    aria-controls="tab-solde"
+                    aria-selected="false">
+                <i class="bi bi-wallet2 text-primary me-2"></i>Solde
+                <span class="badge bg-info ms-1">{{ soldeConges|default(18) }}j</span>
+            </button>
+        </li>
+    </ul>
+
+    <!-- CONTENU ONGLETS -->
+    <div class="tab-content" id="congeTabsContent">
+
+        <!-- ONGLET 1: DEMANDER -->
+        <div class="tab-pane fade show active" id="tab-demander" role="tabpanel" aria-labelledby="tab-demander-btn">
+            <div class="row g-4">
+                <!-- FORMULAIRE -->
+                <div class="col-12 col-lg-8">
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-header bg-transparent border-0">
+                            <h5 class="fw-bold mb-0">
+                                <i class="bi bi-plus-circle text-success me-2"></i>Nouvelle demande de congé
+                            </h5>
+                            <small class="text-muted">Remplissez le formulaire ci-dessous</small>
+                        </div>
+                        <div class="card-body">
+                            {{ form_start(form) }}
+                                <div class="mb-3">
+                                    {{ form_label(form.typeConge, 'Type de congé *', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                                    {{ form_widget(form.typeConge, {'attr': {'class': 'form-select'}}) }}
+                                    {{ form_errors(form.typeConge) }}
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form_label(form.dateDebut, 'Date début *', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                                        {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
+                                        {{ form_errors(form.dateDebut) }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form_label(form.dateFin, 'Date fin *', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                                        {{ form_widget(form.dateFin, {'attr': {'class': 'form-control'}}) }}
+                                        {{ form_errors(form.dateFin) }}
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Nombre de jours</label>
+                                    <div class="bg-light rounded-3 p-3 text-center">
+                                        <span class="fw-bold text-primary fs-4" id="calculated-days">-</span>
+                                        <small class="text-muted d-block" id="calculated-dates">Veuillez sélectionner les dates</small>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    {{ form_label(form.motif, 'Motif *', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                                    {{ form_widget(form.motif, {'attr': {'class': 'form-control', 'rows': '4', 'placeholder': 'Précisez le motif de votre demande...'}}) }}
+                                    {{ form_errors(form.motif) }}
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="bi bi-send me-2"></i>Envoyer la demande
+                                </button>
+                            {{ form_end(form) }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RÉCAPITULATIF -->
+                <div class="col-12 col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-header bg-transparent border-0">
+                            <h5 class="fw-bold mb-0">
+                                <i class="bi bi-clipboard-data text-primary me-2"></i>Récapitulatif
+                            </h5>
+                            <small class="text-muted">Vos soldes disponibles</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="p-3 bg-light rounded-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-muted small fw-semibold">Congés Payés</span>
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1">Disponible</span>
+                                </div>
+                                <div class="d-flex align-items-baseline gap-1">
+                                    <span class="fw-bold fs-3 text-dark">{{ soldeConges|default(25) }}</span>
+                                    <span class="text-muted">jours restants</span>
+                                </div>
+                                <div class="mt-2 pt-2 border-top text-muted small d-flex justify-content-between">
+                                    <span>Quota annuel : <strong>{{ totalAnnee|default(25) }} jours</strong></span>
+                                    <span>Utilisés : <strong>{{ joursUtilises|default(0) }} jours</strong></span>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info border-0 rounded-3 small mb-0">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Vous avez utilisé <strong>{{ joursUtilises|default(0) }} jours</strong> sur un total de <strong>{{ totalAnnee|default(25) }}</strong> cette année.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ONGLET 2: SOLDE -->
+        <div class="tab-pane fade" id="tab-solde" role="tabpanel" aria-labelledby="tab-solde-btn">
+            <!-- TABLEAU HISTORIQUE -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-list-check text-primary me-2"></i>Historique des congés pris
+                    </h5>
+                    <a href="#" class="btn btn-outline-dark btn-sm">
+                        <i class="bi bi-download me-1"></i>Exporter
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle table-borderless mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-3 py-3">Type</th>
+                                    <th class="py-3">Période</th>
+                                    <th class="py-3 text-center">Durée</th>
+                                    <th class="py-3 text-center pe-3">Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for conge in congesHistorique %}
+                                    <tr>
+                                        <td class="ps-3">
+                                            {% set typeNom = conge.typeConge ? conge.typeConge.nom|lower : '' %}
+                                            {% if 'paye' in typeNom %}
+                                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
+                                                    <i class="bi bi-umbrella me-1"></i>{{ conge.typeConge.nom }}
+                                                </span>
+                                            {% elseif 'rtt' in typeNom %}
+                                                <span class="badge bg-info-subtle text-info rounded-pill px-3 py-2">
+                                                    <i class="bi bi-clock me-1"></i>{{ conge.typeConge.nom }}
+                                                </span>
+                                            {% elseif 'maladie' in typeNom %}
+                                                <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
+                                                    <i class="bi bi-heart-pulse me-1"></i>{{ conge.typeConge.nom }}
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
+                                                    <i class="bi bi-file-text me-1"></i>{{ conge.typeConge ? conge.typeConge.nom : 'Autre' }}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if conge.dateDebut == conge.dateFin %}
+                                                {{ conge.dateDebut ? conge.dateDebut|date('d/m/Y') : '-' }}
+                                            {% else %}
+                                                {{ conge.dateDebut ? conge.dateDebut|date('d/m/Y') : '-' }} au {{ conge.dateFin ? conge.dateFin|date('d/m/Y') : '-' }}
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="fw-semibold">
+                                                {{ conge.nbJours }} {{ conge.nbJours > 1 ? 'jours' : 'jour' }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center pe-3">
+                                            {% if conge.statut == constant('App\\Entity\\Conge::STATUS_VALIDE') %}
+                                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                                                    <i class="bi bi-check-circle-fill me-1"></i>Approuvé
+                                                </span>
+                                            {% elseif conge.statut == constant('App\\Entity\\Conge::STATUS_REFUSE') %}
+                                                <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
+                                                    <i class="bi bi-x-circle-fill me-1"></i>Refusé
+                                                </span>
+                                            {% elseif conge.statut == constant('App\\Entity\\Conge::STATUS_ANNULE') %}
+                                                <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
+                                                    <i class="bi bi-slash-circle me-1"></i>Annulé
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
+                                                    <i class="bi bi-clock-history me-1"></i>En attente
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-muted">Aucun historique de congé disponible.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center py-3 flex-wrap gap-2">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>Affichage de vos demandes récentes
+                    </small>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- JavaScript pour calculer dynamiquement la durée en jours -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const startDateInput = document.querySelector('input[id$="_dateDebut"]');
+        const endDateInput = document.querySelector('input[id$="_dateFin"]');
+        const daysDisplay = document.getElementById('calculated-days');
+        const datesDisplay = document.getElementById('calculated-dates');
+
+        function calculateDays() {
+            if (startDateInput && endDateInput && startDateInput.value && endDateInput.value) {
+                const start = new Date(startDateInput.value);
+                const end = new Date(endDateInput.value);
+
+                if (end >= start) {
+                    const diffTime = Math.abs(end - start);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+                    daysDisplay.textContent = diffDays + (diffDays > 1 ? ' jours' : ' jour');
+
+                    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+                    const formattedStart = start.toLocaleDateString('fr-FR', options);
+                    const formattedEnd = end.toLocaleDateString('fr-FR', options);
+
+                    if (formattedStart === formattedEnd) {
+                        datesDisplay.textContent = `(le ${formattedStart})`;
+                    } else {
+                        datesDisplay.textContent = `(du ${formattedStart} au ${formattedEnd})`;
+                    }
+                } else {
+                    daysDisplay.textContent = '0 jour';
+                    datesDisplay.textContent = 'La date de fin doit être après la date de début';
+                }
+            } else {
+                daysDisplay.textContent = '-';
+                datesDisplay.textContent = 'Veuillez sélectionner les dates';
+            }
+        }
+
+        if (startDateInput && endDateInput) {
+            startDateInput.addEventListener('change', calculateDays);
+            endDateInput.addEventListener('change', calculateDays);
+            calculateDays();
+        }
+    });
+</script>
+
+<!-- Style pour les onglets modernes -->
+<style>
+    .nav-tabs .nav-link {
+        color: #6c757d;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .nav-tabs .nav-link:hover {
+        background-color: #f8f9fa;
+        color: #0d6efd;
+    }
+    .nav-tabs .nav-link.active {
+        background-color: #0d6efd;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    .nav-tabs .nav-link.active .badge {
+        background-color: rgba(255,255,255,0.25) !important;
+        color: #ffffff !important;
+    }
+    .tab-pane {
+        animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Fonctionnalités - RH Soft Pro{% endblock %}
+
+{% block body %}
+<!-- PAGE HEADER -->
+<section class="bg-primary bg-gradient py-5">
+    <div class="container py-4">
+        <div class="row align-items-center pt-5">
+            <div class="col-lg-8 mx-auto text-center text-white">
+                <h1 class="display-4 fw-bold mb-3">Tout ce dont vous avez besoin</h1>
+                <p class="lead text-white-50">Une suite complète pour gérer vos ressources humaines efficacement</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ALL FEATURES SECTION -->
+<section class="py-5">
+    <div class="container py-4">
+        <div class="row g-4">
+            <!-- Feature 1: Gestion Employés -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-lg rounded-4 p-4">
+                    <div class="bg-primary bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-people fs-1 text-primary"></i>
+                    </div>
+                    <h4 class="fw-bold">Gestion Employés</h4>
+                    <p class="text-muted">Centralisez toutes les informations de vos employés : coordonnées, contrats, documents et historique complet.</p>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Fiches employés complètes</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Documents en ligne</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Feature 2: Planning Hebdomadaire -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-lg rounded-4 p-4">
+                    <div class="bg-success bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-calendar-week fs-1 text-success"></i>
+                    </div>
+                    <h4 class="fw-bold">Planning Hebdomadaire</h4>
+                    <p class="text-muted">Créez et gérez les plannings de vos équipes en quelques clics avec une visualisation intuitive.</p>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Planning visuel interactif</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Modifications en temps réel</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Feature 3: Pointage QR Code -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-lg rounded-4 p-4">
+                    <div class="bg-warning bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-qr-code fs-1 text-warning"></i>
+                    </div>
+                    <h4 class="fw-bold">Pointage simple</h4>
+                    <p class="text-muted">Système de pointage simple et rapide en seul clic avec suivi précis des heures de travail.</p>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i>Pointage sécurisé</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i>Suivi en temps réel</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Feature 4: Gestion des Congés -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-lg rounded-4 p-4">
+                    <div class="bg-info bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-calendar-check fs-1 text-info"></i>
+                    </div>
+                    <h4 class="fw-bold">Gestion des Congés</h4>
+                    <p class="text-muted">Demandes de congés en ligne, validation par le manager et suivi des soldes en temps réel.</p>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-info me-2"></i>Demandes en ligne</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-info me-2"></i>Soldes en temps réel</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Feature 5: Reporting -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-lg rounded-4 p-4">
+                    <div class="bg-danger bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-graph-up-arrow fs-1 text-danger"></i>
+                    </div>
+                    <h4 class="fw-bold">Reporting</h4>
+                    <p class="text-muted">Tableaux de bord et rapports détaillés pour analyser la performance de votre entreprise.</p>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-danger me-2"></i>Tableaux de bord</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-danger me-2"></i>Indicateurs clés</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ADDITIONAL FEATURES SECTION -->
+<section class="py-5 bg-light">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">Et bien plus encore</h2>
+            <p class="text-muted lead">Des fonctionnalités avancées pour une gestion RH complète</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="d-flex gap-3 p-3 bg-white rounded-4 shadow-sm h-100">
+                    <div class="flex-shrink-0">
+                        <div class="bg-warning bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <i class="bi bi-file-pdf text-warning fs-3"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold">Export PDF & Excel</h5>
+                        <p class="text-muted small mb-0">Exportez vos rapports et données dans tous les formats</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex gap-3 p-3 bg-white rounded-4 shadow-sm h-100">
+                    <div class="flex-shrink-0">
+                        <div class="bg-info bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <i class="bi bi-shield-lock text-info fs-3"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold">Sécurité RGPD</h5>
+                        <p class="text-muted small mb-0">Conformité RGPD et protection des données sensibles</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex gap-3 p-3 bg-white rounded-4 shadow-sm h-100">
+                    <div class="flex-shrink-0">
+                        <div class="bg-danger bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <i class="bi bi-cloud-upload text-danger fs-3"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold">Sauvegarde automatique</h5>
+                        <p class="text-muted small mb-0">Données sauvegardées automatiquement dans le cloud</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA SECTION -->
+<section class="bg-primary bg-gradient py-5">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center text-white">
+                <h2 class="display-4 fw-bold mb-3">Prêt à essayer RH Soft Pro ?</h2>
+                <p class="lead text-white-50 mb-4">Découvrez toutes nos fonctionnalités avec un essai gratuit de 14 jours</p>
+                <div class="d-flex flex-wrap gap-3 justify-content-center">
+                    <a href="{{ path('app_register') }}" class="btn btn-light btn-lg px-5 fw-semibold">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Commencer l'essai gratuit
+                    </a>
+                    <a href="{{ path('app_pricing') }}" class="btn btn-outline-light btn-lg px-5">
+                        <i class="bi bi-eye me-2"></i>Voir les tarifs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

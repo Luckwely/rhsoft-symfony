@@ -1,0 +1,48 @@
+<!-- NAVBAR -->
+<nav class="navbar bg-primary navbar-expand-lg navbar-light shadow" style=" box-shadow: rgba(243, 243, 243, 0.08) 0px 5px 15px;">
+    <div class="container">
+
+        <!-- LOGO -->
+        <a class="" href="{{ path("app_home") }}">
+            <img src="../uploads/home/logo.png" alt="Logo RH Soft Pro" width="auto" height="50" style="object-fit: cover;">
+        </a>
+
+        <!-- TOGGLER MOBILE -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- MENU -->
+        <div class="collapse navbar-collapse" id="navbarMain">
+
+            <!-- LIENS CENTRE -->
+            <ul class="navbar-nav mx-auto mb-2 mb-lg-0 text-white">
+                <li class="nav-item">
+                    <a class="nav-link text-white {% if app.request.attributes.get('_route') == 'app_home' %}active fw-semibold{% endif %}" href="{{ path("app_home") }}">
+                        Accueil
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white {% if app.request.attributes.get('_route') == 'app_fonctionnalite' %}active fw-semibold{% endif %}" href="{{ path("app_fonctionnalite") }}">
+                        Fonctionnalités
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white {% if app.request.attributes.get('_route') == 'app_pricing' %}active fw-semibold{% endif %}" href="{{ path("app_pricing") }}">
+                        Tarifs
+                    </a>
+                </li>
+            </ul>
+
+            <!-- BOUTONS DROITE -->
+            <div class="d-flex flex-column flex-lg-row gap-2">
+                <a href="{{ path('app_login') }}" class="btn bg-white text-primary">
+                    <i class="bi bi-person-circle me-1"></i>Connexion
+                </a>
+                <a href="{{ path('app_register') }}" class="btn btn-outline-light">
+                    <i class="bi bi-gift-fill me-1"></i>Essai Gratuit
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>

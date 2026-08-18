@@ -1,0 +1,5 @@
+{% extends 'layouts/base_admin.html.twig' %}
+{% block title %}Mon Profil{% endblock %}
+{% block body %}
+    {% include 'partials/_profile_content.html.twig' with {'parametreRouteName': 'app_admin_parametre', 'profileRouteName': 'app_admin_profile'} %}
+{% endblock %}

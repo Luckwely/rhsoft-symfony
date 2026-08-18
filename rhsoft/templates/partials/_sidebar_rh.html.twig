@@ -1,0 +1,87 @@
+<!-- Logo & Role Header -->
+<div class="d-flex align-items-center justify-content-between gap-2 mb-4 pb-3 border-bottom border-secondary px-2" style="min-width: 0;">
+    <!-- Logo -->
+    <a href="{{ path('app_rh_dashboard') }}" class="sidebar-logo d-flex align-items-center text-decoration-none flex-shrink-0 overflow-hidden">
+        <img src="{{ asset('uploads/home/logo.png') }}" alt="RH Soft Pro Logo" style="display: block; max-height: 38px; width: auto; max-width: 100%; object-fit: contain;">
+    </a>
+
+    <!-- User Role Badge -->
+    <div class="ms-auto flex-shrink-0">
+        {% if 'ROLE_SUPER_ADMIN' in app.user.roles %}
+            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Super Admin</span>
+        {% elseif 'ROLE_ADMIN' in app.user.roles %}
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Admin</span>
+        {% elseif 'ROLE_RH' in app.user.roles %}
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">RH</span>
+        {% elseif 'ROLE_MANAGER' in app.user.roles %}
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Manager</span>
+        {% else %}
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Employé</span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Navigation Menu -->
+<nav class="nav nav-pills flex-column mb-auto gap-1">
+    {% set current_route =  app.request.attributes.get('_route')|default('') %}
+    <a href="{{ path('app_rh_dashboard') }}"
+        class="nav-link {% if current_route == 'app_rh_dashboard' or current_route starts with 'app_rh_dashboard_' %}active{% endif %}">
+        <i class="bi bi-speedometer2 me-2"></i>
+        Tableau de bord
+    </a>
+    <a href="{{ path('app_rh_employee') }}"
+        class="nav-link {% if current_route == 'app_rh_employee' or current_route starts with 'app_rh_employee_' %}active{% endif %}">
+        <i class="bi bi-people me-2"></i>
+        Employés
+    </a>
+    <a href="{{ path('app_rh_offre') }}"
+        class="nav-link {% if current_route == 'app_rh_offre' or current_route starts with 'app_rh_offre_' %}active{% endif %}">
+        <i class="bi bi-megaphone me-2"></i>
+        Recrutement
+    </a>
+    <a href="{{ path('app_rh_demandes_conge') }}"
+        class="nav-link {% if current_route == 'app_rh_demandes_conge' or current_route starts with 'app_rh_demandes_' %}active{% endif %}">
+        <i class="bi bi-clipboard-check me-2"></i>
+        Demandes
+    </a>
+    <a href="{{ path('app_rh_planning') }}"
+        class="nav-link {% if current_route == 'app_rh_planning' or current_route starts with 'app_rh_planning_' %}active{% endif %}">
+        <i class="bi bi-calendar-week me-2"></i>
+        Planning
+    </a>
+    <a href="{{ path('app_rh_paie_preparer') }}"
+        class="nav-link {% if current_route == 'app_rh_paie_preparer' or current_route starts with 'app_rh_paie_' %}active{% endif %}">
+        <i class="bi bi-wallet2 me-2"></i>
+        Paie
+    </a>
+    <a href="{{ path('app_rh_pointage') }}"
+        class="nav-link {% if current_route == 'app_rh_pointage' or current_route starts with 'app_rh_pointage_' %}active{% endif %}">
+        <i class="bi bi-clock-history me-2"></i>
+        Pointage
+    </a>
+    <a href="{{ path('app_rh_rapport') }}"
+        class="nav-link {% if current_route == 'app_rh_rapport' or current_route starts with 'app_rh_rapport_' %}active{% endif %}">
+        <i class="bi bi-graph-up-arrow me-2"></i>
+        Rapports
+    </a>
+</nav>
+
+<!-- Sidebar Footer - User Info -->
+<div class="sidebar-user p-3 border-top border-secondary mt-auto">
+    <div class="d-flex align-items-center">
+        <div class="avatar-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center overflow-hidden rounded-circle" style="width: 40px; height: 40px; min-width: 40px;">
+            {% if app.user.entreprise and app.user.entreprise.logo %}
+                <img src="{{ asset('uploads/logos/' ~ app.user.entreprise.logo) }}" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
+            {% elseif app.user.photo %}
+                <img src="{{ asset('uploads/employees/' ~ app.user.photo) }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+            {% else %}
+                {{ app.user.prenom ? app.user.prenom|slice(0, 1)|upper : 'U' }}
+            {% endif %}
+        </div>
+        <div class="ms-2 overflow-hidden">
+            <div class="user-company" style="font-size: 0.75rem;">
+               Nom d'entreprise: {{ app.user.entreprise.nom ?? 'Entreprise' }}
+            </div>
+        </div>
+    </div>
+</div>

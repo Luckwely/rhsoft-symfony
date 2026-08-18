@@ -1,0 +1,99 @@
+{% extends 'layouts/base_carriere.html.twig' %}
+{% block title %}{{ offre.titre }} - {{ offre.entreprise.nom }}{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+
+    <!-- Bouton de retour -->
+    <div class="mb-4">
+        <a href="{{ path('app_carriere_globale') }}" class="text-decoration-none text-muted fw-semibold">
+            <i class="bi bi-arrow-left me-1"></i> Retour à toutes les offres
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Colonne principale : Description de l'offre -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm p-4 p-md-5 rounded-4 bg-white">
+
+                <!-- Titre et entreprise -->
+                <div class="mb-4">
+                    <span class="badge bg-primary-subtle text-primary fw-semibold px-3 py-2 rounded-pill mb-3">Offre ouverte</span>
+                    <h1 class="fw-bold text-dark display-6 mb-2">{{ offre.titre }}</h1>
+                    <p class="text-muted fs-5 mb-0">
+                        <i class="bi bi-building me-2"></i><strong>{{ offre.entreprise.nom }}</strong>
+                    </p>
+                </div>
+
+                <hr class="text-muted opacity-25 my-4">
+
+                <!-- Description -->
+                <div class="job-description">
+                    <h3 class="h4 fw-bold text-dark mb-3">Description du poste</h3>
+                    <div class="text-secondary lh-lg">
+                        {{ offre.description|nl2br }}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Colonne secondaire : Carte récapitulative & Action -->
+        <div class="col-lg-4">
+            <!-- top passé à 8rem pour s'arrêter nettement en dessous du navbar -->
+            <div class="card border-0 shadow-sm p-4 rounded-4 bg-white sticky-top" style="top: 8rem; z-index: 5;">
+
+                <h4 class="h5 fw-bold text-dark mb-4">Informations clés</h4>
+
+                <ul class="list-unstyled mb-4">
+                    <!-- Lieu -->
+                    <li class="d-flex align-items-center mb-3 text-secondary">
+                        <div class="bg-light rounded-circle p-2 me-3 text-primary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; min-width: 40px;">
+                            <i class="bi bi-geo-alt fs-5"></i>
+                        </div>
+                        <div>
+                            <small class="d-block text-muted">Localisation</small>
+                            <strong class="text-dark">{{ offre.lieu ?? 'Remote' }}</strong>
+                        </div>
+                    </li>
+
+                    <!-- Date de publication -->
+                    <li class="d-flex align-items-center mb-3 text-secondary">
+                        <div class="bg-light rounded-circle p-2 me-3 text-primary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; min-width: 40px;">
+                            <i class="bi bi-calendar-event fs-5"></i>
+                        </div>
+                        <div>
+                            <small class="d-block text-muted">Publiée le</small>
+                            <strong class="text-dark">{{ offre.createdAt|date('d/m/Y') }}</strong>
+                        </div>
+                    </li>
+
+                    {% if offre.dateExpiration %}
+                        <li class="d-flex align-items-center mb-3 text-secondary">
+                            <div class="bg-light rounded-circle p-2 me-3 text-danger d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; min-width: 40px;">
+                                <i class="bi bi-clock-history fs-5"></i>
+                            </div>
+                            <div>
+                                <small class="d-block text-muted">Date limite</small>
+                                <strong class="text-dark">{{ offre.dateExpiration|date('d/m/Y') }}</strong>
+                            </div>
+                        </li>
+                    {% endif %}
+                </ul>
+
+                <hr class="text-muted opacity-25 mb-4">
+
+                <!-- Bouton d'action principal -->
+                <div class="d-grid">
+                    <a href="{{ path('app_candidature_new', {id: offre.id}) }}" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                        <i class="bi bi-send-fill me-2"></i>Postuler à cette offre
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

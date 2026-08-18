@@ -1,0 +1,60 @@
+<!-- Logo & Role Header -->
+<div class="d-flex align-items-center justify-content-between gap-2 mb-4 pb-3 border-bottom border-secondary px-2" style="min-width: 0;">
+    <!-- Logo -->
+    <a href="{{ path('app_rh_dashboard') }}" class="sidebar-logo d-flex align-items-center text-decoration-none flex-shrink-0 overflow-hidden">
+        <img src="{{ asset('uploads/home/logo.png') }}" alt="RH Soft Pro Logo" style="display: block; max-height: 38px; width: auto; max-width: 100%; object-fit: contain;">
+    </a>
+
+    <!-- User Role Badge -->
+    <div class="ms-auto flex-shrink-0">
+        {% if 'ROLE_SUPER_ADMIN' in app.user.roles %}
+            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Super Admin</span>
+        {% elseif 'ROLE_ADMIN' in app.user.roles %}
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Admin</span>
+        {% elseif 'ROLE_RH' in app.user.roles %}
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">RH</span>
+        {% elseif 'ROLE_MANAGER' in app.user.roles %}
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Manager</span>
+        {% else %}
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1 fs-xs fw-semibold" style="font-size: 0.7rem;">Employé</span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Navigation Menu -->
+<nav class="nav nav-pills flex-column mb-auto gap-1">
+    {% set current_route = app.request.attributes.get('_route') %}
+	<a href="{{ path('app_super_admin_dashboard') }}" class="nav-link {% if 'app_super_admin_dashboard' in current_route %}active{% endif %}">
+		<i class="bi bi-speedometer2 me-2"></i>
+		Dashboard Global
+	</a>
+	<a href="{{ path('app_super_admin_entreprise') }}" class="nav-link {% if 'app_super_admin_entreprise' in current_route %}active{% endif %}">
+		<i class="bi bi-buildings me-2"></i>
+		Gestion Entreprises
+	</a>
+	<a href="{{ path('app_super_admin_facturation') }}" class="nav-link {% if 'app_super_admin_facturation' in current_route %}active{% endif %}">
+		<i class="bi bi-receipt me-2"></i>
+		Facturation
+	</a>
+	<a href="{{ path('app_super_admin_module') }}" class="nav-link {% if 'app_super_admin_module' in current_route %}active{% endif %}">
+		<i class="bi bi-grid-3x3-gap-fill me-2"></i>
+		Modules
+	</a>
+	<a href="{{ path('app_super_admin_parametre') }}" class="nav-link {% if 'app_super_admin_parametre' in current_route %}active{% endif %}">
+		<i class="bi bi-gear me-2"></i>
+        Administration
+	</a>
+</nav>
+
+<!-- Sidebar Footer - User Info -->
+<div class="sidebar-user">
+	<div class="d-flex align-items-center">
+		<div class="avatar-circle bg-primary">
+			{{ app.user.prenom ? app.user.prenom|slice(0, 1)|upper : 'U' }}
+		</div>
+		<div class="ms-2">
+			<div class="user-name">{{ app.user.prenom ? app.user.prenom ~ ' ' ~ app.user.nom : app.user.email }}</div>
+			<div class="user-company">{{ app.user.entreprise.nom ?? 'Entreprise' }}</div>
+		</div>
+	</div>
+</div>

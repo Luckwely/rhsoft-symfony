@@ -1,0 +1,216 @@
+{% extends "layouts/base_super_admin.html.twig" %}
+
+{% block title %}Gestion des Entreprises{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4">
+    <!-- En-tête -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h1 class="h2 fw-bold mb-0">
+                Gestion des Entreprises
+            </h1>
+            <p class="text-muted small mb-0">Gérez toutes les entreprises de la plateforme RH Soft Pro</p>
+        </div>
+    </div>
+
+    <!-- Barre de recherche et filtres -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-3">
+           <form method="GET" action="{{ path('app_super_admin_entreprise') }}">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-5">
+                    <div class="position-relative">
+                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        <input
+                            type="text"
+                            value="{{ app.request.query.get('q') }}"
+                            name="q" class="form-control ps-5" placeholder="Rechercher une entreprise..." aria-label="Rechercher">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select"> {# <- name manquant #}
+                        <option value="">Tous les statuts</option>
+                        <option value="active" {{ app.request.query.get('status') == 'active' ? 'selected' : '' }}>Actif</option>
+                        <option value="inactif" {{ app.request.query.get('status') == 'inactif' ? 'selected' : '' }}>Inactif</option>
+                        <option value="essai" {{ app.request.query.get('status') == 'essai' ? 'selected' : '' }}>En essai</option>
+                        <option value="suspendu" {{ app.request.query.get('status') == 'suspendu' ? 'selected' : '' }}>Suspendu</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-funnel me-1"></i>Filtrer
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <a  class="btn btn-outline-secondary w-100" href="{{ path('app_super_admin_entreprise') }}">
+                        <i class="bi bi-arrow-repeat me-1"></i>
+                    </a>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tableau des entreprises -->
+    <div class="card border-0 shadow-sm">
+    {% set paginationData = pagination.getPaginationData() %}
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-3 py-3">Entreprise</th>
+                            <th class="py-3">Admin</th>
+                            <th class="py-3">Plan</th>
+                            <th class="py-3 text-center">Utilisateurs</th>
+                            <th class="py-3 text-center">Statut</th>
+                            <th class="py-3 text-center pe-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Ligne 1 -->
+                        {% for data in pagination %}
+                        {% set entreprise = data[0] %}
+                            <tr>
+                                <td class="ps-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold" style="width: 36px; height: 36px; font-size: 14px;">
+                                            {% if entreprise.logo %}
+                                                <img src="{{ asset('uploads/logos/' ~ entreprise.logo) }}"
+                                                    alt="{{ entreprise.nom }}"
+                                                    class="rounded-circle w-100 h-100"
+                                                    style="object-fit: cover;">
+                                            {% else %}
+                                                <div class="bg-primary bg-opacity-10 text-primary w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
+                                                    {{ entreprise.nom|slice(0,2)|upper }} {# Prend les 2 premières lettres #}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold">{{ entreprise.nom }}</div>
+                                            <div class="text-muted small">{{ entreprise.email }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 28px; height: 28px; font-size: 11px;">
+                                            {% if data.adminPhoto %}
+                                                <img src="{{ asset('uploads/logos/' ~ data.adminPhoto) }}"
+                                                    alt="{{ data.adminNom }}"
+                                                    class="rounded-circle w-100 h-100"
+                                                    style="object-fit: cover;">
+                                            {% else %}
+                                                <div class="bg-primary bg-opacity-10 text-white w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
+                                                    {% if data.adminNom is not empty and data.adminPrenom is not empty %}
+                                                        {{ data.adminNom|slice(0,1)|upper ~ data.adminPrenom|slice(0,1)|upper }}
+                                                    {% else %}
+                                                        N/A
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <span class="small">{{ data.adminPrenom|default('N/A') }} {{ data.adminNom }}</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-primary bg-opacity-10 text-primary">{{ entreprise.plan}}</span></td>
+                                <td class="text-center"><span class="fw-semibold">{{ data.nbUsers }}</span></td>
+                                <td class="text-center">
+                                    {% set status = entreprise.status|default('Inactif') %}
+                                    {% set color = status == 'active' ? 'success' : (status == 'suspendu' ? 'warning' : 'danger') %}
+                                    <span class="badge bg-success bg-opacity-10 text-{{ color }}">
+                                        <i class="bi bi-check-circle-fill me-1"></i>{{ status }}
+                                    </span>
+                                </td>
+                                <td class="text-center pe-3">
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ path("app_super_admin_entreprise_details", {'id': entreprise.id}) }}">
+                                            <button class="btn btn-sm btn-outline-secondary" title="Voir">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </a>
+
+                                        {% if entreprise.status == 'active' %}
+                                            <a href="{{ path('app_super_admin_entreprise_toggle', {'id': entreprise.id}) }}"
+                                            class="btn btn-sm btn-outline-warning"
+                                            onclick="return confirm('Suspendre cette entreprise ?')">
+                                                <i class="bi bi-pause-circle"></i> Suspendre
+                                            </a>
+                                        {% else %}
+                                            <a href="{{ path('app_super_admin_entreprise_toggle', {'id': entreprise.id}) }}"
+                                            class="btn btn-sm btn-outline-success">
+                                            <i class="bi bi-play-circle"></i> Activer
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center p-5">
+                                    <i class="bi bi-search text-muted fs-2 d-block mb-2"></i>
+                                    <h6 class="fw-bold">Aucune entreprise trouvée</h6>
+                                    <p class="text-muted small mb-0">Essayez de modifier vos filtres de recherche</p>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Footer avec pagination -->
+        {% if paginationData.totalCount > 0 %}
+        <div class="card-footer bg-transparent border-0 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+            {% set paginationData = pagination.getPaginationData() %}
+            <small class="text-muted">
+                <i class="bi bi-info-circle me-1"></i>Affichage de {{ paginationData.firstItemNumber }} à {{ paginationData.lastItemNumber }} sur {{ paginationData.totalCount }} entreprises
+            </small>
+            <nav aria-label="Pagination des entreprises">
+                {{ knp_pagination_render(pagination) }}
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Statistiques rapides -->
+    <div class="row g-3 mt-3">
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-3 text-center">
+                    <span class="badge bg-primary mb-1">Total</span>
+                    <h5 class="fw-bold mb-0">{{ stats.total }}</h5>
+                    <small class="text-muted">Entreprises</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-3 text-center">
+                    <span class="badge bg-success mb-1">Actifs</span>
+                    <h5 class="fw-bold mb-0 text-success">{{ stats.actifs }}</h5>
+                    <small class="text-muted">Entreprises</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-3 text-center">
+                    <span class="badge bg-warning mb-1">En essai</span>
+                    <h5 class="fw-bold mb-0 text-warning">{{ stats.essai }}</h5>
+                    <small class="text-muted">Entreprises</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-3 text-center">
+                    <span class="badge bg-danger mb-1">Inactifs</span>
+                    <h5 class="fw-bold mb-0 text-danger">{{ stats.inactifs }}</h5>
+                    <small class="text-muted">Entreprises</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
