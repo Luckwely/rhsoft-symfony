@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page { margin: 28px 32px; }
+        body { font-family: DejaVu Sans, sans-serif; color: #202124; font-size: 10px; }
+        h1 { color: #123c69; font-size: 20px; margin: 0 0 4px; }
+        h2 { color: #123c69; font-size: 13px; border-bottom: 1px solid #d9e2ec; padding-bottom: 5px; margin: 20px 0 8px; }
+        .muted { color: #6b7280; }
+        .grid { width: 100%; margin: 12px 0; }
+        .card { display: inline-block; width: 23%; margin-right: 1%; vertical-align: top; border: 1px solid #d9e2ec; padding: 8px; box-sizing: border-box; }
+        .label { color: #6b7280; font-size: 8px; text-transform: uppercase; }
+        .value { font-size: 16px; font-weight: bold; margin-top: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        th { background: #eef3f8; text-align: left; font-weight: bold; }
+        th, td { border: 1px solid #d9e2ec; padding: 6px; }
+        .right { text-align: right; }
+    </style>
+</head>
+<body>
+    <h1>Rapport RH — {{ reportData.year }}</h1>
+    <div class="muted">Entreprise : {{ entreprise.nom|default('Entreprise') }} · Généré le {{ generatedAt|date('d/m/Y H:i') }}</div>
+
+    <div class="grid">
+        <div class="card"><div class="label">Effectif total</div><div class="value">{{ reportData.totalEmployees }}</div></div>
+        <div class="card"><div class="label">Taux de turnover</div><div class="value">{{ reportData.turnoverRate }}%</div></div>
+        <div class="card"><div class="label">Embauches</div><div class="value">{{ reportData.hires }}</div></div>
+        <div class="card"><div class="label">Départs</div><div class="value">{{ reportData.departures }}</div></div>
+    </div>
+
+    <h2>Bilan social</h2>
+    <table>
+        <thead><tr><th>Indicateur</th><th class="right">Valeur</th></tr></thead>
+        <tbody>
+            <tr><td>Masse salariale brute</td><td class="right">{{ reportData.masseSalariale|number_format(0, ',', ' ') }} Ar</td></tr>
+            <tr><td>Taux d'absentéisme</td><td class="right">{{ reportData.tauxAbsenteisme }}%</td></tr>
+            <tr><td>Présents aujourd'hui</td><td class="right">{{ reportData.presentToday }}</td></tr>
+            <tr><td>Absents aujourd'hui</td><td class="right">{{ reportData.absentToday }}</td></tr>
+            <tr><td>Demandes de congé en attente</td><td class="right">{{ reportData.pendingLeaves }}</td></tr>
+            <tr><td>Ancienneté moyenne</td><td class="right">{{ reportData.ancienneteMoyenne is not null ? reportData.ancienneteMoyenne ~ ' ans' : 'Non renseignée' }}</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Répartition par service</h2>
+    <table>
+        <thead><tr><th>Service</th><th class="right">Employés</th></tr></thead>
+        <tbody>
+        {% for row in reportData.serviceDistribution %}
+            <tr><td>{{ row.service|default('Non affecté') }}</td><td class="right">{{ row.total }}</td></tr>
+        {% else %}<tr><td colspan="2">Aucune donnée disponible.</td></tr>{% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
+

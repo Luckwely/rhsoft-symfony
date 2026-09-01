@@ -39,7 +39,21 @@ class Paie
     #[ORM\Column(type: 'float', nullable: true)]
     private ?float $masseSalariale = null;
 
-    // 1. Simule getStartDate() en combinant l'année et le mois (utilisé pour IntlDateFormatter)
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $paidAt = null;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $payslipSentAt = null;
+
+    #[ORM\ManyToOne]
+    private ?User $validePar = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $montantAvanceDeduite = '0.00';
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $montantHeuresSupplementaires = '0.00';
+
     public function getStartDate(): ?\DateTimeInterface
     {
         if ($this->annee && $this->mois) {
@@ -48,19 +62,16 @@ class Paie
         return null;
     }
 
-    // 2. Alias pour getGrossAmount() pointant vers salaireBrut
     public function getGrossAmount(): ?float
     {
         return $this->salaireBrut !== null ? (float) $this->salaireBrut : null;
     }
 
-    // 3. Alias pour getDeductions() pointant vers cotisations
     public function getDeductions(): ?float
     {
         return $this->cotisations !== null ? (float) $this->cotisations : null;
     }
 
-    // --- Remplacement de la colonne en doublon par une méthode virtuelle ---
     public function getNetAmount(): ?float
     {
         return $this->salaireNet !== null ? (float) $this->salaireNet : null;
@@ -71,7 +82,6 @@ class Paie
         $this->salaireNet = $netAmount !== null ? (string) $netAmount : null;
         return $this;
     }
-    // ---------------------------------------------------------------------
 
     public function getMasseSalariale(): ?float
     {
@@ -106,4 +116,21 @@ class Paie
 
     public function getStatus(): ?string { return $this->status; }
     public function setStatus(string $status): static { $this->status = $status; return $this; }
+
+    public function getPaidAt(): ?\DateTimeImmutable { return $this->paidAt; }
+    public function setPaidAt(?\DateTimeImmutable $paidAt): static { $this->paidAt = $paidAt; return $this; }
+
+    public function getPayslipSentAt(): ?\DateTimeImmutable { return $this->payslipSentAt; }
+    public function setPayslipSentAt(?\DateTimeImmutable $payslipSentAt): static { $this->payslipSentAt = $payslipSentAt; return $this; }
+
+    public function getValidePar(): ?User { return $this->validePar; }
+    public function setValidePar(?User $validePar): static { $this->validePar = $validePar; return $this; }
+
+    public function getMontantAvanceDeduite(): ?float { return $this->montantAvanceDeduite !== null ? (float) $this->montantAvanceDeduite : 0.0; }
+    public function setMontantAvanceDeduite(?float $montantAvanceDeduite): static { $this->montantAvanceDeduite = $montantAvanceDeduite !== null ? (string) $montantAvanceDeduite : '0.00'; return $this; }
+
+    public function getMontantHeuresSupplementaires(): ?float { return $this->montantHeuresSupplementaires !== null ? (float) $this->montantHeuresSupplementaires : 0.0; }
+    public function setMontantHeuresSupplementaires(?float $montantHeuresSupplementaires): static { $this->montantHeuresSupplementaires = $montantHeuresSupplementaires !== null ? (string) $montantHeuresSupplementaires : '0.00'; return $this; }
+
+    public function isPaid(): bool { return $this->status === 'payée'; }
 }

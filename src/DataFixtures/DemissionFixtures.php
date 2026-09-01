@@ -22,8 +22,10 @@ class DemissionFixtures extends Fixture implements DependentFixtureInterface
             'Raisons personnelles et familiales'
         ];
 
-        // On crée quelques demandes de démission pour certains utilisateurs (ex: index 3, 6 et 9)
-        $employesConcernes = [3, 6, 9];
+        // On crée quelques demandes de démission pour certains utilisateurs (2e employé de
+        // chaque entreprise, sous la disposition UserFixtures à 5 utilisateurs/entreprise :
+        // admin, RH, manager, employé, employé -> index 5, 10, 15).
+        $employesConcernes = [5, 10, 15];
 
         foreach ($employesConcernes as $userIndex) {
             /** @var User $employee */

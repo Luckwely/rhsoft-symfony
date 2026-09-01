@@ -1,0 +1,438 @@
+{% extends "layouts/base_super_admin.html.twig" %}
+
+{% block title %}Administration - Paramètres Système{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4">
+    <!-- En-tête -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h1 class="h2 fw-bold mb-0">
+                Administration Système
+            </h1>
+            <p class="text-muted small mb-0">Gérez les paramètres, templates et logs de la plateforme</p>
+        </div>
+    </div>
+
+    {% set activeTab = app.request.query.get('tab', 'connexions') %}
+
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs border-0 gap-2 mb-4" id="adminTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {{ activeTab == 'connexions' ? 'active' : '' }} border-0 rounded-3 px-4"
+                    id="connexions-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#connexions"
+                    type="button"
+                    role="tab"
+                    aria-controls="connexions"
+                    aria-selected="{{ activeTab == 'connexions' ? 'true' : 'false' }}">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Connexions
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {{ activeTab == 'erreurs' ? 'active' : '' }} border-0 rounded-3 px-4"
+                    id="erreurs-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#erreurs"
+                    type="button"
+                    role="tab"
+                    aria-controls="erreurs"
+                    aria-selected="{{ activeTab == 'erreurs' ? 'true' : 'false' }}">
+                <i class="bi bi-exclamation-triangle me-2"></i>Logs Erreurs
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tabs Content -->
+    <div class="tab-content" id="adminTabsContent">
+
+        <!-- TAB 4: CONNEXIONS -->
+        <div class="tab-pane fade {{ activeTab == 'connexions' ? 'show active' : '' }}" id="connexions" role="tabpanel" aria-labelledby="connexions-tab">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-box-arrow-in-right text-primary me-2"></i>Historique des Connexions
+                    </h5>
+                    <small class="text-muted">Suivez toutes les connexions des utilisateurs</small>
+                </div>
+            </div>
+
+            <!-- Filtres Connexions -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-3">
+                    <form method="GET" action="{{ path('app_super_admin_parametre') }}">
+                        <input type="hidden" name="tab" value="connexions">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-9">
+                                <select name="conn_status" class="form-select">
+                                    <option value="">Tous</option>
+                                    <option value="success" {{ app.request.query.get('conn_status') == 'success' ? 'selected' : '' }}>Succès</option>
+                                    <option value="failed" {{ app.request.query.get('conn_status') == 'failed' ? 'selected' : '' }}>Échec</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-funnel me-1"></i>Filtrer
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tableau des connexions -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-3 py-3">Date</th>
+                                    <th class="py-3">Email</th>
+                                    <th class="py-3">Entreprise</th>
+                                    <th class="py-3">IP</th>
+                                    <th class="py-3 text-center">Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for conn in connections %}
+                                <tr>
+                                    <td class="ps-3">
+                                        <span class="fw-semibold">{{ conn.loggedAt|date('d/m/Y') }}</span>
+                                        <span class="text-muted small d-block">{{ conn.loggedAt|date('H:i:s') }}</span>
+                                    </td>
+                                    <td>{{ conn.userEmail ?? 'N/A' }}</td>
+                                    <td>{{ conn.companyName ?? 'N/A' }}</td>
+                                    <td><code>{{ conn.ipAddress ?? 'N/A' }}</code></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-{{ conn.level == 'success' ? 'success' : 'danger' }} bg-opacity-10 text-{{ conn.level == 'success' ? 'success' : 'danger' }}">
+                                            <i class="bi bi-{{ conn.level == 'success' ? 'check-circle-fill' : 'x-circle-fill' }} me-1"></i>{{ conn.level|capitalize }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">Aucune connexion enregistrée.</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Pagination Connexions -->
+                <div class="card-footer bg-white border-0 px-3 py-3">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+
+                        <div class="pagination-info text-muted small">
+                            {% if connections.totalItemCount > 0 %}
+
+                                <i class="bi bi-list-ul me-1"></i>
+
+                                Affichage de
+                                <strong>
+                                    {{ connections.itemNumberPerPage * (connections.currentPageNumber - 1) + 1 }}
+                                </strong>
+                                à
+                                <strong>
+                                    {{ min(
+                                        connections.itemNumberPerPage * connections.currentPageNumber,
+                                        connections.totalItemCount
+                                    ) }}
+                                </strong>
+                                sur
+                                <strong>{{ connections.totalItemCount }}</strong>
+                                connexions
+
+                            {% else %}
+
+                                <i class="bi bi-info-circle me-1"></i>
+                                Aucune connexion
+
+                            {% endif %}
+                        </div>
+
+                        {% if connections.pageCount > 1 %}
+                            <div class="pagination-container">
+                                {{ knp_pagination_render(connections, null, {
+                                    'tab': 'connexions',
+                                    'conn_status': app.request.query.get('conn_status')
+                                }) }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: ERREURS -->
+        <div class="tab-pane fade {{ activeTab == 'erreurs' ? 'show active' : '' }}" id="erreurs" role="tabpanel" aria-labelledby="erreurs-tab">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-exclamation-triangle text-warning me-2"></i>Logs Système
+                    </h5>
+                    <small class="text-muted">Suivez les erreurs et événements système</small>
+                </div>
+            </div>
+
+            <!-- Filtres Erreurs -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-3">
+                    <form method="GET" action="{{ path('app_super_admin_parametre') }}">
+                        <input type="hidden" name="tab" value="erreurs">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-5">
+                                <div class="position-relative">
+                                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                                    <input type="text" name="err_search" value="{{ app.request.query.get('err_search') }}" class="form-control ps-5" placeholder="Rechercher...">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <select name="err_level" class="form-select">
+                                    <option value="">Tous les niveaux</option>
+                                    <option value="critical" {{ app.request.query.get('err_level') == 'critical' ? 'selected' : '' }}>Critique</option>
+                                    <option value="error" {{ app.request.query.get('err_level') == 'error' ? 'selected' : '' }}>Erreur</option>
+                                    <option value="warning" {{ app.request.query.get('err_level') == 'warning' ? 'selected' : '' }}>Avertissement</option>
+                                    <option value="info" {{ app.request.query.get('err_level') == 'info' ? 'selected' : '' }}>Info</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-funnel me-1"></i>Filtrer
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tableau des erreurs -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-3 py-3">Date</th>
+                                    <th class="py-3">Niveau</th>
+                                    <th class="py-3">Message</th>
+                                    <th class="py-3 pe-3">Fichier</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for err in errors %}
+                                    <tr class="{{ err.level == 'critical' ? 'table-danger' : '' }}">
+                                        <td class="ps-3">
+                                            <span class="fw-semibold">{{ err.loggedAt|date('d/m/Y') }}</span>
+                                            <span class="text-muted small d-block">{{ err.loggedAt|date('H:i:s') }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{{ err.level == 'critical' ? 'danger' : (err.level == 'warning' ? 'warning' : 'secondary') }}">
+                                                <i class="bi bi-exclamation-circle me-1"></i>{{ err.level|capitalize }}
+                                            </span>
+                                        </td>
+                                        <td>{{ err.message }}</td>
+                                        <td class="pe-3">
+                                            <code class="small">{{ err.sourceFile ?? 'N/A' }}</code>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-muted">Aucun log d'erreur trouvé.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pagination Erreurs -->
+                <div class="card-footer bg-white border-0 px-3 py-3">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+
+                        <div class="pagination-info text-muted small">
+                            {% if errors.totalItemCount > 0 %}
+
+                                <i class="bi bi-list-ul me-1"></i>
+
+                                Affichage de
+                                <strong>
+                                    {{ errors.itemNumberPerPage * (errors.currentPageNumber - 1) + 1 }}
+                                </strong>
+                                à
+                                <strong>
+                                    {{ min(
+                                        errors.itemNumberPerPage * errors.currentPageNumber,
+                                        errors.totalItemCount
+                                    ) }}
+                                </strong>
+                                sur
+                                <strong>{{ errors.totalItemCount }}</strong>
+                                logs
+
+                            {% else %}
+
+                                <i class="bi bi-info-circle me-1"></i>
+                                Aucun log
+
+                            {% endif %}
+                        </div>
+
+                        {% if errors.pageCount > 1 %}
+                            <div class="pagination-container">
+                                {{ knp_pagination_render(errors, null, {
+                                    'tab': 'erreurs',
+                                    'err_search': app.request.query.get('err_search'),
+                                    'err_level': app.request.query.get('err_level')
+                                }) }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    document.querySelectorAll('#adminTabs button[data-bs-toggle="tab"]').forEach(function (tabEl) {
+
+        tabEl.addEventListener('shown.bs.tab', function (event) {
+
+            const targetId = event.target.getAttribute('data-bs-target');
+
+            const tabName = targetId === '#erreurs'
+                ? 'erreurs'
+                : 'connexions';
+
+            const url = new URL(window.location.href);
+
+            url.searchParams.set('tab', tabName);
+
+            // Reset pagination when changing tabs
+            url.searchParams.delete('conn_page');
+            url.searchParams.delete('err_page');
+
+            window.history.replaceState({}, '', url);
+        });
+
+    });
+
+});
+</script>
+
+<style>
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .pagination-container ul.pagination {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+        padding: 0;
+    }
+
+    .pagination-container .page-item {
+        margin: 0;
+    }
+
+    .pagination-container .page-item .page-link {
+        min-width: 38px;
+        height: 38px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+
+        background: #ffffff;
+        color: #495057;
+
+        padding: 0 12px;
+
+        font-size: 13px;
+        font-weight: 600;
+
+        transition:
+            background-color 0.2s ease,
+            color 0.2s ease,
+            border-color 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    /* Hover */
+    .pagination-container .page-item:not(.disabled):not(.active) .page-link:hover {
+        background: #f0f6ff;
+        border-color: #0d6efd;
+        color: #0d6efd;
+
+        transform: translateY(-2px);
+
+        box-shadow: 0 4px 10px rgba(13, 110, 253, 0.12);
+    }
+
+    /* Active page */
+    .pagination-container .page-item.active .page-link {
+        background: #0d6efd;
+        border-color: #0d6efd;
+        color: #ffffff;
+
+        box-shadow: 0 4px 10px rgba(13, 110, 253, 0.25);
+    }
+
+    /* Disabled */
+    .pagination-container .page-item.disabled .page-link {
+        background: #f8f9fa;
+        border-color: #f1f3f5;
+        color: #adb5bd;
+
+        cursor: not-allowed;
+    }
+
+    /* Previous / Next */
+    .pagination-container .page-item:first-child .page-link,
+    .pagination-container .page-item:last-child .page-link {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    /* Ellipsis */
+    .pagination-container .page-item.disabled .page-link {
+        box-shadow: none;
+    }
+
+    /* Mobile */
+    @media (max-width: 576px) {
+
+        .pagination-container {
+            width: 100%;
+            overflow-x: auto;
+            justify-content: flex-start;
+            padding-bottom: 4px;
+        }
+
+        .pagination-container ul.pagination {
+            flex-wrap: nowrap;
+        }
+
+        .pagination-container .page-item .page-link {
+            min-width: 36px;
+            height: 36px;
+            font-size: 12px;
+        }
+    }
+</style>
+{% endblock %}

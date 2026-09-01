@@ -16,8 +16,9 @@ class PaieFixtures extends Fixture implements DependentFixtureInterface
         $faker = Factory::create('fr_FR');
         $statuts = ['payé', 'en attente', 'validé'];
 
-        // On suppose que vos UserFixtures ont généré 9 utilisateurs (index 1 à 9)
-        for ($userIndex = 1; $userIndex <= 9; $userIndex++) {
+        // UserFixtures génère désormais 5 utilisateurs par entreprise (admin, RH, manager,
+        // 2 employés) x 3 entreprises = 15 utilisateurs (index 1 à 15).
+        for ($userIndex = 1; $userIndex <= 15; $userIndex++) {
             /** @var User $employee */
             $employee = $this->getReference('user_' . $userIndex, User::class);
 

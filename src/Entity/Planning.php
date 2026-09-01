@@ -26,7 +26,6 @@ class Planning
     #[ORM\Column(name: 'week_start', type: Types::DATE_IMMUTABLE)] private ?\DateTimeInterface $weekStart = null;
     #[ORM\Column(type: Types::TIME_IMMUTABLE, nullable: true)] private ?\DateTimeInterface $heureDebut = null;
     #[ORM\Column(type: Types::TIME_IMMUTABLE, nullable: true)] private ?\DateTimeInterface $heureFin = null;
-    #[ORM\Column(nullable: true)] private ?int $pauseMinutes = null;
     #[ORM\Column(length: 20)] private ?string $typeJour = self::TYPE_TRAVAIL;
     #[ORM\Column(type: Types::TEXT, nullable: true)] private ?string $comment = null;
     #[ORM\Column(length: 20)] private ?string $status = self::STATUT_BROUILLON;
@@ -36,7 +35,6 @@ class Planning
 
     public function __construct() { $this->createdAt = new \DateTimeImmutable(); }
 
-    // HELPERS
     public function isTravail(): bool { return $this->typeJour === self::TYPE_TRAVAIL; }
     public function isDayOff(): bool { return $this->typeJour === self::TYPE_REPOS; }
     public function isConge(): bool { return $this->typeJour === self::TYPE_CONGE; }
@@ -51,8 +49,13 @@ class Planning
     public function getDureeMinutes(): int
     {
         if(!$this->isTravail() || !$this->heureDebut || !$this->heureFin) return 0;
-        $diff = ($this->heureFin->getTimestamp() - $this->heureDebut->getTimestamp()) / 60;
-        return max(0, $diff - ($this->pauseMinutes ?? 0));
+        $diffSeconds = $this->heureFin->getTimestamp() - $this->heureDebut->getTimestamp();
+        // Vacation de nuit (ex: 22h00 -> 06h00) : l'heure de fin "avant" l'heure de
+        // début sur l'horloge signifie en réalité qu'elle tombe le lendemain.
+        if ($diffSeconds < 0) {
+            $diffSeconds += 86400;
+        }
+        return max(0, (int) ($diffSeconds / 60));
     }
 
     #[Assert\Callback]
@@ -64,7 +67,6 @@ class Planning
         }
     }
 
-    // GETTERS SETTERS
     public function getId(): ?int { return $this->id; }
     public function getUser(): ?User { return $this->user; }
     public function setUser(?User $user): static { $this->user = $user; return $this; }
@@ -78,8 +80,7 @@ class Planning
     public function setHeureDebut(?\DateTimeInterface $heureDebut): static { $this->heureDebut = $heureDebut ? \DateTimeImmutable::createFromInterface($heureDebut) : null; return $this; }
     public function getHeureFin(): ?\DateTimeInterface { return $this->heureFin; }
     public function setHeureFin(?\DateTimeInterface $heureFin): static { $this->heureFin = $heureFin ? \DateTimeImmutable::createFromInterface($heureFin) : null; return $this; }
-    public function getPauseMinutes(): ?int { return $this->pauseMinutes; }
-    public function setPauseMinutes(?int $pauseMinutes): static { $this->pauseMinutes = $pauseMinutes; return $this; }
+
     public function getTypeJour(): ?string { return $this->typeJour; }
     public function setTypeJour(string $typeJour): static { $this->typeJour = $typeJour; return $this; }
     public function getComment(): ?string { return $this->comment; }

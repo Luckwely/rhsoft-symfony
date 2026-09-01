@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\DTO\PayslipDashboardKpiDto;
 use App\Service\Contract\PayslipMetricsCalculatorInterface;
-use IntlDateFormatter;
 
 class PayslipMetricsCalculator implements PayslipMetricsCalculatorInterface
 {
@@ -20,14 +19,19 @@ class PayslipMetricsCalculator implements PayslipMetricsCalculatorInterface
 
         if (count($payslipsArray) > 0) {
             $latestPayslip = $payslipsArray[0];
-            $lastNetSalary = $latestPayslip->getNetAmount();
+            $lastNetSalary = (float) ($latestPayslip->getSalaireNet() ?? 0);
 
-            $formatter = new IntlDateFormatter('fr_FR', IntlDateFormatter::NONE, IntlDateFormatter::NONE, null, null, 'MMMM yyyy');
-            $lastMonth = ucfirst($formatter->format($latestPayslip->getStartDate()));
+            $months = [
+                1 => 'Janvier', 2 => 'Février', 3 => 'Mars', 4 => 'Avril',
+                5 => 'Mai', 6 => 'Juin', 7 => 'Juillet', 8 => 'Août',
+                9 => 'Septembre', 10 => 'Octobre', 11 => 'Novembre', 12 => 'Décembre',
+            ];
+            $lastMonth = ($months[$latestPayslip->getMois()] ?? (string) $latestPayslip->getMois())
+                .' '.$latestPayslip->getAnnee();
 
             foreach ($payslipsArray as $payslip) {
-                $totalGross += $payslip->getGrossAmount();
-                $totalDeductions += $payslip->getDeductions();
+                $totalGross += (float) ($payslip->getSalaireBrut() ?? 0);
+                $totalDeductions += (float) ($payslip->getCotisations() ?? 0);
                 $count++;
             }
         }

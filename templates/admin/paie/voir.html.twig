@@ -1,0 +1,138 @@
+{% extends 'layouts/base_admin.html.twig' %}
+
+{% block title %}Fiche de paie - {{ employee.prenom }} {{ employee.nom }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4 py-3">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">Fiche de paie</h3>
+            <p class="text-muted mb-0">{{ payslip.mois }}/{{ payslip.annee }} — {{ employee.prenom }} {{ employee.nom }}</p>
+        </div>
+        <div class="d-flex gap-2 mt-3 mt-lg-0">
+            <a href="{{ path('app_admin_paie_generer', {mois: payslip.mois, annee: payslip.annee}) }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Retour
+            </a>
+            <a href="{{ path('app_admin_paie_telecharger', {id: payslip.id}) }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-download me-1"></i>Télécharger PDF
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0">
+                    <div class="fw-bold text-primary fs-5">{{ entreprise.nom }}</div>
+                    {% if entreprise.adresse %}<small class="text-muted d-block">{{ entreprise.adresse }}</small>{% endif %}
+                    {% if entreprise.tel %}<small class="text-muted">{{ entreprise.tel }}</small>{% endif %}
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless mb-4">
+                        <tr>
+                            <td class="text-muted" style="width: 180px;">Employé</td>
+                            <td class="fw-semibold">{{ employee.prenom }} {{ employee.nom }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Poste</td>
+                            <td>{{ employee.poste|default('-') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Service</td>
+                            <td>{{ employee.service|default('-') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Email</td>
+                            <td>{{ employee.email }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Statut</td>
+                            <td>
+                                {% if payslip.isPaid %}
+                                    <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                                        <i class="bi bi-check-circle-fill me-1"></i>Payée le {{ payslip.paidAt|date('d/m/Y à H:i') }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
+                                        <i class="bi bi-clock-history me-1"></i>Calculée, en attente de paiement
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if payslip.payslipSentAt %}
+                        <tr>
+                            <td class="text-muted">Fiche envoyée</td>
+                            <td><i class="bi bi-envelope-check text-success me-1"></i>{{ payslip.payslipSentAt|date('d/m/Y à H:i') }} à {{ employee.email }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if payslip.isPaid and payslip.validePar %}
+                        <tr>
+                            <td class="text-muted">Validée par</td>
+                            <td>
+                                <i class="bi bi-person-check text-primary me-1"></i>{{ payslip.validePar.prenom }} {{ payslip.validePar.nom }}
+                                {% if payslip.paidAt %}<small class="text-muted">le {{ payslip.paidAt|date('d/m/Y à H:i') }}</small>{% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </table>
+
+                    <table class="table table-bordered align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Élément</th>
+                                <th class="text-end">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Salaire brut</td>
+                                <td class="text-end">{{ payslip.salaireBrut|number_format(0, ',', ' ') }} Ar</td>
+                            </tr>
+                            {% if payslip.montantHeuresSupplementaires > 0 %}
+                            <tr>
+                                <td class="text-muted">&nbsp;&nbsp;dont heures supplémentaires</td>
+                                <td class="text-end text-muted">{{ payslip.montantHeuresSupplementaires|number_format(0, ',', ' ') }} Ar</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <td>Cotisations (CNaPS, OSTIE, IRSA)</td>
+                                <td class="text-end text-danger">- {{ payslip.cotisations|number_format(0, ',', ' ') }} Ar</td>
+                            </tr>
+                            {% if payslip.montantAvanceDeduite > 0 %}
+                            <tr>
+                                <td>Avance sur salaire déduite</td>
+                                <td class="text-end text-danger">- {{ payslip.montantAvanceDeduite|number_format(0, ',', ' ') }} Ar</td>
+                            </tr>
+                            {% endif %}
+                            <tr class="table-light fw-bold">
+                                <td>Salaire net {{ payslip.isPaid ? 'payé' : 'à payer' }}</td>
+                                <td class="text-end text-success">{{ payslip.salaireNet|number_format(0, ',', ' ') }} Ar</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3"><i class="bi bi-shield-check text-primary me-2"></i>Actions</h6>
+                    {% if not payslip.isPaid %}
+                        <form method="post" action="{{ path('app_admin_paie_valider', {id: payslip.id}) }}" onsubmit="return confirm('Valider et payer cette fiche ? Elle sera envoyée automatiquement par email à {{ employee.email }}.');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('valider-' ~ payslip.id) }}">
+                            <button type="submit" class="btn btn-success w-100 mb-2">
+                                <i class="bi bi-send-check me-1"></i>Valider, payer &amp; envoyer
+                            </button>
+                        </form>
+                    {% else %}
+                        <div class="alert alert-success border-0 rounded-3 small mb-0">
+                            <i class="bi bi-check-circle-fill me-1"></i>Cette fiche a déjà été payée{% if payslip.payslipSentAt %} et envoyée à l'employé{% endif %}.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -16,6 +16,39 @@ class OffreRepository extends ServiceEntityRepository
         parent::__construct($registry, Offre::class);
     }
 
+    /**
+     * @return Offre[] Open job offers belonging to the entreprise identified by this slug.
+     */
+    public function findByEntrepriseSlug(string $slug): array
+    {
+        return $this->createQueryBuilder('o')
+            ->join('o.entreprise', 'e')
+            ->andWhere('e.slug = :slug')->setParameter('slug', $slug)
+            ->andWhere('o.status = :status')->setParameter('status', 'ouverte')
+            ->orderBy('o.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function createOpenOffersQuery(): \Doctrine\ORM\QueryBuilder
+    {
+        return $this->createQueryBuilder('o')
+            ->andWhere('o.status = :status')
+            ->setParameter('status', 'ouverte')
+            ->orderBy('o.id', 'DESC');
+    }
+
+    public function createOpenOffersByEntrepriseSlugQuery(string $slug): \Doctrine\ORM\QueryBuilder
+    {
+        return $this->createQueryBuilder('o')
+            ->join('o.entreprise', 'e')
+            ->andWhere('e.slug = :slug')
+            ->andWhere('o.status = :status')
+            ->setParameter('slug', $slug)
+            ->setParameter('status', 'ouverte')
+            ->orderBy('o.id', 'DESC');
+    }
+
     //    /**
     //     * @return Offre[] Returns an array of Offre objects
     //     */

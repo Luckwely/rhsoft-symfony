@@ -8,10 +8,10 @@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
         <div>
             <h3 class="fw-bold mb-1">
-                <i class="bi bi-umbrella text-primary me-2"></i>Mes Congés
+                Mes Congés
             </h3>
             <p class="text-muted mb-0">
-                <i class="bi bi-calendar-check me-1"></i>Gérez vos demandes de congés
+                Gérez vos demandes de congés
             </p>
         </div>
     </div>
@@ -75,7 +75,15 @@
                             <small class="text-muted">Remplissez le formulaire ci-dessous</small>
                         </div>
                         <div class="card-body">
+                            {% if not canRequestLeave %}
+                                <div class="alert alert-warning border-0 rounded-3" role="alert">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                    Vous ne pouvez pas encore demander de congé : il faut au moins <strong>3 mois d'ancienneté</strong>
+                                    (ancienneté actuelle : <strong>{{ moisAnciennete }} mois</strong>).
+                                </div>
+                            {% endif %}
                             {{ form_start(form) }}
+                                <fieldset {% if not canRequestLeave %}disabled{% endif %}>
                                 <div class="mb-3">
                                     {{ form_label(form.typeConge, 'Type de congé *', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                                     {{ form_widget(form.typeConge, {'attr': {'class': 'form-select'}}) }}
@@ -99,15 +107,19 @@
                                         <span class="fw-bold text-primary fs-4" id="calculated-days">-</span>
                                         <small class="text-muted d-block" id="calculated-dates">Veuillez sélectionner les dates</small>
                                     </div>
+                                    <small class="text-danger d-block mt-1 d-none" id="balance-warning">
+                                        <i class="bi bi-exclamation-circle me-1"></i>Cette demande dépasse votre solde disponible ({{ soldeConges|default(0) }} jours).
+                                    </small>
                                 </div>
                                 <div class="mb-3">
                                     {{ form_label(form.motif, 'Motif *', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                                     {{ form_widget(form.motif, {'attr': {'class': 'form-control', 'rows': '4', 'placeholder': 'Précisez le motif de votre demande...'}}) }}
                                     {{ form_errors(form.motif) }}
                                 </div>
-                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <button type="submit" class="btn btn-primary btn-lg w-100" id="submit-conge-btn" {% if not canRequestLeave %}disabled{% endif %}>
                                     <i class="bi bi-send me-2"></i>Envoyer la demande
                                 </button>
+                                </fieldset>
                             {{ form_end(form) }}
                         </div>
                     </div>
@@ -133,7 +145,7 @@
                             <hr>
                             <div class="alert alert-info border-0 rounded-3 small mb-0">
                                 <i class="bi bi-info-circle me-1"></i>
-                                Vous avez utilisé <strong>{{ joursUtilises|default(7) }} jours</strong> sur {{ totalAnnee|default(25) }} cette année
+                                Vous avez utilisé <strong>{{ joursUtilises|default(7) }} jours</strong> sur {{ totalAnnee|default(25) }} acquis depuis votre embauche
                             </div>
                         </div>
                     </div>
@@ -149,9 +161,6 @@
                     <h5 class="fw-bold mb-0">
                         <i class="bi bi-list-check text-primary me-2"></i>Historique des congés pris
                     </h5>
-                    <a href="#" class="btn btn-outline-dark btn-sm">
-                        <i class="bi bi-download me-1"></i>Exporter
-                    </a>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -246,14 +255,22 @@
         const endDateInput = document.querySelector('input[id$="_dateFin"]');
         const daysDisplay = document.getElementById('calculated-days');
         const datesDisplay = document.getElementById('calculated-dates');
+        const balanceWarning = document.getElementById('balance-warning');
+        const submitBtn = document.getElementById('submit-conge-btn');
+        const soldeDisponible = {{ soldeConges|default(0) }};
+        const canRequestLeave = {{ canRequestLeave ? 'true' : 'false' }};
 
         function calculateDays() {
             if (startDateInput && endDateInput && startDateInput.value && endDateInput.value) {
                 const start = new Date(startDateInput.value);
                 const end = new Date(endDateInput.value);
 
-                if (end >= start) {
-                    const diffTime = Math.abs(end - start);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const isPast = start < today;
+
+                if (end >= start && !isPast) {
+                    const diffTime = end - start;
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
                     daysDisplay.textContent = diffDays + (diffDays > 1 ? ' jours' : ' jour');
@@ -267,13 +284,31 @@
                     } else {
                         datesDisplay.textContent = `(du ${formattedStart} au ${formattedEnd})`;
                     }
+
+                    // Empêche l'envoi si la demande dépasse le solde disponible
+                    const exceedsBalance = diffDays > soldeDisponible;
+                    if (balanceWarning) {
+                        balanceWarning.classList.toggle('d-none', !exceedsBalance);
+                    }
+                    if (submitBtn && canRequestLeave) {
+                        submitBtn.disabled = exceedsBalance;
+                    }
                 } else {
                     daysDisplay.textContent = '0 jour';
                     datesDisplay.textContent = 'La date de fin doit être après la date de début';
+                    if (balanceWarning) {
+                        balanceWarning.classList.add('d-none');
+                    }
+                    if (submitBtn && canRequestLeave) {
+                        submitBtn.disabled = true;
+                    }
                 }
             } else {
                 daysDisplay.textContent = '-';
                 datesDisplay.textContent = 'Veuillez sélectionner les dates';
+                if (submitBtn && canRequestLeave) {
+                    submitBtn.disabled = true;
+                }
             }
         }
 

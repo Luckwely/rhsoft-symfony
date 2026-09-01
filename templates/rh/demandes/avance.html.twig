@@ -8,15 +8,12 @@
     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4">
         <div>
             <h3 class="fw-bold mb-1">
-                <i class="bi bi-clipboard-check text-primary me-2"></i>Gestion des Demandes
+                Gestion des Demandes
             </h3>
             <p class="text-muted mb-0">
-                <i class="bi bi-list-check me-1"></i>Validez les demandes de vos équipes
+                Validez les demandes de vos équipes
             </p>
         </div>
-        <button class="btn btn-outline-dark btn-sm mt-3 mt-lg-0">
-            <i class="bi bi-download me-1"></i>Exporter
-        </button>
     </div>
 
     <!-- NAVIGATION ONGLETS BOOTSTRAP -->
@@ -24,13 +21,13 @@
         <li class="nav-item" role="presentation">
             <a href="{{ path('app_rh_demandes_conge') }}" class="nav-link border-0 rounded-3 px-4">
                 <i class="bi bi-umbrella text-primary me-2"></i>Congés
-                <span class="badge bg-warning ms-1">8 en attente</span>
+                <span class="badge bg-warning ms-1">{{ congeCount|default(0) }} en attente</span>
             </a>
         </li>
         <li class="nav-item" role="presentation">
             <a href="{{ path('app_rh_demandes_avance') }}" class="nav-link active border-0 rounded-3 px-4">
                 <i class="bi bi-coin text-info me-2"></i>Avances sur salaire
-                <span class="badge bg-info ms-1">4</span>
+                <span class="badge bg-info ms-1">{{ demandes.getTotalItemCount }}</span>
             </a>
         </li>
     </ul>
@@ -42,7 +39,7 @@
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body">
                     <span class="text-muted small">Total demandé ce mois</span>
-                    <div class="fs-3 fw-bold text-primary">{{ stats.total|number_format(0, ',', ' ') }} €</div>
+                    <div class="fs-3 fw-bold text-primary">{{ stats.total|number_format(0, ',', ' ') }} Ar</div>
                 </div>
             </div>
         </div>
@@ -58,8 +55,85 @@
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body">
                     <span class="text-muted small">Montant moyen</span>
-                    <div class="fs-3 fw-bold">{{ stats.moyenne|number_format(0, ',', ' ') }} €</div>
+                    <div class="fs-3 fw-bold">{{ stats.moyenne|number_format(0, ',', ' ') }} Ar</div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AVANCES APPROUVÉES EN ATTENTE DE VERSEMENT -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-transparent border-0">
+            <h5 class="fw-bold mb-0">
+                Approuvées, en attente de versement
+            </h5>
+            <small class="text-muted">{{ aVerser.getTotalItemCount }} avance(s) approuvée(s) en attente de versement</small>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle table-borderless mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-3 py-3">Employé</th>
+                            <th class="py-3 text-end">Montant</th>
+                            <th class="py-3">Approuvée le</th>
+                            <th class="py-3 text-center pe-3">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for avance in aVerser %}
+                        <tr>
+                            <td class="ps-3">
+                                <div class="fw-semibold">{{ avance.employee.nom }} {{ avance.employee.prenom }}</div>
+                            </td>
+                            <td class="text-end fw-bold">{{ avance.montant|number_format(0, ',', ' ') }} Ar</td>
+                            <td>{{ avance.dateDemande|date('d/m/Y') }}</td>
+                            <td class="text-center pe-3">
+                                {% if avance.employee != app.user %}
+                                <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#payerAvance{{ avance.id }}">
+                                    <i class="bi bi-send-check me-1"></i>Marquer versée
+                                </button>
+                                {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary">Votre demande</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        <div class="modal fade" id="payerAvance{{ avance.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <form method="post" action="{{ path('app_rh_avance_marquer_paye', {id: avance.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('rh_avance_payer_' ~ avance.id) }}">
+                                    <div class="modal-content">
+                                        <div class="modal-header"><h5>Confirmer le versement de l'avance</h5></div>
+                                        <div class="modal-body">
+                                            <p>Montant à verser à {{ avance.employee.nom }} {{ avance.employee.prenom }} : <strong>{{ avance.montant|number_format(0, ',', ' ') }} Ar</strong></p>
+                                            <div class="mb-3">
+                                                <label class="form-label">Mode de paiement</label>
+                                                <select name="mode_paiement" class="form-select" required>
+                                                    <option value="" disabled selected>Sélectionner...</option>
+                                                    {% for label, value in modesPaiement %}
+                                                        <option value="{{ value }}">{{ label }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Référence (n° virement, transaction...)</label>
+                                                <input type="text" name="reference_paiement" class="form-control" placeholder="Optionnel">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                            <button type="submit" class="btn btn-success">Confirmer le versement</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        {% else %}
+                        <tr><td colspan="4" class="text-center py-4">Aucune avance en attente de versement</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -68,9 +142,9 @@
     <div class="card border-0 shadow-sm rounded-4">
         <div class="card-header bg-transparent border-0">
             <h5 class="fw-bold mb-0">
-                <i class="bi bi-coin text-info me-2"></i>Demandes en attente
+                Demandes en attente
             </h5>
-            <small class="text-muted">4 demandes à traiter</small>
+            <small class="text-muted">{{ demandes.getTotalItemCount }} demande(s) à traiter</small>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -99,7 +173,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="text-end fw-bold">{{ avance.montant|number_format(0, ',', ' ') }} €</td>
+                            <td class="text-end fw-bold">{{ avance.montant|number_format(0, ',', ' ') }} Ar</td>
                             <td>{{ avance.motif }}</td>
                             <td>{{ avance.dateDemande|date('d/m/Y') }}</td>
                             <td class="text-center">
@@ -108,14 +182,38 @@
                                 </span>
                             </td>
                             <td class="text-center pe-3">
+                                {% if avance.employee != app.user %}
                                 <form method="post" action="{{ path('app_rh_avance_approuver', {id: avance.id}) }}" class="d-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('rh_avance_approuver_' ~ avance.id) }}">
                                     <button class="btn btn-sm btn-success"><i class="bi bi-check-lg me-1"></i>Approuver</button>
                                 </form>
                                 <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#refusAvance{{ avance.id }}">
                                     <i class="bi bi-x-lg me-1"></i>Rejeter
                                 </button>
+                                {% else %}
+                                <span class="badge bg-warning-subtle text-warning">Auto-validation interdite</span>
+                                {% endif %}
                             </td>
                         </tr>
+
+                        <!-- Modal Rejet -->
+                        <div class="modal fade" id="refusAvance{{ avance.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <form method="post" action="{{ path('app_rh_avance_rejeter', {id: avance.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('rh_avance_rejeter_' ~ avance.id) }}">
+                            <div class="modal-content">
+                                <div class="modal-header"><h5>Rejeter la demande d'avance</h5></div>
+                                <div class="modal-body">
+                                <textarea name="motif" class="form-control" placeholder="Motif du rejet...">{{ avance.motif }}</textarea>
+                                </div>
+                                <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <button type="submit" class="btn btn-danger">Confirmer le rejet</button>
+                                </div>
+                            </div>
+                            </form>
+                        </div>
+                        </div>
                         {% else %}
                         <tr><td colspan="6" class="text-center py-4">Aucune demande d'avance</td></tr>
                         {% endfor %}
@@ -125,15 +223,9 @@
         </div>
         <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center py-3">
             <small class="text-muted">
-                <i class="bi bi-info-circle me-1"></i>4 demandes en attente de validation
+                <i class="bi bi-info-circle me-1"></i>{{ demandes.getTotalItemCount }} demande(s) en attente de validation
             </small>
-            <nav aria-label="Pagination">
-                <ul class="pagination mb-0">
-                    <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
-                </ul>
-            </nav>
+            {% if demandes.pageCount > 1 %}<nav aria-label="Pagination des demandes">{{ knp_pagination_render(demandes) }}</nav>{% endif %}
         </div>
     </div>
 </div>

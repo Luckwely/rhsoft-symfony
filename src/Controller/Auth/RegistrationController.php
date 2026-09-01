@@ -53,7 +53,7 @@ class RegistrationController extends AbstractController
             if ($plan === 'essai') {
                 $entreprise->setStatus('trial');
                 $entreprise->setPlan('essai');
-                $entreprise->setDateFinAbonnement(new \DateTime('+14 days'));
+                $entreprise->setDateFinAbonnement(new \DateTime('+31 days'));
             } else {
                 $entreprise->setStatus('pending'); // waiting for payment
                 $entreprise->setPlan($plan);
@@ -80,6 +80,7 @@ class RegistrationController extends AbstractController
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
             $user->setEntreprise($entreprise);
             $user->setRoles(['ROLE_ADMIN']);
+            $user->setSalaireBase($entreprise->getSalaireBaseAdmin());
             $user->setIsActive(false);
             $user->setIsVerified(false);
             $user->setEmailVerifiedAt(null);

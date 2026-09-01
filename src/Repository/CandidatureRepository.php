@@ -16,6 +16,16 @@ class CandidatureRepository extends ServiceEntityRepository
         parent::__construct($registry, Candidature::class);
     }
 
+    public function createPendingByOfferQuery(\App\Entity\Offre $offre): \Doctrine\ORM\QueryBuilder
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.offre = :offre')
+            ->andWhere('c.statut = :statut')
+            ->setParameter('offre', $offre)
+            ->setParameter('statut', 'en_attente')
+            ->orderBy('c.createdAt', 'DESC');
+    }
+
     //    /**
     //     * @return Candidature[] Returns an array of Candidature objects
     //     */

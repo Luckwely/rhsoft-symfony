@@ -2,16 +2,37 @@
 
 {% block title %}Rapports RH{% endblock %}
 
+{# Badge d'évolution réutilisable pour le tableau "Détail Bilan Social".
+   value  : variation numérique, ou null si non calculable (ex: pas de donnée l'année précédente).
+   invert : true quand une hausse de l'indicateur est un signal négatif (ex: départs, absentéisme).
+   unit   : unité affichée après la valeur ('%' par défaut, 'pt' pour un écart en points). #}
+{% macro evolution_badge(value, invert = false, unit = '%') %}
+    {% if value is null %}
+        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
+            <i class="bi bi-dash me-1"></i>N/A
+        </span>
+    {% elseif value == 0 %}
+        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
+            <i class="bi bi-dash me-1"></i>Stable
+        </span>
+    {% else %}
+        {% set isPositiveSignal = invert ? value < 0 : value > 0 %}
+        <span class="badge {{ isPositiveSignal ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} rounded-pill px-3 py-2">
+            <i class="bi {{ value > 0 ? 'bi-arrow-up' : 'bi-arrow-down' }} me-1"></i>{{ value > 0 ? '+' : '' }}{{ value }}{{ unit }}
+        </span>
+    {% endif %}
+{% endmacro %}
+
 {% block body %}
 <div class="container-fluid px-4 py-3">
     <!-- HEADER -->
     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4">
         <div>
             <h3 class="fw-bold mb-1">
-                <i class="bi bi-graph-up-arrow text-primary me-2"></i>Rapports RH
+                Rapports RH
             </h3>
             <p class="text-muted mb-0">
-                <i class="bi bi-bar-chart-line me-1"></i>Analysez vos données RH et exportez vos bilans
+                Analysez vos données RH et exportez vos bilans
             </p>
         </div>
         <div class="d-flex gap-2 mt-3 mt-lg-0">
@@ -19,9 +40,9 @@
                 <input type="number" name="year" min="2000" max="2100" class="form-control form-control-sm" style="width: 100px;" value="{{ reportData.year }}">
                 <button type="submit" class="btn btn-outline-dark btn-sm">Année</button>
             </form>
-            <button class="btn btn-outline-dark btn-sm">
+            <a href="{{ path('app_rh_rapport_export_pdf', {year: reportData.year}) }}" class="btn btn-outline-dark btn-sm">
                 <i class="bi bi-download me-1"></i>Exporter PDF
-            </button>
+            </a>
         </div>
     </div>
 
@@ -36,7 +57,7 @@
                     role="tab"
                     aria-controls="tab-turnover"
                     aria-selected="true">
-                <i class="bi bi-arrow-left-right text-primary me-2"></i>Turnover
+                <i class="bi bi-arrow-left-right text-link me-2"></i>Turnover
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -48,7 +69,7 @@
                     role="tab"
                     aria-controls="tab-bilan"
                     aria-selected="false">
-                <i class="bi bi-file-text text-success me-2"></i>Bilan Social
+                <i class="bi bi-file-text text-link me-2"></i>Bilan Social
             </button>
         </li>
     </ul>
@@ -104,7 +125,7 @@
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-header bg-transparent border-0">
                             <h5 class="fw-bold mb-0">
-                                <i class="bi bi-graph-up text-primary me-2"></i>Évolution Turnover 6 mois
+                                Départs sur 6 mois
                             </h5>
                             <small class="text-muted">Tendance des départs</small>
                         </div>
@@ -119,7 +140,7 @@
                     <div class="card border-0 shadow-sm rounded-4 h-100">
                         <div class="card-header bg-transparent border-0">
                             <h5 class="fw-bold mb-0">
-                                <i class="bi bi-pie-chart text-primary me-2"></i>Départs par motif
+                                Départs par motif
                             </h5>
                             <small class="text-muted">Analyse du turnover</small>
                         </div>
@@ -136,40 +157,54 @@
             <!-- CARDS STATS -->
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
-                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-header bg-transparent border-0 fw-semibold">
-                            <i class="bi bi-gender-ambiguous text-primary me-2"></i>Répartition H/F
+                            Répartition H/F
                         </div>
                         <div class="card-body">
-                            <canvas id="genreChart" height="160"></canvas>
-                            <div class="d-flex justify-content-between mt-3">
-                                <span><i class="bi bi-circle-fill text-primary me-1"></i>Hommes 62%</span>
-                                <span><i class="bi bi-circle-fill text-info me-1"></i>Femmes 38%</span>
+                            <div style="position: relative; height: 200px;">
+                                <canvas id="genreChart"></canvas>
+                            </div>
+                            <div class="d-flex justify-content-between mt-3 small">
+                                <span><i class="bi bi-circle-fill text-primary me-1"></i>Hommes {{ reportData.genreDistribution.H }}</span>
+                                <span><i class="bi bi-circle-fill text-info me-1"></i>Femmes {{ reportData.genreDistribution.F }}</span>
+                                {% if reportData.genreDistribution.non_renseigne > 0 %}
+                                    <span><i class="bi bi-circle-fill text-secondary me-1"></i>Non renseigné {{ reportData.genreDistribution.non_renseigne }}</span>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-header bg-transparent border-0 fw-semibold">
-                            <i class="bi bi-calendar3 text-primary me-2"></i>Répartition par Âge
+                            Répartition par Âge
                         </div>
                         <div class="card-body">
-                            <canvas id="ageChart" height="160"></canvas>
+                            <div style="position: relative; height: 200px;">
+                                <canvas id="ageChart"></canvas>
+                            </div>
+                            {% if reportData.ageDistributionWithoutBirthdate > 0 %}
+                                <small class="text-muted mt-2 d-block text-center">
+                                    {{ reportData.ageDistributionWithoutBirthdate }} employé(s) sans date de naissance renseignée, exclu(s) du graphique
+                                </small>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-header bg-transparent border-0 fw-semibold">
-                            <i class="bi bi-clock-history text-primary me-2"></i>Ancienneté Moyenne
+                            Ancienneté Moyenne
                         </div>
                         <div class="card-body text-center">
-                            <div class="fs-1 fw-bold text-primary">3.2 <small class="fs-5 text-muted">ans</small></div>
-                            <div class="progress mt-3" style="height: 8px;">
-                                <div class="progress-bar bg-primary" style="width: 65%"></div>
-                            </div>
-                            <small class="text-muted mt-2 d-block">+0.3 an vs 2024</small>
+                            {% if reportData.ancienneteMoyenne is not null %}
+                                <div class="fs-1 fw-bold text-primary">{{ reportData.ancienneteMoyenne }} <small class="fs-5 text-muted">ans</small></div>
+                                <small class="text-muted mt-2 d-block">Basée sur les employés actifs avec une date d'embauche renseignée</small>
+                            {% else %}
+                                <i class="bi bi-database-slash fs-1 text-muted opacity-50 mb-2 d-block"></i>
+                                <p class="text-muted small mb-0">Aucune date d'embauche renseignée pour le moment</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -179,11 +214,11 @@
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h5 class="fw-bold mb-0">
-                        <i class="bi bi-file-text text-primary me-2"></i>Détail Bilan Social 2025
+                        Détail Bilan Social {{ reportData.year }}
                     </h5>
-                    <button class="btn btn-success btn-sm">
+                    <a href="{{ path('app_rh_rapport_export_bilan_pdf', {year: reportData.year}) }}" class="btn btn-success btn-sm">
                         <i class="bi bi-file-earmark-pdf me-1"></i>Exporter PDF Bilan Social
-                    </button>
+                    </a>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -192,72 +227,46 @@
                                 <tr>
                                     <th class="ps-3 py-3">Indicateur</th>
                                     <th class="py-3 text-end">Valeur</th>
-                                    <th class="py-3 text-center pe-3">Évolution</th>
+                                    <th class="py-3 text-center pe-3">Évolution vs {{ reportData.year - 1 }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td class="ps-3 fw-semibold">Effectif Total</td>
-                                    <td class="text-end">142</td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
-                                            <i class="bi bi-arrow-up me-1"></i>+5.2%
-                                        </span>
-                                    </td>
+                                    <td class="text-end">{{ reportData.totalEmployees }}</td>
+                                    <td class="text-center pe-3">{{ _self.evolution_badge(reportData.effectifEvolution) }}</td>
                                 </tr>
                                 <tr>
                                     <td class="ps-3 fw-semibold">Nombre d'embauches</td>
-                                    <td class="text-end">28</td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
-                                            <i class="bi bi-arrow-up me-1"></i>+12%
-                                        </span>
-                                    </td>
+                                    <td class="text-end">{{ reportData.hires }}</td>
+                                    <td class="text-center pe-3">{{ _self.evolution_badge(reportData.hiresEvolution) }}</td>
                                 </tr>
                                 <tr>
                                     <td class="ps-3 fw-semibold">Nombre de départs</td>
-                                    <td class="text-end">19</td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
-                                            <i class="bi bi-arrow-up me-1"></i>+3%
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3 fw-semibold">Âge moyen</td>
-                                    <td class="text-end">34.5 ans</td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
-                                            <i class="bi bi-dash me-1"></i>Stable
-                                        </span>
-                                    </td>
+                                    <td class="text-end">{{ reportData.departures }}</td>
+                                    <td class="text-center pe-3">{{ _self.evolution_badge(reportData.departuresEvolution, true) }}</td>
                                 </tr>
                                 <tr>
                                     <td class="ps-3 fw-semibold">Masse salariale</td>
-                                    <td class="text-end">1 432 000 €</td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
-                                            <i class="bi bi-arrow-up me-1"></i>+8.1%
-                                        </span>
+                                    <td class="text-end">
+                                        {% if reportData.masseSalariale > 0 %}
+                                            {{ reportData.masseSalariale|number_format(0, ',', ' ') }} Ar
+                                        {% else %}
+                                            <span class="text-muted">Aucune fiche de paie {{ reportData.year }}</span>
+                                        {% endif %}
                                     </td>
+                                    <td class="text-center pe-3">{{ _self.evolution_badge(reportData.masseSalarialeEvolution) }}</td>
                                 </tr>
                                 <tr>
                                     <td class="ps-3 fw-semibold">Taux d'absentéisme</td>
-                                    <td class="text-end">4.8%</td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
-                                            <i class="bi bi-arrow-up me-1"></i>+0.5%
-                                        </span>
+                                    <td class="text-end">
+                                        {% if reportData.tauxAbsenteisme > 0 or reportData.presentToday > 0 %}
+                                            {{ reportData.tauxAbsenteisme }}%
+                                        {% else %}
+                                            <span class="text-muted">Aucun pointage {{ reportData.year }}</span>
+                                        {% endif %}
                                     </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3 fw-semibold">Formation (heures/an)</td>
-                                    <td class="text-end">18.5 h</td>
-                                    <td class="text-center pe-3">
-                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
-                                            <i class="bi bi-arrow-up me-1"></i>+15%
-                                        </span>
-                                    </td>
+                                    <td class="text-center pe-3">{{ _self.evolution_badge(reportData.tauxAbsenteismeEvolution, true, 'pt') }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -313,7 +322,7 @@ document.addEventListener('DOMContentLoaded', function() {
         data: {
             labels: {{ reportData.chartLabels|json_encode|raw }},
             datasets: [{
-                label: 'Taux Turnover %',
+                label: 'Départs',
                 data: {{ reportData.chartValues|json_encode|raw }},
                 borderColor: '#0d6efd',
                 backgroundColor: gradient1,
@@ -342,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     padding: 12,
                     callbacks: {
                         label: function(context) {
-                            return 'Taux: ' + context.parsed.y + '%';
+                            return 'Départs: ' + context.parsed.y;
                         }
                     }
                 }
@@ -350,15 +359,12 @@ document.addEventListener('DOMContentLoaded', function() {
             scales: {
                 y: {
                     beginAtZero: true,
-                    max: 4,
                     grid: {
                         color: 'rgba(0,0,0,0.05)',
                         drawBorder: false
                     },
                     ticks: {
-                        callback: function(value) {
-                            return value + '%';
-                        }
+                        precision: 0
                     }
                 },
                 x: {
@@ -426,15 +432,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 3. PIE CHART GENRE
+    // 3. PIE CHART GENRE (répartition H/F réelle)
     new Chart(document.getElementById('genreChart'), {
         type: 'pie',
         data: {
-            labels: ['Hommes', 'Femmes'],
+            labels: ['Hommes', 'Femmes', 'Non renseigné'],
             datasets: [{
-                data: [62, 38],
-                backgroundColor: ['#0d6efd', '#0dcaf0'],
-                borderColor: ['#ffffff', '#ffffff'],
+                data: [
+                    {{ reportData.genreDistribution.H }},
+                    {{ reportData.genreDistribution.F }},
+                    {{ reportData.genreDistribution.non_renseigne }}
+                ],
+                backgroundColor: ['#0d6efd', '#0dcaf0', '#adb5bd'],
+                borderColor: ['#ffffff', '#ffffff', '#ffffff'],
                 borderWidth: 2,
                 hoverOffset: 8
             }]
@@ -454,7 +464,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     padding: 12,
                     callbacks: {
                         label: function(context) {
-                            return context.label + ': ' + context.parsed + '%';
+                            return context.label + ': ' + context.parsed;
                         }
                     }
                 }
@@ -462,14 +472,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 4. BAR CHART AGE
+    // 4. BAR CHART AGE (répartition par tranche d'âge réelle)
     new Chart(document.getElementById('ageChart'), {
         type: 'bar',
         data: {
-            labels: ['<25', '25-34', '35-44', '45-54', '55+'],
+            labels: {{ reportData.ageDistributionLabels|json_encode|raw }},
             datasets: [{
                 label: 'Nb Employés',
-                data: [18, 52, 41, 22, 9],
+                data: {{ reportData.ageDistributionValues|json_encode|raw }},
                 backgroundColor: [
                     'rgba(13, 110, 253, 0.7)',
                     'rgba(13, 110, 253, 0.8)',
@@ -505,12 +515,12 @@ document.addEventListener('DOMContentLoaded', function() {
             scales: {
                 y: {
                     beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    },
                     grid: {
                         color: 'rgba(0,0,0,0.05)',
                         drawBorder: false
-                    },
-                    ticks: {
-                        stepSize: 10
                     }
                 },
                 x: {
@@ -521,6 +531,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
 });
 </script>
 {% endblock %}

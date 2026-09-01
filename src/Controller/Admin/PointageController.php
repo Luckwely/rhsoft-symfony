@@ -59,6 +59,12 @@ final class PointageController extends AbstractController
         EntityManagerInterface $em
     ): Response
     {
+        if ($pointage->getEntreprise() !== $this->getUser()->getEntreprise()) {
+            throw $this->createAccessDeniedException('Pointage hors de votre entreprise.');
+        }
+        if (!$this->isCsrfTokenValid('admin_pointage_corriger_'.$pointage->getId(), (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Jeton de sécurité invalide.');
+        }
         if($pointage->isValide()) {
             $this->addFlash('danger', 'Journée déjà validée. Impossible de modifier.');
             return $this->redirectToRoute('app_admin_pointage', ['date' => $request->request->get('date')]);
@@ -78,7 +84,7 @@ final class PointageController extends AbstractController
         $pointage->setMotifCorrection($request->request->get('motif'));
         $pointage->setCorrigePar($this->getUser());
         $pointage->setCorrigeLe(new \DateTimeImmutable());
-        $pointage->setStatut($pointage->getMinutesRetard() > 0 ? 'retard' : 'present'); // auto
+        $pointage->setStatut($pointage->getStatutEffectif());
 
         $em->flush();
         $this->addFlash('success', 'Pointage corrigé avec succès');
@@ -86,13 +92,17 @@ final class PointageController extends AbstractController
         return $this->redirectToRoute('app_admin_pointage', ['date' => $date]);
     }
 
-    #[Route('/pointage/valider/{date}', name: 'app_admin_pointage_valider')]
+    #[Route('/pointage/valider/{date}', name: 'app_admin_pointage_valider', methods: ['POST'])]
     public function valider(
         \DateTimeImmutable $date,
+        Request $request,
         PointageRepository $repo,
         EntityManagerInterface $em
     ): Response
     {
+        if (!$this->isCsrfTokenValid('admin_pointage_valider_'.$date->format('Y-m-d'), (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Jeton de sécurité invalide.');
+        }
         $entreprise = $this->getUser()->getEntreprise();
         $repo->validerJournee($date, $entreprise);
 
@@ -101,11 +111,41 @@ final class PointageController extends AbstractController
     }
 
 
-    #[Route('/pointage/export', name: 'app_admin_pointage_export', methods: ['POST'])]
-    public function export(Request $request): Response
+    #[Route('/pointage/export', name: 'app_admin_pointage_export', methods: ['POST', 'GET'])]
+    public function export(Request $request, PointageRepository $pointageRepo): Response
     {
-        $this->addFlash('info', 'Export en cours...');
-        return $this->redirectToRoute('app_admin_pointage');
+        $entreprise = $this->getUser()->getEntreprise();
+        $date = new \DateTimeImmutable($request->query->get('date', $request->request->get('date', 'today')));
+        $status = $request->query->get('status', $request->request->get('status'));
+        $service = $request->query->get('service', $request->request->get('service'));
+        $q = $request->query->get('q', $request->request->get('q'));
+
+        $pointages = $pointageRepo->findByDateWithFilters($date, $status, $service, $q, $entreprise)->getQuery()->getResult();
+
+        $lines = ["Employé;Poste;Service;Statut;Heure prévue début;Heure prévue fin;Heure entrée;Heure sortie;Heures travaillées;Retard (min)"];
+        foreach ($pointages as $pointage) {
+            $employee = $pointage->getEmployee();
+            $lines[] = implode(';', [
+                sprintf('%s %s', $employee->getPrenom(), $employee->getNom()),
+                $employee->getPoste() ?? '-',
+                $employee->getService() ?? '-',
+                $pointage->getStatutEffectifLabel(),
+                $pointage->getHeurePrevueDebut()?->format('H:i') ?? '-',
+                $pointage->getHeurePrevueFin()?->format('H:i') ?? '-',
+                $pointage->getHeureEntree()?->format('H:i') ?? '-',
+                $pointage->getHeureSortie()?->format('H:i') ?? '-',
+                $pointage->getFormattedHeuresTravaillees(),
+                $pointage->getMinutesRetard(),
+            ]);
+        }
+
+        $filename = sprintf('pointage-%s.csv', $date->format('Y-m-d'));
+        $csv = "\xEF\xBB\xBF".implode("\n", $lines); // BOM UTF-8 pour Excel
+
+        return new Response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ]);
     }
 
     #[Route('/pointage/generer', name: 'app_admin_pointage_generer', methods: ['POST'])]
@@ -116,6 +156,9 @@ final class PointageController extends AbstractController
         PointageRepository $pointageRepo
     ): Response
     {
+        if (!$this->isCsrfTokenValid('admin_pointage_generer', (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Jeton de sécurité invalide.');
+        }
         $date = new \DateTimeImmutable($request->request->get('date', 'today'));
         $entreprise = $this->getUser()->getEntreprise();
 
@@ -149,8 +192,7 @@ final class PointageController extends AbstractController
             $pointage->setDate($date);
             $pointage->setHeurePrevueDebut($p->getHeureDebut() ? \DateTimeImmutable::createFromInterface($p->getHeureDebut()) : null);
             $pointage->setHeurePrevueFin($p->getHeureFin() ? \DateTimeImmutable::createFromInterface($p->getHeureFin()) : null);
-            $pointage->setPausePrevueMinutes($p->getPauseMinutes());
-            $pointage->setPauseMinutes($p->getPauseMinutes());
+           
             $pointage->setStatut('present');
 
             $em->persist($pointage);

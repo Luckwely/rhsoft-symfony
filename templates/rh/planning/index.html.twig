@@ -77,7 +77,15 @@
                     {% set dayName = dayNames[dayIndex] %} {# 'lundi', 'mardi'... garanti FR #}
                     {% set p = planningMap[employe.id][dayName]?? null %}
 
-                    <td class="p-1 {{ not canEdit? 'bg-light' }}">
+                    <td class="p-1 {{ not canEdit? 'bg-light' }} {{ p and p.isConge and p.status == 'valide' ? 'bg-info-subtle' }}">
+                        {% if p and p.isConge and p.status == 'valide' %}
+                            <div class="text-center py-2" title="Congé validé — non modifiable ici">
+                                <i class="bi bi-lock-fill text-info"></i><br>
+                                <span class="badge bg-info-subtle text-info" style="font-size:9px">
+                                    <i class="bi bi-airplane-fill me-1"></i>Congé
+                                </span>
+                            </div>
+                        {% else %}
                         <div class="d-flex flex-column gap-1">
                             {% if not canEdit %}
                                 <input type="hidden" name="planning[{{ employe.id }}][{{ dayIndex }}][isDayOff]" value="{{ p and p.isDayOff? '1' : '0' }}">
@@ -96,11 +104,9 @@
                             <input type="time" class="form-control form-control-sm {{ not canEdit? 'bg-light' }}"
                                 name="planning[{{ employe.id }}][{{ dayIndex }}][heureFin]"
                                 value="{{ p and p.heureFin? p.heureFin|date('H:i') : '17:00' }}" {{ not canEdit? 'readonly' }}>
-                            <label class="form-check-label" style="font-size:9px">Pause min</label>
-                            <input type="number" class="form-control form-control-sm {{ not canEdit? 'bg-light' }}"
-                                name="planning[{{ employe.id }}][{{ dayIndex }}][pauseMinutes]"
-                                value="{{ p? p.pauseMinutes : 60 }}" {{ not canEdit? 'readonly' }}>
+                            
                         </div>
+                        {% endif %}
                     </td>
                 {% endfor %}
             </tr>
@@ -108,6 +114,35 @@
         </tbody>
     </table>
     </div>
+    </div>
+
+    <!-- CALENDRIER DES CONGÉS DE LA SEMAINE -->
+    <div class="card border-0 shadow-sm rounded-4 mt-3">
+        <div class="card-header bg-transparent border-0">
+            <h6 class="fw-bold mb-0"><i class="bi bi-calendar-week text-info me-2"></i>Calendrier des congés — semaine du {{ weekStart|date('d/m') }}</h6>
+        </div>
+        <div class="card-body">
+            <div class="row g-2">
+                {% for day in days %}
+                    {% set key = day|date('Y-m-d') %}
+                    {% set employesEnConge = congesSemaine[key]|default([]) %}
+                    <div class="col">
+                        <div class="border rounded-3 p-2 h-100 {{ employesEnConge|length > 0 ? 'bg-info-subtle' : 'bg-light' }}">
+                            <div class="small fw-semibold text-center mb-1">{{ day|date('D')|capitalize }} {{ day|date('d/m') }}</div>
+                            {% if employesEnConge|length > 0 %}
+                                {% for emp in employesEnConge %}
+                                    <div class="small text-info-emphasis text-truncate" title="{{ emp.prenom }} {{ emp.nom }}">
+                                        <i class="bi bi-airplane-fill me-1"></i>{{ emp.prenom }} {{ emp.nom|slice(0,1) }}.
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="small text-muted text-center">—</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 
     <!-- PAGINATION -->

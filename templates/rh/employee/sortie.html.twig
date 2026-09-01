@@ -10,7 +10,7 @@
             Gestion des Employés
         </h3>
         <p class="text-muted mb-0">
-            <i class="bi bi-list-check me-1"></i>Gérez vos collaborateurs, embauches et sorties
+            Gérez vos collaborateurs, embauches et sorties
         </p>
     </div>
 
@@ -23,7 +23,12 @@
         </li>
         <li class="nav-item">
             <a href="{{ path('app_rh_employee_embauche') }}" class="nav-link border-0 rounded-3 px-4">
-                <i class="bi bi-person-plus text-success me-2"></i>Embauches
+                <i class="bi bi-person-plus text-info me-2"></i>Embauches
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ path('app_rh_employee_import') }}" class="nav-link border-0 rounded-3 px-4">
+                <i class="bi bi-upload text-info me-2"></i>Importer (CSV)
             </a>
         </li>
         <li class="nav-item">
@@ -60,9 +65,9 @@
                 </h5>
                 <small class="text-muted">Historique des départs</small>
             </div>
-            <button class="btn btn-outline-danger btn-sm">
-                <i class="bi bi-download me-1"></i>Exporter
-            </button>
+            <a href="{{ path('app_rh_employee_sortie_export', {q: app.request.query.get('q')}) }}" class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-download me-1"></i>Exporter CSV
+            </a>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">

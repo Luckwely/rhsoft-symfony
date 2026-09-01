@@ -34,12 +34,13 @@ class CandidatureFixtures extends Fixture implements DependentFixtureInterface
             $offreAleatoire = $faker->randomElement($offres);
             $candidature->setOffre($offreAleatoire);
 
-            $candidature->setNom($faker->lastName() . ' ' . $faker->firstName());
+            $candidature->setNom($faker->lastName());
+            $candidature->setPrenom($faker->firstName());
             $candidature->setEmail($faker->unique()->safeEmail());
             $candidature->setTelephone($faker->phoneNumber());
             $candidature->setCv('cv_' . $faker->slug() . '.pdf');
             $candidature->setSource($faker->randomElement($sources));
-            $candidature->setLettreMotivation($faker->paragraphs(2, true));
+            $candidature->setLettreMotivation('lettre_' . $faker->slug() . '.pdf');
             $candidature->setStatut($faker->randomElement($statuts));
 
             $manager->persist($candidature);

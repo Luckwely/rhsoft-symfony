@@ -1,7 +1,7 @@
 {% extends 'layouts/base_admin.html.twig' %}
 
 {% block body %}
-<div class="container-fluid px-4 py-3">
+<div class="container-fluid page-shell">
     <!-- HEADER -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
         <div>
@@ -9,10 +9,13 @@
                 Gestion des Employés
             </h4>
             <p class="text-muted small mb-0">
-                <i class="bi bi-database me-1"></i>{{ employees.getTotalItemCount }} employés au total
+                {{ employees.getTotalItemCount }} employés au total
             </p>
         </div>
         <div class="d-flex gap-2 mt-3 mt-md-0">
+            <a href="{{ path('app_admin_employee_import') }}" class="btn btn-outline-primary">
+                <i class="bi bi-upload me-1"></i>Importer CSV
+            </a>
             <a href="{{ path('app_admin_employee_new') }}" class="btn btn-primary">
                 <i class="bi bi-person-plus me-1"></i>Ajouter Employé
             </a>
@@ -212,7 +215,7 @@
                                                         <i class="bi bi-calendar-check text-primary"></i>
                                                         <div>
                                                             <small class="text-muted d-block">Solde Congé</small>
-                                                            <span class="fw-semibold">{{ employee.soldeConge ?? '25' }} jours</span>
+                                                            <span class="fw-semibold">{{ conge_solde(employee) }} jours</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -252,8 +255,6 @@
                                                                 <tr>
                                                                     <th>Jour</th>
                                                                     <th>Shift</th>
-                                                                    <th>Pause</th>
-                                                                    <th>Pausette</th>
                                                                     <th>Statut</th>
                                                                 </tr>
                                                             </thead>
@@ -296,7 +297,7 @@
                                                                             <span class="text-primary">{{ p.heureDebut|date('H:i') }} - {{ p.heureFin|date('H:i') }}</span>
                                                                         {% endif %}
                                                                     </td>
-                                                                    <td>{{ p.pauseMinutes ? p.pauseMinutes ~ ' min' : '-' }}</td>
+
                                                                     <td>
                                                                         {% if p.isDayOff %}
                                                                             <span class="badge bg-secondary-subtle text-secondary rounded-pill">Repos</span>
@@ -434,7 +435,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (button && button.getAttribute('data-id')) {
                 // Single delete - we need to submit the form with the specific ID
                 const employeeId = button.getAttribute('data-id');
-                this.querySelector('.modal-footer .btn-danger').addEventListener('click', function(e) {
+                this.querySelector('.modal-footer .btn-danger').onclick = function(e) {
                     e.preventDefault();
                     const form = document.getElementById('bulk-form');
                     const input = document.createElement('input');
@@ -443,7 +444,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     input.value = employeeId;
                     form.appendChild(input);
                     form.submit();
-                });
+                };
             } else {
                 // Bulk delete - form already handles it
                 this.querySelector('.modal-footer .btn-danger').onclick = function() {

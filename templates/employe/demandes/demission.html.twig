@@ -112,11 +112,11 @@
                                             <td class="ps-3 fw-semibold">{{ item.dateDepart ? item.dateDepart|date('d/m/Y') : '-' }}</td>
                                             <td>{{ item.dateDemande ? item.dateDemande|date('d/m/Y') : '-' }}</td>
                                             <td class="text-center pe-3">
-                                                {% if item.statut == 'valide' %}
+                                                {% if item.statut == 'validee' %}
                                                     <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
                                                         <i class="bi bi-check-circle-fill me-1"></i>Approuvé
                                                     </span>
-                                                {% elseif item.statut == 'refuse' %}
+                                                {% elseif item.statut == 'refusee' %}
                                                     <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
                                                         <i class="bi bi-x-circle-fill me-1"></i>Refusé
                                                     </span>

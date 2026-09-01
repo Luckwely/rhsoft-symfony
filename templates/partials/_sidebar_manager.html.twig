@@ -54,6 +54,21 @@
         <i class="bi bi-clipboard-check me-2"></i>
         Demandes
     </a>
+    <a href="{{ path('app_manager_conge') }}"
+        class="nav-link {% if current_route == 'app_manager_conge' %}active{% endif %}">
+        <i class="bi bi-umbrella me-2"></i>
+        Mes Congés
+    </a>
+    <a href="{{ path('app_manager_demission') }}"
+        class="nav-link {% if current_route == 'app_manager_demission' %}active{% endif %}">
+        <i class="bi bi-file-earmark-text me-2"></i>
+        Ma Démission
+    </a>
+    <a href="{{ path('app_manager_avance') }}"
+        class="nav-link {% if current_route == 'app_manager_avance' %}active{% endif %}">
+        <i class="bi bi-coin me-2"></i>
+        Mon Avance
+    </a>
 </nav>
 
 <!-- Sidebar Footer - User Info -->

@@ -34,20 +34,33 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
             /** @var Entreprise $entreprise */
             $entreprise = $this->getReference('entreprise_' . $i, Entreprise::class);
 
-            // Création de 3 utilisateurs par entreprise (ex: 1 admin et 2 employés)
-            for ($j = 1; $j <= 3; $j++) {
+            // Création de 5 utilisateurs par entreprise : 1 admin, 1 RH, 1 manager, 2 employés.
+            // Auparavant seuls ROLE_ADMIN et ROLE_USER étaient générés : aucun compte RH ou
+            // Manager n'existait dans les fixtures, rendant ces rôles impossibles à tester
+            // avec des données fraîches (ex: connexion RH, auto-approbation congé/avance...).
+            for ($j = 1; $j <= 5; $j++) {
                 $user = new User();
                 $user->setEntreprise($entreprise);
                 $user->setNom($faker->lastName);
                 $user->setPrenom($faker->firstName);
                 $user->setEmail($faker->unique()->companyEmail);
 
-                // Attribution des rôles (le premier est admin, les autres sont employés)
-                if ($j === 1) {
-                    $user->setRoles(['ROLE_ADMIN']);
-                } else {
-                    $user->setRoles(['ROLE_USER']);
-                }
+                // Attribution des rôles : 1 admin, 1 RH, 1 manager, puis des employés.
+                // BUG: le cas par défaut donnait ROLE_USER (rôle Symfony implicite ajouté à
+                // tout le monde par User::getRoles()), pas ROLE_EMPLOYE. Or access_control
+                // (^/employe) et tous les contrôleurs Employe\* exigent explicitement
+                // ROLE_EMPLOYE — jamais attribué par ces fixtures. Un compte "employé" de
+                // test pouvait donc se connecter (authentification OK) mais se voyait
+                // ensuite refuser l'accès à /employe/profile juste après, ce qui ressemble
+                // à un échec de connexion. Le flux d'embauche réel (EmployeeFormType /
+                // EmployeeCsvImportService) attribuait déjà correctement ROLE_EMPLOYE ;
+                // seules ces fixtures de test avaient la valeur par défaut incorrecte.
+                $user->setRoles(match ($j) {
+                    1 => ['ROLE_ADMIN'],
+                    2 => ['ROLE_RH'],
+                    3 => ['ROLE_MANAGER'],
+                    default => ['ROLE_EMPLOYE'],
+                });
 
                 // Hachage du mot de passe (mot de passe par défaut : "password123")
                 $hashedPassword = $this->passwordHasher->hashPassword($user, 'password123');
@@ -65,6 +78,13 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
                 $user->setHeuresContractuelles(8.0);
                 $user->setSoldeConge(25.0);
                 $user->setDateEmbauche($faker->dateTimeBetween('-2 years', 'now'));
+
+                // Salaire de base : nécessaire au calcul du plafond d'avance sur salaire
+                // (pourcentage du salaire de base) — sans lui, le plafond est nul et aucune
+                // demande d'avance n'est possible pour un utilisateur de fixtures. Repris des
+                // salaires de base configurés par rôle sur l'entreprise (Paramètres > Salaires),
+                // pour rester cohérent avec ce qui est appliqué lors d'une vraie embauche.
+                $user->setSalaireBase($entreprise->getSalaireBaseForRoles($user->getRoles()));
 
                 // Informations bancaires (optionnel)
                 $user->setBanqueNom($faker->randomElement($banques));

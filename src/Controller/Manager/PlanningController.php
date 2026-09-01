@@ -4,6 +4,7 @@ namespace App\Controller\Manager;
 
 use App\Entity\Planning;
 use App\Entity\User;
+use App\Service\CongeManagerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -30,7 +31,8 @@ final class PlanningController extends AbstractController
     public function index(
         Request $request,
         EntityManagerInterface $em,
-        PaginatorInterface $paginator
+        PaginatorInterface $paginator,
+        CongeManagerService $congeManager
     ): Response
     {
         $entreprise = $this->getUser()->getEntreprise();
@@ -81,6 +83,9 @@ final class PlanningController extends AbstractController
         $prevWeek = (clone $weekStart)->modify('-7 days');
         $nextWeek = (clone $weekStart)->modify('+7 days');
 
+        // Calendrier d'équipe des congés validés (semaine affichée)
+        $congesSemaine = $congeManager->getCongeCalendarForRange($entreprise, $weekStart, (clone $weekStart)->modify('+6 days'));
+
         return $this->render('manager/planning/index.html.twig', [
             'employees' => $employees,
             'planningMap' => $planningMap,
@@ -90,7 +95,8 @@ final class PlanningController extends AbstractController
             'days' => $this->days,
             'canEdit' => $canEdit,
             'search' => $search?? '',
-            'role' => $role?? ''
+            'role' => $role?? '',
+            'congesSemaine' => $congesSemaine,
         ]);
     }
 
@@ -122,6 +128,11 @@ final class PlanningController extends AbstractController
                     'dayOfWeek' => $day
                 ]);
 
+                // Un jour de congé validé est verrouillé : le planificateur ne peut pas l'écraser.
+                if ($planning && $planning->isConge() && $planning->getStatus() === 'valide') {
+                    continue;
+                }
+
                 if($planning && $planning->getStatus() === 'valide'){
                     $newPlanning = new Planning();
                     $newPlanning->setUser($user);
@@ -150,7 +161,7 @@ final class PlanningController extends AbstractController
                     $planning->setHeureFin(!empty($dayData['heureFin'])? \DateTimeImmutable::createFromFormat('H:i', $dayData['heureFin']) : null);
                 }
 
-                $planning->setPauseMinutes(!empty($dayData['pauseMinutes']) ? (int)$dayData['pauseMinutes'] : null);
+                
                 $planning->setComment($dayData['comment'] ?? null);
 
                 $em->persist($planning);

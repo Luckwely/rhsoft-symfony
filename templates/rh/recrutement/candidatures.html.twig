@@ -33,10 +33,18 @@
                     <tbody>
                     {% for candidature in candidatures %}
                         <tr>
-                            <td class="fw-bold">{{ candidature.nom }}</td>
+                            <td class="fw-bold">{{ candidature.prenom }} {{ candidature.nom }}</td>
                             <td><a href="mailto:{{ candidature.email }}">{{ candidature.email }}</a></td>
                             <td>{{ candidature.telephone }}</td>
-                            <td>{{ candidature.lettreMotivation|length > 50 ? candidature.lettreMotivation|slice(0, 50) ~ '...' : candidature.lettreMotivation }}</td>
+                            <td>
+                                {% if candidature.lettreMotivation %}
+                                    <a href="{{ asset('uploads/lettre_motivation/' ~ candidature.lettreMotivation) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-file-earmark-pdf"></i> Voir la lettre
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">Aucune lettre</span>
+                                {% endif %}
+                            </td>
                             <td>
                                 {% if candidature.cv %}
                                     <a href="{{ asset('uploads/cv/' ~ candidature.cv) }}" target="_blank" class="btn btn-sm btn-outline-primary">
@@ -61,7 +69,7 @@
                                         data-bs-toggle="modal"
                                         data-bs-target="#confirmRefuseModal"
                                         data-url="{{ path('rh_candidature_refuser', {id: candidature.id}) }}"
-                                        data-nom="{{ candidature.nom }}">
+                                        data-nom="{{ candidature.prenom }} {{ candidature.nom }}">
                                     <i class="bi bi-x-circle-fill me-1"></i> Refuser
                                 </button>
                             </td>

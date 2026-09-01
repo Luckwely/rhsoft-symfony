@@ -44,7 +44,7 @@
                 </div>
                 <div class="col-md-2">
                     <a  class="btn btn-outline-secondary w-100" href="{{ path('app_super_admin_entreprise') }}">
-                        <i class="bi bi-arrow-repeat me-1"></i>Réinitialiser
+                        <i class="bi bi-arrow-repeat me-1"></i>
                     </a>
                 </div>
             </div>
@@ -103,11 +103,15 @@
                                                     style="object-fit: cover;">
                                             {% else %}
                                                 <div class="bg-primary bg-opacity-10 text-white w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
-                                                    {{ data.adminNom|slice(0,1)|upper ~ data.adminPrenom|slice(0,1)|upper }}
+                                                    {% if data.adminNom is not empty and data.adminPrenom is not empty %}
+                                                        {{ data.adminNom|slice(0,1)|upper ~ data.adminPrenom|slice(0,1)|upper }}
+                                                    {% else %}
+                                                        N/A
+                                                    {% endif %}
                                                 </div>
                                             {% endif %}
                                         </div>
-                                        <span class="small">{{ data.adminPrenom }} {{ data.adminNom }}</span>
+                                        <span class="small">{{ data.adminPrenom|default('N/A') }} {{ data.adminNom }}</span>
                                     </div>
                                 </td>
                                 <td><span class="badge bg-primary bg-opacity-10 text-primary">{{ entreprise.plan}}</span></td>

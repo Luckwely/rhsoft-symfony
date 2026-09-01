@@ -31,16 +31,6 @@ class PlanningType extends AbstractType
                 'widget' => 'single_text',
                 'required' => false
             ])
-            ->add('pause', TimeType::class, [
-                'widget' => 'single_text',
-                'required' => false,
-                'mapped' => false,
-            ])
-            ->add('pausette', TimeType::class, [
-                'widget' => 'single_text',
-                'required' => false,
-                'mapped' => false,
-            ])
         ;
     }
 

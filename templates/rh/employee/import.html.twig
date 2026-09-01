@@ -1,0 +1,205 @@
+{% extends 'layouts/base_rh.html.twig' %}
+
+{% block title %}Gestion des Employés{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4 py-3">
+
+    <!-- FLASH MESSAGES -->
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show border-0 rounded-4 shadow-sm" role="alert">
+                <i class="bi bi-{{ label == 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill' }} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <!-- HEADER -->
+    <div class="mb-4">
+        <h3 class="fw-bold mb-1">
+            Gestion des Employés
+        </h3>
+        <p class="text-muted mb-0">
+            Gérez vos collaborateurs, embauches et sorties
+        </p>
+    </div>
+
+    <!-- NAVIGATION ONGLETS BOOTSTRAP -->
+    <ul class="nav nav-tabs border-0 gap-2 mb-4">
+        <li class="nav-item">
+            <a href="{{ path('app_rh_employee') }}" class="nav-link border-0 rounded-3 px-4">
+                <i class="bi bi-list-ul me-2"></i>Liste des Employés
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ path('app_rh_employee_embauche') }}" class="nav-link border-0 rounded-3 px-4">
+                <i class="bi bi-person-plus text-info me-2"></i>Embauches
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ path('app_rh_employee_import') }}" class="nav-link active border-0 rounded-3 px-4">
+                <i class="bi bi-upload text-info me-2"></i>Importer (CSV)
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ path('app_rh_employee_sortie') }}" class="nav-link border-0 rounded-3 px-4">
+                <i class="bi bi-person-x text-danger me-2"></i>Sorties
+            </a>
+        </li>
+    </ul>
+
+    <div class="row g-4">
+        <!-- FORMULAIRE D'IMPORT -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-upload text-primary me-2"></i>Importer des employés depuis un fichier CSV
+                    </h5>
+                    <small class="text-muted">Idéal si votre entreprise a déjà une liste d'employés : ajoutez-les tous en une fois au lieu de les saisir un par un.</small>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ path('app_rh_employee_import') }}" enctype="multipart/form-data">
+                        <input type="hidden" name="_token" value="{{ csrf_token('rh_employee_import') }}">
+                        <div class="mb-3">
+                            <label for="csv_file" class="form-label fw-semibold">Fichier CSV</label>
+                            <input type="file" class="form-control" id="csv_file" name="csv_file" accept=".csv,text/csv" required>
+                            <div class="form-text">
+                                Colonnes attendues : <code>Prenom</code>, <code>Nom</code>, <code>Email</code> (obligatoires),
+                                <code>Telephone</code>, <code>Adresse</code>, <code>Poste</code>, <code>Service</code>,
+                                <code>Role</code> (rh / manager / employe), <code>Date embauche</code>, <code>Solde conge</code>, <code>Salaire base</code>,
+                                <code>Genre</code> (H / F), <code>Date naissance</code>.
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info border-0 rounded-3 mb-4">
+                            <i class="bi bi-envelope-check me-1"></i>
+                            Un email d’invitation est envoyé automatiquement à chaque employé importé. Il contient un lien sécurisé pour confirmer son compte et définir son mot de passe.
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-upload me-1"></i>Importer les employés
+                            </button>
+                            <a href="{{ path('app_rh_employee_import_template') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-download me-1"></i>Télécharger le modèle CSV
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- RESULTATS -->
+            {% if results is not null %}
+                <div class="card border-0 shadow-sm rounded-4 mt-4">
+                    <div class="card-header bg-transparent border-0">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-clipboard-check text-primary me-2"></i>Résultat de l'import
+                        </h5>
+                        <small class="text-muted">
+                            {{ results.total }} ligne(s) analysée(s) ·
+                            {{ results.success|length }} importée(s) ·
+                            {{ results.errors|length }} en erreur
+                        </small>
+                    </div>
+                    <div class="card-body">
+                        {% if results.success|length > 0 %}
+                            <h6 class="fw-semibold text-success mb-2">
+                                <i class="bi bi-check-circle me-1"></i>Employés importés ({{ results.success|length }})
+                            </h6>
+                            <div class="table-responsive mb-4">
+                                <table class="table table-sm table-hover align-middle">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th>Ligne</th>
+                                            <th>Nom &amp; Prénom</th>
+                                            <th>Email</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for entry in results.success %}
+                                            <tr>
+                                                <td>{{ entry.line }}</td>
+                                                <td>{{ entry.nom }} {{ entry.prenom }}</td>
+                                                <td>{{ entry.email }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+
+                        {% if results.errors|length > 0 %}
+                            <h6 class="fw-semibold text-danger mb-2">
+                                <i class="bi bi-x-circle me-1"></i>Lignes ignorées / erreurs ({{ results.errors|length }})
+                            </h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover align-middle">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th style="width: 80px;">Ligne</th>
+                                            <th>Détail</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for error in results.errors %}
+                                            <tr>
+                                                <td>{{ error.line > 0 ? error.line : '—' }}</td>
+                                                <td>{{ error.message }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- AIDE / INSTRUCTIONS -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0">
+                    <h6 class="fw-bold mb-0">
+                        <i class="bi bi-info-circle text-primary me-2"></i>Comment ça marche
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ol class="mb-4 ps-3">
+                        <li class="mb-2">Téléchargez le modèle CSV et ouvrez-le dans Excel, Google Sheets ou LibreOffice.</li>
+                        <li class="mb-2">Remplissez une ligne par employé (gardez la ligne d'en-tête telle quelle).</li>
+                        <li class="mb-2">Enregistrez le fichier au format CSV.</li>
+                        <li class="mb-2">Importez-le ici. Chaque ligne valide crée un nouvel employé (compte inactif jusqu'à son acceptation d'invitation).</li>
+                        <li>Les lignes avec un email déjà utilisé, un email invalide, ou des champs obligatoires manquants sont ignorées et listées dans le rapport d'erreurs, sans bloquer le reste de l'import.</li>
+                    </ol>
+                    <div class="alert alert-info border-0 rounded-3 mb-0">
+                        <i class="bi bi-lightbulb me-1"></i>
+                        Le nombre d'employés que vous pouvez importer dépend des limites de votre abonnement. Si la limite est atteinte en cours d'import, les lignes restantes sont ignorées et signalées.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Style pour les onglets modernes -->
+<style>
+    .nav-tabs .nav-link {
+        color: #6c757d;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .nav-tabs .nav-link:hover {
+        background-color: #f8f9fa;
+        color: #0d6efd;
+    }
+    .nav-tabs .nav-link.active {
+        background-color: #0d6efd;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+</style>
+{% endblock %}

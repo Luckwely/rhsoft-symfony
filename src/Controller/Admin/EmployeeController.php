@@ -3,9 +3,18 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Entity\Planning;
+use App\Entity\Pointage;
+use App\Entity\Conge;
+use App\Entity\Demission;
+use App\Entity\Paie;
+use App\Entity\AvanceSalaire;
+use App\Entity\Notification;
+use App\Service\SubscriptionLimitService;
+use App\Service\EmployeeCsvImportService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Form\EmployeeFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
@@ -70,17 +79,27 @@ class EmployeeController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         MailerInterface $mailer,
+        SubscriptionLimitService $subscriptionLimitService,
         string $upload_dir
     ): Response
     {
         $admin = $this->getUser();
         $entreprise = $admin->getEntreprise();
 
+        if (!$subscriptionLimitService->canAddEmployee($entreprise)) {
+            $this->addFlash('danger', $subscriptionLimitService->getEmployeeLimitReachedMessage($entreprise));
+
+            return $this->redirectToRoute('app_admin_employee');
+        }
+
         $user = new User();
 
         // Pre-fill fields if passed from query parameters (accepted candidature)
         if ($request->query->has('nom')) {
             $user->setNom($request->query->get('nom'));
+        }
+        if ($request->query->has('prenom')) {
+            $user->setPrenom($request->query->get('prenom'));
         }
         if ($request->query->has('email')) {
             $user->setEmail($request->query->get('email'));
@@ -97,6 +116,7 @@ class EmployeeController extends AbstractController
             $user->setEntreprise($entreprise);
             $user->setIsActive(false);
             $user->setIsVerified(false);
+            $user->setSalaireBase($entreprise->getSalaireBaseForRoles($user->getRoles()));
 
             // UPLOAD PHOTO
             $photoFile = $form->get('photo')->getData();
@@ -149,6 +169,116 @@ class EmployeeController extends AbstractController
         ]);
     }
 
+    #[Route('/employees/import', name: 'app_admin_employee_import')]
+    public function import(
+        Request $request,
+        EmployeeCsvImportService $csvImportService,
+        MailerInterface $mailer,
+        SubscriptionLimitService $subscriptionLimitService
+    ): Response
+    {
+        $entreprise = $this->getUser()->getEntreprise();
+        $results = null;
+
+        if ($request->isMethod('POST')) {
+            /** @var UploadedFile|null $csvFile */
+            $csvFile = $request->files->get('csv_file');
+            $sendInvitations = (bool) $request->request->get('send_invitations');
+
+            if (!$csvFile) {
+                $this->addFlash('danger', 'Veuillez sélectionner un fichier CSV à importer.');
+
+                return $this->redirectToRoute('app_admin_employee_import');
+            }
+
+            $extension = strtolower($csvFile->getClientOriginalExtension() ?: '');
+            if (!in_array($extension, ['csv', 'txt'], true)) {
+                $this->addFlash('danger', 'Le fichier doit être au format CSV (.csv).');
+
+                return $this->redirectToRoute('app_admin_employee_import');
+            }
+
+            if (!$subscriptionLimitService->canAddEmployee($entreprise)) {
+                $this->addFlash('danger', $subscriptionLimitService->getEmployeeLimitReachedMessage($entreprise));
+
+                return $this->redirectToRoute('app_admin_employee_import');
+            }
+
+            $results = $csvImportService->import($csvFile->getPathname(), $entreprise);
+
+            if ($sendInvitations && !empty($results['success'])) {
+                $results['errors'] = array_merge(
+                    $results['errors'],
+                    $this->sendBulkInvitations($results['success'], $mailer)
+                );
+            }
+
+            // On retire la référence à l'entité avant de passer au template
+            $results['success'] = array_map(static fn(array $entry) => [
+                'line' => $entry['line'],
+                'nom' => $entry['nom'],
+                'prenom' => $entry['prenom'],
+                'email' => $entry['email'],
+            ], $results['success']);
+
+            if (!empty($results['success'])) {
+                $this->addFlash('success', sprintf(
+                    '%d employé(s) importé(s) avec succès%s.',
+                    count($results['success']),
+                    $sendInvitations ? ' et invitation(s) envoyée(s)' : ''
+                ));
+            }
+            if (!empty($results['errors'])) {
+                $this->addFlash('danger', sprintf(
+                    '%d ligne(s) n\'ont pas pu être importées. Voir le détail ci-dessous.',
+                    count($results['errors'])
+                ));
+            }
+        }
+
+        return $this->render('admin/employee/import.html.twig', [
+            'results' => $results,
+        ]);
+    }
+
+    #[Route('/employees/import/modele', name: 'app_admin_employee_import_template')]
+    public function importTemplate(EmployeeCsvImportService $csvImportService): Response
+    {
+        return new Response($csvImportService->buildTemplateCsv(), 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="modele-import-employes.csv"',
+        ]);
+    }
+
+    /**
+     * Sends the invitation email to each freshly-imported user.
+     * Returns an array of error entries (same shape as the import errors)
+     * for any invitation that failed to send.
+     */
+    private function sendBulkInvitations(array $importedEntries, MailerInterface $mailer): array
+    {
+        $errors = [];
+
+        foreach ($importedEntries as $entry) {
+            /** @var User $user */
+            $user = $entry['user'];
+            $url = $this->generateUrl('app_invite_accept', ['token' => $user->getInvitationToken()], UrlGeneratorInterface::ABSOLUTE_URL);
+            $email = (new Email())
+                ->from('no-reply@rhsoft.mg')
+                ->to($user->getEmail())
+                ->subject('Invitation RhSoft - Rejoignez votre entreprise')
+                ->html($this->renderView('emails/invitation.html.twig', ['user' => $user, 'url' => $url]));
+
+            try {
+                $mailer->send($email);
+            } catch (\Exception $e) {
+                $errors[] = ['line' => 0, 'message' => "Employé {$user->getEmail()} importé, mais l'email d'invitation n'a pas pu être envoyé (" . $e->getMessage() . ')'];
+            }
+        }
+
+        return $errors;
+    }
+
     #[Route('/employees/{id}/edit', name: 'app_admin_employee_edit')]
     public function edit(
         Request $request,
@@ -160,6 +290,8 @@ class EmployeeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $employee->setSalaireBase($employee->getEntreprise()->getSalaireBaseForRoles($employee->getRoles()));
+
 
             // Gestion Upload Photo
             $photoFile = $form->get('photo')->getData();
@@ -200,11 +332,17 @@ class EmployeeController extends AbstractController
         if ($user->getEntreprise() !== $this->getUser()->getEntreprise()) {
             throw $this->createAccessDeniedException('Cet employé n\'appartient pas à votre entreprise.');
         }
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
-            $em->remove($user);
-            $em->flush();
-            $this->addFlash('success', 'Employé supprimé.');
+        if (!$this->isCsrfTokenValid('delete'.$user->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Jeton CSRF invalide. Suppression annulée.');
+            return $this->redirectToRoute('app_admin_employee');
         }
+        if ($user === $this->getUser()) {
+            $this->addFlash('danger', 'Vous ne pouvez pas supprimer votre propre compte.');
+            return $this->redirectToRoute('app_admin_employee');
+        }
+        $this->removeEmployeeAndDependencies($user, $em);
+        $em->flush();
+        $this->addFlash('success', 'Employé supprimé.');
         return $this->redirectToRoute('app_admin_employee');
     }
 
@@ -250,18 +388,39 @@ class EmployeeController extends AbstractController
     ): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        if ($this->isCsrfTokenValid('bulk-delete', $request->request->get('_token'))) {
-            $ids = $request->request->all('ids');
-            $users = $em->getRepository(User::class)->findBy(['id' => $ids]);
-            foreach ($users as $user) {
-                if ($user->getEntreprise() === $this->getUser()->getEntreprise()) {
-                    $em->remove($user);
-                }
-            }
-            $em->flush();
-            $this->addFlash('success', count($ids).' employé(s) supprimé(s)');
+        if (!$this->isCsrfTokenValid('bulk-delete', (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Jeton CSRF invalide. Suppression annulée.');
+            return $this->redirectToRoute('app_admin_employee');
         }
+        $ids = array_values(array_filter(array_map('intval', (array) $request->request->all('ids'))));
+        $users = $em->getRepository(User::class)->findBy(['id' => $ids]);
+        $deleted = 0;
+        foreach ($users as $user) {
+            if ($user !== $this->getUser() && $user->getEntreprise() === $this->getUser()->getEntreprise()) {
+                $this->removeEmployeeAndDependencies($user, $em);
+                $deleted++;
+            }
+        }
+        $em->flush();
+        $this->addFlash('success', $deleted.' employé(s) supprimé(s)');
         return $this->redirectToRoute('app_admin_employee');
+    }
+
+    private function removeEmployeeAndDependencies(User $user, EntityManagerInterface $em): void
+    {
+        foreach ($em->getRepository(Pointage::class)->findBy(['employee' => $user]) as $item) { $em->remove($item); }
+        foreach ($em->getRepository(Planning::class)->findBy(['user' => $user]) as $item) { $em->remove($item); }
+        foreach ($em->getRepository(Conge::class)->findBy(['employee' => $user]) as $item) { $em->remove($item); }
+        foreach ($em->getRepository(Demission::class)->findBy(['employee' => $user]) as $item) { $em->remove($item); }
+        foreach ($em->getRepository(Paie::class)->findBy(['employee' => $user]) as $item) { $em->remove($item); }
+        foreach ($em->getRepository(AvanceSalaire::class)->findBy(['employee' => $user]) as $item) { $em->remove($item); }
+        foreach ($em->getRepository(Notification::class)->findBy(['destinataire' => $user]) as $item) { $em->remove($item); }
+        foreach ($em->getRepository(Paie::class)->findBy(['validePar' => $user]) as $item) { $item->setValidePar(null); }
+        foreach ($em->getRepository(AvanceSalaire::class)->findBy(['validePar' => $user]) as $item) { $item->setValidePar(null); }
+        foreach ($em->getRepository(AvanceSalaire::class)->findBy(['payePar' => $user]) as $item) { $item->setPayePar(null); }
+        foreach ($em->getRepository(Demission::class)->findBy(['validePar' => $user]) as $item) { $item->setValidePar(null); }
+        foreach ($em->getRepository(Pointage::class)->findBy(['corrigePar' => $user]) as $item) { $item->setCorrigePar(null); }
+        $em->remove($user);
     }
 
     #[Route('/employees/{id}/update-role', name: 'admin_employee_update_role', methods: ['POST'])]

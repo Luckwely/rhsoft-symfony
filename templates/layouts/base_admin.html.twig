@@ -31,6 +31,8 @@
                 z-index: 1030;
                 background-color: #1e1f22;
                 transition: transform 0.3s ease-in-out;
+                overflow-y: auto;
+                overflow-x: hidden;
             }
 
             .sidebar .nav-link {
@@ -55,6 +57,24 @@
             .sidebar .nav-link i {
                 width: 20px;
                 font-size: 18px;
+            }
+
+            /* Shared responsive page spacing */
+            .page-shell {
+                width: 100%;
+                padding: 1rem 1rem 2rem;
+            }
+
+            @media (min-width: 768px) {
+                .page-shell {
+                    padding: 1.5rem 1.5rem 2.5rem;
+                }
+            }
+
+            @media (min-width: 1200px) {
+                .page-shell {
+                    padding: 2rem 2rem 3rem;
+                }
             }
 
             /* Main Content */
@@ -362,6 +382,52 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endfor %}
+
+                {# --- Bandeau Abonnement : visible sur tout l'espace Admin --- #}
+                {% if app.user and app.user.entreprise %}
+                    {% set entreprise = app.user.entreprise %}
+                    {% set finAbo = entreprise.dateFinAbonnement %}
+                    {% set joursRestants = finAbo ? date().diff(finAbo).days * (finAbo > date() ? 1 : -1) : null %}
+
+                    {% if entreprise.status == 'expired' or entreprise.status == 'canceled' or entreprise.status == 'pending' %}
+                        <div class="alert alert-danger d-flex flex-column flex-sm-row justify-content-between align-items-sm-center rounded-4 shadow-sm mb-4" role="alert">
+                            <div class="mb-2 mb-sm-0">
+                                <i class="bi bi-exclamation-octagon-fill me-2"></i>
+                                {% if entreprise.status == 'pending' %}
+                                    <strong>Paiement en attente.</strong> Votre dernier renouvellement n'a pas pu être confirmé.
+                                {% else %}
+                                    <strong>Votre abonnement {{ entreprise.status == 'canceled' ? 'a été annulé' : 'a expiré' }}.</strong>
+                                    L'accès à votre espace sera restreint tant qu'il n'est pas renouvelé.
+                                {% endif %}
+                            </div>
+                            <a href="{{ path('app_pricing') }}" class="btn btn-danger btn-sm fw-semibold flex-shrink-0">
+                                <i class="bi bi-arrow-repeat me-1"></i>Renouveler mon abonnement
+                            </a>
+                        </div>
+                    {% elseif entreprise.status == 'trial' and joursRestants is not null and joursRestants <= 7 %}
+                        <div class="alert alert-warning d-flex flex-column flex-sm-row justify-content-between align-items-sm-center rounded-4 shadow-sm mb-4" role="alert">
+                            <div class="mb-2 mb-sm-0">
+                                <i class="bi bi-clock-history me-2"></i>
+                                <strong>Votre période d'essai se termine {{ joursRestants <= 0 ? "aujourd'hui" : 'dans ' ~ joursRestants ~ ' jour' ~ (joursRestants > 1 ? 's' : '') }}.</strong>
+                                Passez à un abonnement payant pour ne pas perdre l'accès.
+                            </div>
+                            <a href="{{ path('app_pricing') }}" class="btn btn-warning btn-sm fw-semibold flex-shrink-0">
+                                <i class="bi bi-arrow-repeat me-1"></i>Renouveler mon abonnement
+                            </a>
+                        </div>
+                    {% elseif entreprise.status == 'active' and entreprise.plan in ['premium', 'vip'] and finAbo and joursRestants is not null and joursRestants <= 7 %}
+                        <div class="alert alert-info d-flex flex-column flex-sm-row justify-content-between align-items-sm-center rounded-4 shadow-sm mb-4" role="alert">
+                            <div class="mb-2 mb-sm-0">
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                <strong>Votre offre {{ entreprise.plan|upper }} se renouvelle {{ joursRestants <= 0 ? "aujourd'hui" : 'dans ' ~ joursRestants ~ ' jour' ~ (joursRestants > 1 ? 's' : '') }}</strong>
+                                ({{ finAbo|date('d/m/Y') }}). Vérifiez que votre moyen de paiement est à jour.
+                            </div>
+                            <a href="{{ path('app_billing', {plan: entreprise.plan}) }}" class="btn btn-outline-primary btn-sm fw-semibold flex-shrink-0">
+                                <i class="bi bi-arrow-repeat me-1"></i>Renouveler maintenant
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endif %}
 
                 {% block body %}{% endblock %}
             </main>

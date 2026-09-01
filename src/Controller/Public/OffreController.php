@@ -5,36 +5,53 @@ use App\Entity\Offre;
 use App\Entity\Candidature;
 use App\Form\CandidatureType;
 use App\Repository\OffreRepository;
+use App\Repository\EntrepriseRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 #[Route('/carriere')]
 class OffreController extends AbstractController
 {
     #[Route('/', name: 'app_carriere_globale')]
-    public function index(OffreRepository $offreRepository): Response
+    public function index(Request $request, OffreRepository $offreRepository, PaginatorInterface $paginator): Response
     {
-        $offres = $offreRepository->findBy(
-            ['status' => 'ouverte'],
-            ['id' => 'DESC']
+        $offres = $paginator->paginate(
+            $offreRepository->createOpenOffersQuery(),
+            $request->query->getInt('page', 1),
+            9
         );
         return $this->render('public/offre/index.html.twig', [
             'offres' => $offres,
+            'pagination' => $offres,
             'titre' => 'Toutes les offres d\'emploi'
         ]);
     }
 
     #[Route('/{slug}', name: 'app_carriere_entreprise')]
-    public function byEntreprise(string $slug, OffreRepository $offreRepository): Response
+    public function byEntreprise(string $slug, Request $request, OffreRepository $offreRepository, EntrepriseRepository $entrepriseRepository, PaginatorInterface $paginator): Response
     {
-        $offres = $offreRepository->findByEntrepriseSlug($slug);
+        $entreprise = $entrepriseRepository->findOneBy(['slug' => $slug]);
+
+        if (!$entreprise) {
+            throw $this->createNotFoundException('Entreprise introuvable.');
+        }
+
+        $offres = $paginator->paginate(
+            $offreRepository->createOpenOffersByEntrepriseSlugQuery($slug),
+            $request->query->getInt('page', 1),
+            9
+        );
+
         return $this->render('public/offre/index.html.twig', [
             'offres' => $offres,
-            'titre' => 'Offres de ' . $slug
+            'pagination' => $offres,
+            'entreprise' => $entreprise,
+            'titre' => 'Offres de ' . $entreprise->getNom(),
         ]);
     }
 
@@ -72,6 +89,17 @@ class OffreController extends AbstractController
                     $this->addFlash('danger', 'Erreur upload CV');
                 }
                 $candidature->setCv($newFilename);
+            }
+
+            $lettreFile = $form->get('lettreMotivation')->getData();
+            if ($lettreFile) {
+                $newLettreFilename = uniqid().'_'.preg_replace('/\s+/', '_', $lettreFile->getClientOriginalName());
+                try {
+                    $lettreFile->move($this->getParameter('lettre_motivation_directory'), $newLettreFilename);
+                    $candidature->setLettreMotivation($newLettreFilename);
+                } catch (FileException $e) {
+                    $this->addFlash('danger', 'Erreur upload lettre de motivation');
+                }
             }
 
             $em->persist($candidature);

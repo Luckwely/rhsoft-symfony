@@ -11,7 +11,17 @@ class AvanceSalaire
     public const STATUS_DEMANDE = 'demande';
     public const STATUS_VALIDE = 'valide';
     public const STATUS_REFUSE = 'refuse';
+    public const STATUS_PAYEE = 'payee';
     public const STATUS_REMBOURSE = 'rembourse';
+
+    public const MODE_VIREMENT = 'virement';
+    public const MODE_ESPECES = 'especes';
+    public const MODE_MOBILE_MONEY = 'mobile_money';
+    public const MODES_PAIEMENT = [
+        'Virement bancaire' => self::MODE_VIREMENT,
+        'Espèces' => self::MODE_ESPECES,
+        'Mobile Money' => self::MODE_MOBILE_MONEY,
+    ];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -50,7 +60,21 @@ class AvanceSalaire
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $commentaire = null;
 
-    // Add these getters and setters:
+    #[ORM\ManyToOne]
+    private ?Paie $paie = null;
+
+    #[ORM\Column(length: 30, nullable: true)]
+    private ?string $modePaiement = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $referencePaiement = null;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $datePaiement = null;
+
+    #[ORM\ManyToOne]
+    private ?User $payePar = null;
+
     public function getCommentaire(): ?string
     {
         return $this->commentaire;
@@ -62,13 +86,78 @@ class AvanceSalaire
         return $this;
     }
 
+    public function getPaie(): ?Paie
+    {
+        return $this->paie;
+    }
+
+    public function setPaie(?Paie $paie): static
+    {
+        $this->paie = $paie;
+        return $this;
+    }
+
+    public function getModePaiement(): ?string
+    {
+        return $this->modePaiement;
+    }
+
+    public function setModePaiement(?string $modePaiement): static
+    {
+        $this->modePaiement = $modePaiement;
+        return $this;
+    }
+
+    public function getReferencePaiement(): ?string
+    {
+        return $this->referencePaiement;
+    }
+
+    public function setReferencePaiement(?string $referencePaiement): static
+    {
+        $this->referencePaiement = $referencePaiement;
+        return $this;
+    }
+
+    public function getDatePaiement(): ?\DateTimeImmutable
+    {
+        return $this->datePaiement;
+    }
+
+    public function setDatePaiement(?\DateTimeInterface $datePaiement): static
+    {
+        $this->datePaiement = $datePaiement ? \DateTimeImmutable::createFromInterface($datePaiement) : null;
+        return $this;
+    }
+
+    public function getPayePar(): ?User
+    {
+        return $this->payePar;
+    }
+
+    public function setPayePar(?User $payePar): static
+    {
+        $this->payePar = $payePar;
+        return $this;
+    }
+
+    public function isPayee(): bool
+    {
+        return in_array($this->statut, [self::STATUS_PAYEE, self::STATUS_REMBOURSE], true);
+    }
+
+    public function isRemboursee(): bool
+    {
+        return $this->statut === self::STATUS_REMBOURSE;
+    }
+
     public function __construct()
     {
         $this->dateDemande = new \DateTimeImmutable();
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    // getters setters... générés par make:entity
+
     public function getId(): ?int { return $this->id; }
     public function getEmployee(): ?User { return $this->employee; }
     public function setEmployee(?User $employee): static { $this->employee = $employee; return $this; }

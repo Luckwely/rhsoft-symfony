@@ -50,6 +50,23 @@ final class ParametreController extends AbstractController
                 $entityManager->flush();
                 $this->addFlash('success', 'Règles de pointage mises à jour avec succès.');
             }
+            elseif ($actionType === 'salaires')
+            {
+                foreach ([
+                    'salaire_base_admin' => 'setSalaireBaseAdmin',
+                    'salaire_base_rh' => 'setSalaireBaseRh',
+                    'salaire_base_manager' => 'setSalaireBaseManager',
+                    'salaire_base_employe' => 'setSalaireBaseEmploye',
+                ] as $field => $setter) {
+                    $valeur = str_replace(',', '.', (string) $request->request->get($field));
+                    if (is_numeric($valeur) && (float) $valeur >= 0) {
+                        $entreprise->$setter((float) $valeur);
+                    }
+                }
+
+                $entityManager->flush();
+                $this->addFlash('success', 'Salaires de base mis à jour avec succès. Ils s\'appliqueront aux prochains employés créés ou modifiés.');
+            }
 
             return $this->redirectToRoute('app_admin_parametre');
         }

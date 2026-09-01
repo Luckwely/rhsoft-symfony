@@ -1,0 +1,159 @@
+{% extends 'layouts/base_admin.html.twig' %}
+
+{% block body %}
+<div class="container mt-4">
+
+    <!-- FLASH MESSAGES -->
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h3 class="mb-1">Importer des employés (CSV)</h3>
+            <p class="text-muted small mb-0">Idéal si votre entreprise a déjà une liste d'employés : ajoutez-les tous en une fois au lieu de les saisir un par un.</p>
+        </div>
+        <div class="d-flex gap-2 mt-3 mt-md-0">
+            <a href="{{ path('app_admin_employee') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Retour à la liste
+            </a>
+            <a href="{{ path('app_admin_employee_new') }}" class="btn btn-primary">
+                <i class="bi bi-person-plus me-1"></i>Ajouter un seul employé
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- FORMULAIRE D'IMPORT -->
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-upload me-2"></i>Fichier CSV</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ path('app_admin_employee_import') }}" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="csv_file" class="form-label">Fichier CSV</label>
+                            <input type="file" class="form-control" id="csv_file" name="csv_file" accept=".csv,text/csv" required>
+                            <div class="form-text">
+                                Colonnes attendues : <code>Prenom</code>, <code>Nom</code>, <code>Email</code> (obligatoires),
+                                <code>Telephone</code>, <code>Adresse</code>, <code>Poste</code>, <code>Service</code>,
+                                <code>Role</code> (rh / manager / employe), <code>Date embauche</code>, <code>Solde conge</code>, <code>Salaire base</code>,
+                                <code>Genre</code> (H / F), <code>Date naissance</code>.
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" value="1" id="send_invitations" name="send_invitations" checked>
+                            <label class="form-check-label" for="send_invitations">
+                                Envoyer un email d'invitation à chaque employé importé
+                            </label>
+                            <div class="form-text">
+                                Sans cet email, l'employé n'a aucun moyen de définir son mot de passe et ne pourra pas se connecter.
+                                Décochez uniquement si vous préférez envoyer les invitations plus tard (bouton "Renvoyer l'invitation" sur la fiche employé).
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-upload me-1"></i>Importer les employés
+                            </button>
+                            <a href="{{ path('app_admin_employee_import_template') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-download me-1"></i>Télécharger le modèle CSV
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- RESULTATS -->
+            {% if results is not null %}
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-clipboard-check me-2"></i>Résultat de l'import</h5>
+                        <small class="text-muted">
+                            {{ results.total }} ligne(s) analysée(s) ·
+                            {{ results.success|length }} importée(s) ·
+                            {{ results.errors|length }} en erreur
+                        </small>
+                    </div>
+                    <div class="card-body">
+                        {% if results.success|length > 0 %}
+                            <h6 class="text-success mb-2"><i class="bi bi-check-circle me-1"></i>Employés importés ({{ results.success|length }})</h6>
+                            <div class="table-responsive mb-4">
+                                <table class="table table-sm table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Ligne</th>
+                                            <th>Nom &amp; Prénom</th>
+                                            <th>Email</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for entry in results.success %}
+                                            <tr>
+                                                <td>{{ entry.line }}</td>
+                                                <td>{{ entry.nom }} {{ entry.prenom }}</td>
+                                                <td>{{ entry.email }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+
+                        {% if results.errors|length > 0 %}
+                            <h6 class="text-danger mb-2"><i class="bi bi-x-circle me-1"></i>Lignes ignorées / erreurs ({{ results.errors|length }})</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 80px;">Ligne</th>
+                                            <th>Détail</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for error in results.errors %}
+                                            <tr>
+                                                <td>{{ error.line > 0 ? error.line : '—' }}</td>
+                                                <td>{{ error.message }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- AIDE / INSTRUCTIONS -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Comment ça marche</h6>
+                </div>
+                <div class="card-body">
+                    <ol class="mb-4 ps-3">
+                        <li class="mb-2">Téléchargez le modèle CSV et ouvrez-le dans Excel, Google Sheets ou LibreOffice.</li>
+                        <li class="mb-2">Remplissez une ligne par employé (gardez la ligne d'en-tête telle quelle).</li>
+                        <li class="mb-2">Enregistrez le fichier au format CSV.</li>
+                        <li class="mb-2">Importez-le ici. Chaque ligne valide crée un nouvel employé (compte inactif jusqu'à son acceptation d'invitation).</li>
+                        <li>Les lignes avec un email déjà utilisé, un email invalide, ou des champs obligatoires manquants sont ignorées et listées dans le rapport d'erreurs, sans bloquer le reste de l'import.</li>
+                    </ol>
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-lightbulb me-1"></i>
+                        Le nombre d'employés que vous pouvez importer dépend des limites de votre abonnement. Si la limite est atteinte en cours d'import, les lignes restantes sont ignorées et signalées.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -27,11 +27,18 @@
 
                 {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'class': 'needs-validation'}}) }}
 
-                    {# Champ Nom #}
-                    <div class="mb-3">
-                        {{ form_label(form.nom, 'Nom complet', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-                        {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'Votre nom et prénom'}}) }}
-                        {{ form_errors(form.nom) }}
+                    {# Champs Nom / Prénom #}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.nom, 'Nom', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                            {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'Votre nom'}}) }}
+                            {{ form_errors(form.nom) }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.prenom, 'Prénom', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                            {{ form_widget(form.prenom, {'attr': {'class': 'form-control', 'placeholder': 'Votre prénom'}}) }}
+                            {{ form_errors(form.prenom) }}
+                        </div>
                     </div>
 
                     {# Champ Email #}
@@ -57,8 +64,8 @@
 
                     {# Champ Lettre de motivation #}
                     <div class="mb-4">
-                        {{ form_label(form.lettreMotivation, 'Lettre de motivation', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-                        {{ form_widget(form.lettreMotivation, {'attr': {'class': 'form-control', 'rows': 5, 'placeholder': 'Parlez-nous de vous et de vos motivations...'}}) }}
+                        {{ form_label(form.lettreMotivation, 'Lettre de motivation (PDF)', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                        {{ form_widget(form.lettreMotivation, {'attr': {'class': 'form-control'}}) }}
                         {{ form_errors(form.lettreMotivation) }}
                     </div>
 

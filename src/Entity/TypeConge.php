@@ -112,7 +112,7 @@ class TypeConge
     public function removeConge(Conge $conge): static
     {
         if ($this->conges->removeElement($conge)) {
-            // set the owning side to null (unless already changed)
+
             if ($conge->getTypeConge() === $this) {
                 $conge->setTypeConge(null);
             }

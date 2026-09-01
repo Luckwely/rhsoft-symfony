@@ -6,6 +6,7 @@ use App\Entity\Entreprise;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\QueryBuilder;
 
 /** @extends ServiceEntityRepository<Conge> */
 class CongeRepository extends ServiceEntityRepository
@@ -41,8 +42,7 @@ class CongeRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    /** @return Conge[] */
-    public function findEnAttenteByEntreprise(Entreprise $entreprise, ?string $type = null, ?string $search = null): array
+    public function createEnAttenteByEntrepriseQueryBuilder(Entreprise $entreprise, ?string $type = null, ?string $search = null, ?User $exclureEmployee = null): QueryBuilder
     {
         $qb = $this->createQueryBuilder('c')
             ->join('c.employee', 'e')
@@ -60,8 +60,20 @@ class CongeRepository extends ServiceEntityRepository
             $qb->andWhere('LOWER(e.nom) LIKE LOWER(:search) OR LOWER(e.prenom) LIKE LOWER(:search)')
                ->setParameter('search', '%'.$search.'%');
         }
+        if ($exclureEmployee) {
+            // Un RH/Manager ne doit pas voir sa propre demande dans sa propre file de
+            // validation : elle relève du niveau au-dessus (Admin), pas de lui-même.
+            $qb->andWhere('c.employee != :exclureEmployee')->setParameter('exclureEmployee', $exclureEmployee);
+        }
 
-        return $qb->getQuery()->getResult();
+        return $qb;
+    }
+
+    /** @return Conge[] */
+    public function findEnAttenteByEntreprise(Entreprise $entreprise, ?string $type = null, ?string $search = null, ?User $exclureEmployee = null): array
+    {
+        return $this->createEnAttenteByEntrepriseQueryBuilder($entreprise, $type, $search, $exclureEmployee)
+            ->getQuery()->getResult();
     }
 
     public function countPendingByEntreprise(Entreprise $entreprise): int
@@ -74,5 +86,39 @@ class CongeRepository extends ServiceEntityRepository
             ->setParameter('statut', Conge::STATUS_DEMANDE)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    public function findRecentlyValidatedByEntreprise(Entreprise $entreprise, int $limit = 5): array
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.employee', 'u')
+            ->addSelect('u')
+            ->where('c.entreprise = :entreprise')
+            ->andWhere('c.statut = :statut')
+            ->andWhere('c.valideLe IS NOT NULL')
+            ->setParameter('entreprise', $entreprise)
+            ->setParameter('statut', Conge::STATUS_VALIDE)
+            ->orderBy('c.valideLe', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAbsenceMotifsStatsByEntreprise(Entreprise $entreprise, int $month, int $year): array
+    {
+        $dateDebut = new \DateTimeImmutable(sprintf('%04d-%02d-01 00:00:00', $year, $month));
+        $dateFin = (clone $dateDebut)->modify('last day of this month 23:59:59');
+
+        return $this->createQueryBuilder('c')
+            ->select('c.motif as label', 'SUM(c.nbJours) as days') // Replace nbJours with your actual property name if different
+            ->join('c.employee', 'e')
+            ->where('c.entreprise = :entreprise')
+            ->andWhere('c.dateDebut BETWEEN :dateDebut AND :dateFin')
+            ->setParameter('entreprise', $entreprise)
+            ->setParameter('dateDebut', $dateDebut)
+            ->setParameter('dateFin', $dateFin)
+            ->groupBy('c.motif')
+            ->getQuery()
+            ->getResult();
     }
 }

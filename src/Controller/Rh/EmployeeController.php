@@ -5,6 +5,8 @@ namespace App\Controller\Rh;
 use App\Entity\User;
 use App\Entity\Planning;
 use App\Form\EmployeeFormType;
+use App\Service\SubscriptionLimitService;
+use App\Service\EmployeeCsvImportService;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,6 +14,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -55,6 +58,11 @@ final class EmployeeController extends AbstractController
                 ->setParameter('search', '%'.$search.'%');
         }
 
+        $employeeCount = (int) (clone $queryBuilder)
+            ->select('COUNT(u.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
         $employees = $paginator->paginate(
             $queryBuilder,
             $request->query->getInt('page', 1),
@@ -63,7 +71,9 @@ final class EmployeeController extends AbstractController
 
         return $this->render('rh/employee/index.html.twig', [
             'employees' => $employees,
-            'planningMap' => $planningMap
+            'employeeCount' => $employeeCount,
+            'planningMap' => $planningMap,
+            'q' => $request->query->get('q'),
         ]);
     }
 
@@ -72,16 +82,26 @@ final class EmployeeController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         MailerInterface $mailer,
+        SubscriptionLimitService $subscriptionLimitService,
         string $upload_dir
     ): Response
     {
         $admin = $this->getUser();
         $entreprise = $admin->getEntreprise();
 
+        if (!$subscriptionLimitService->canAddEmployee($entreprise)) {
+            $this->addFlash('danger', $subscriptionLimitService->getEmployeeLimitReachedMessage($entreprise));
+
+            return $this->redirectToRoute('app_rh_employee');
+        }
+
         $user = new User();
         // Pre-fill fields if passed from query parameters (accepted candidature)
         if ($request->query->has('nom')) {
             $user->setNom($request->query->get('nom'));
+        }
+        if ($request->query->has('prenom')) {
+            $user->setPrenom($request->query->get('prenom'));
         }
         if ($request->query->has('email')) {
             $user->setEmail($request->query->get('email'));
@@ -98,6 +118,7 @@ final class EmployeeController extends AbstractController
             $user->setEntreprise($entreprise);
             $user->setIsActive(false);
             $user->setIsVerified(false);
+            $user->setSalaireBase($entreprise->getSalaireBaseForRoles($user->getRoles()));
 
             $uploadDir = $this->getParameter('employees_directory');
 
@@ -148,13 +169,137 @@ final class EmployeeController extends AbstractController
         ]);
     }
 
+    #[Route('/employees/import', name: 'app_rh_employee_import', methods: ['GET', 'POST'])]
+    public function import(
+        Request $request,
+        EmployeeCsvImportService $csvImportService,
+        MailerInterface $mailer,
+        SubscriptionLimitService $subscriptionLimitService
+    ): Response
+    {
+        $entreprise = $this->getUser()->getEntreprise();
+        $results = null;
+
+        if ($request->isMethod('POST')) {
+            /** @var UploadedFile|null $csvFile */
+            $csvFile = $request->files->get('csv_file');
+            // Toute création par import doit permettre à l’employé de définir son mot de passe.
+            // L’invitation est donc envoyée systématiquement après chaque ligne importée.
+            $sendInvitations = true;
+
+            if (!$this->isCsrfTokenValid('rh_employee_import', (string) $request->request->get('_token'))) {
+                $this->addFlash('danger', 'Jeton de sécurité invalide. Merci de réessayer.');
+                return $this->redirectToRoute('app_rh_employee_import');
+            }
+
+            if (!$csvFile) {
+                $this->addFlash('danger', 'Veuillez sélectionner un fichier CSV à importer.');
+
+                return $this->redirectToRoute('app_rh_employee_import');
+            }
+
+            $extension = strtolower($csvFile->getClientOriginalExtension() ?: '');
+            if (!in_array($extension, ['csv', 'txt'], true)) {
+                $this->addFlash('danger', 'Le fichier doit être au format CSV (.csv).');
+
+                return $this->redirectToRoute('app_rh_employee_import');
+            }
+
+            if (!$subscriptionLimitService->canAddEmployee($entreprise)) {
+                $this->addFlash('danger', $subscriptionLimitService->getEmployeeLimitReachedMessage($entreprise));
+
+                return $this->redirectToRoute('app_rh_employee_import');
+            }
+
+            $results = $csvImportService->import($csvFile->getPathname(), $entreprise);
+
+            if ($sendInvitations && !empty($results['success'])) {
+                $results['errors'] = array_merge(
+                    $results['errors'],
+                    $this->sendBulkInvitations($results['success'], $mailer)
+                );
+            }
+
+            // On retire la référence à l'entité avant de passer au template
+            $results['success'] = array_map(static fn(array $entry) => [
+                'line' => $entry['line'],
+                'nom' => $entry['nom'],
+                'prenom' => $entry['prenom'],
+                'email' => $entry['email'],
+            ], $results['success']);
+
+            if (!empty($results['success'])) {
+                $this->addFlash('success', sprintf(
+                    '%d employé(s) importé(s) avec succès%s.',
+                    count($results['success']),
+                    $sendInvitations ? ' et invitation(s) envoyée(s)' : ''
+                ));
+            }
+            if (!empty($results['errors'])) {
+                $this->addFlash('danger', sprintf(
+                    '%d ligne(s) n\'ont pas pu être importées. Voir le détail ci-dessous.',
+                    count($results['errors'])
+                ));
+            }
+        }
+
+        return $this->render('rh/employee/import.html.twig', [
+            'results' => $results,
+        ]);
+    }
+
+    #[Route('/employees/import/modele', name: 'app_rh_employee_import_template')]
+    public function importTemplate(EmployeeCsvImportService $csvImportService): Response
+    {
+        return new Response($csvImportService->buildTemplateCsv(), 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="modele-import-employes.csv"',
+        ]);
+    }
+
+    /**
+     * Sends the invitation email to each freshly-imported user.
+     * Returns an array of error entries (same shape as the import errors)
+     * for any invitation that failed to send.
+     */
+    private function sendBulkInvitations(array $importedEntries, MailerInterface $mailer): array
+    {
+        $errors = [];
+
+        foreach ($importedEntries as $entry) {
+            /** @var User $user */
+            $user = $entry['user'];
+            $url = $this->generateUrl('app_invite_accept', ['token' => $user->getInvitationToken()], UrlGeneratorInterface::ABSOLUTE_URL);
+            $email = (new Email())
+                ->from('no-reply@rhsoft.mg')
+                ->to($user->getEmail())
+                ->subject('Invitation RhSoft - Rejoignez votre entreprise')
+                ->html($this->renderView('emails/invitation.html.twig', ['user' => $user, 'url' => $url]));
+
+            try {
+                $mailer->send($email);
+            } catch (\Exception $e) {
+                $errors[] = ['line' => 0, 'message' => "Employé {$user->getEmail()} importé, mais l'email d'invitation n'a pas pu être envoyé (" . $e->getMessage() . ')'];
+            }
+        }
+
+        return $errors;
+    }
+
+
     #[Route('/employees/{id}/edit', name: 'app_rh_employee_edit')]
     public function edit(Request $request, User $employee, EntityManagerInterface $em): Response
     {
+        if ($employee->getEntreprise() !== $this->getUser()->getEntreprise()) {
+            throw $this->createAccessDeniedException('Cet employé n\'appartient pas à votre entreprise.');
+        }
+
         $form = $this->createForm(EmployeeFormType::class, $employee);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $employee->setSalaireBase($employee->getEntreprise()->getSalaireBaseForRoles($employee->getRoles()));
+
             $uploadDir = $this->getParameter('employees_directory');
 
             // Gestion Upload Photo
@@ -182,6 +327,18 @@ final class EmployeeController extends AbstractController
         return $this->render('rh/employee/edit.html.twig', [
             'employee' => $employee,
             'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/employees/{id}', name: 'app_rh_employee_show', methods: ['GET'])]
+    public function show(User $employee): Response
+    {
+        if ($employee->getEntreprise() !== $this->getUser()->getEntreprise()) {
+            throw $this->createAccessDeniedException('Cet employé n\'appartient pas à votre entreprise.');
+        }
+
+        return $this->render('rh/employee/show.html.twig', [
+            'employee' => $employee,
         ]);
     }
 
@@ -231,10 +388,10 @@ final class EmployeeController extends AbstractController
         // Query builder for departed employees (inactive members belonging to the company)
         $queryBuilder = $em->getRepository(User::class)->createQueryBuilder('u')
             ->where('u.entreprise = :entreprise')
-            ->andWhere('u.is_active = :active')
+            ->andWhere('u.dateSortie IS NOT NULL')
             ->setParameter('entreprise', $entreprise)
-            ->setParameter('active', false)
-            ->orderBy('u.id', 'DESC');
+            ->orderBy('u.dateSortie', 'DESC')
+            ->addOrderBy('u.id', 'DESC');
 
         // Optional search filter for departures if needed
         if ($search = $request->query->get('q')) {
@@ -251,6 +408,41 @@ final class EmployeeController extends AbstractController
 
         return $this->render('rh/employee/sortie.html.twig', [
             'sorties' => $sorties,
+        ]);
+    }
+
+    #[Route('/sortie/export', name: 'app_rh_employee_sortie_export', methods: ['GET'])]
+    public function exportSorties(Request $request, EntityManagerInterface $em): Response
+    {
+        $entreprise = $this->getUser()->getEntreprise();
+        $queryBuilder = $em->getRepository(User::class)->createQueryBuilder('u')
+            ->where('u.entreprise = :entreprise')
+            ->andWhere('u.dateSortie IS NOT NULL')
+            ->setParameter('entreprise', $entreprise)
+            ->orderBy('u.dateSortie', 'DESC');
+
+        if ($search = trim((string) $request->query->get('q', ''))) {
+            $queryBuilder
+                ->andWhere('u.nom LIKE :search OR u.prenom LIKE :search OR u.email LIKE :search')
+                ->setParameter('search', '%'.$search.'%');
+        }
+
+        $lines = ['Nom;Prénom;Email;Poste;Date de sortie;Motif'];
+        foreach ($queryBuilder->getQuery()->getResult() as $employee) {
+            $values = [
+                $employee->getNom(),
+                $employee->getPrenom(),
+                $employee->getEmail(),
+                $employee->getPoste() ?? '',
+                $employee->getDateSortie()?->format('d/m/Y') ?? '',
+                $employee->getMotifSortie() ?? '',
+            ];
+            $lines[] = implode(';', array_map(static fn(?string $value): string => '"'.str_replace('"', '""', (string) $value).'"', $values));
+        }
+
+        return new Response("\xEF\xBB\xBF".implode("\n", $lines), 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="sorties-employes.csv"',
         ]);
     }
 

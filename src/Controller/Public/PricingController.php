@@ -14,7 +14,7 @@ class PricingController extends AbstractController
             'essai' => [
                 'name' => 'Essai',
                 'price' => '0',
-                'period' => '/14 jours',
+                'period' => '/31 jours',
                 'features' => ['Accès limité', '1 Entreprise'],
                 'highlight' => false
             ],
@@ -29,7 +29,7 @@ class PricingController extends AbstractController
                 'name' => 'VIP',
                 'price' => '19,99',
                 'period' => '/mois',
-                'features' => ['Tout de Premium', 'Utilisateurs illimités'],
+                'features' => ['Tout de Premium', "Jusqu'à 20 Utilisateurs"],
                 'highlight' => false
             ],
         ];

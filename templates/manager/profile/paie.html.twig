@@ -8,20 +8,11 @@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
         <div>
             <h3 class="fw-bold mb-1">
-                <i class="bi bi-person-circle text-primary me-2"></i>Mon Profil
+                Mon Profil
             </h3>
             <p class="text-muted mb-0">
-                <i class="bi bi-gear me-1"></i>Gérez vos informations et documents
+                Gérez vos informations et documents
             </p>
-        </div>
-        <div class="d-flex gap-2 mt-3 mt-md-0">
-            <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 44px; height: 44px; font-size: 16px;">
-                {{ user.prenom|first }}{{ user.nom|first }}
-            </div>
-            <div class="d-flex flex-column justify-content-center">
-                <span class="fw-semibold">{{ user.prenom }} {{ user.nom }}</span>
-                <small class="text-muted">{{ user.poste ?? 'Manager' }}</small>
-            </div>
         </div>
     </div>
 
@@ -46,9 +37,11 @@
                 <h5 class="fw-bold mb-0">
                     <i class="bi bi-wallet2 text-success me-2"></i>Mes fiches de paie
                 </h5>
-                <button class="btn btn-outline-dark btn-sm">
-                    <i class="bi bi-download me-1"></i>Télécharger toutes
-                </button>
+                {% if paies is not empty %}
+                    <a href="{{ path('app_manager_profile_paie_download_all') }}" class="btn btn-outline-dark btn-sm">
+                        <i class="bi bi-download me-1"></i>Télécharger toutes
+                    </a>
+                {% endif %}
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -66,12 +59,11 @@
                             {% for paie in paies %}
                                 <tr>
                                     <td class="ps-3"><span class="fw-semibold">{{ paie.mois }}</span></td>
-                                    <td class="text-end">{{ paie.salaireBrut }} €</td>
-                                    <td class="text-end text-danger">-{{ paie.cotisations }} €</td>
-                                    <td class="text-end fw-bold text-success">{{ paie.salaireNet }} €</td>
+                                    <td class="text-end">{{ paie.salaireBrut }} Ar</td>
+                                    <td class="text-end text-danger">-{{ paie.cotisations }} Ar</td>
+                                    <td class="text-end fw-bold text-success">{{ paie.salaireNet }} Ar</td>
                                     <td class="text-center pe-3">
-                                        <button class="btn btn-sm btn-light border-0" title="Voir"><i class="bi bi-eye"></i></button>
-                                        <a href="#" class="btn btn-sm btn-outline-secondary" title="Télécharger PDF"><i class="bi bi-download me-1"></i>PDF</a>
+                                        <a href="{{ path('app_manager_profile_paie_download', {id: paie.id}) }}" class="btn btn-sm btn-outline-secondary" title="Télécharger PDF"><i class="bi bi-download me-1"></i>PDF</a>
                                     </td>
                                 </tr>
                             {% else %}

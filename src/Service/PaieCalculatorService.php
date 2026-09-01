@@ -9,6 +9,22 @@ class PaieCalculatorService
     private const PLAFOND_SOCIAL = 2101440; // Example ceiling (8x SME)
     private const MIN_IRSA = 3000; // Minimum tax perception
 
+    // Heures supplémentaires : équivalent mensuel de la règle légale des 8 premières
+    // heures sup/semaine majorées à 30%, le reste à 50% (21.66 = 5j/semaine x 4.33
+    // semaines/mois, la même conversion jour->mois déjà utilisée pour le taux horaire
+    // estimé côté reporting RH, afin que les deux écrans restent cohérents entre eux).
+    public const JOURS_OUVRES_PAR_MOIS = 21.66;
+    public const SEUIL_HS_30_PAR_MOIS = 35.0;
+    public const TAUX_MAJORATION_HS_30 = 1.30;
+    public const TAUX_MAJORATION_HS_50 = 1.50;
+
+    // Primes calculées sur la présence réelle / l'ancienneté réelle (et non plus des
+    // montants fixes saisis manuellement) : un employé absent ou présent moins de 5
+    // jours dans la semaine touche donc mécaniquement moins de panier repas / transport.
+    private const PANIER_REPAS_PAR_JOUR = 5000; // Ar par jour réellement présent
+    private const TRANSPORT_PAR_JOUR = 5000; // Ar par jour réellement présent
+    private const PRIME_ANCIENNETE_PAR_AN = 20000; // Ar par année d'ancienneté
+
     public function calculerPaie(array $data): array
     {
         $salaireBase = $data['salaire_base'];
@@ -20,14 +36,32 @@ class PaieCalculatorService
         $salaireDeBaseEffectif = max(0, $salaireBase - $retenueAbsence);
 
         // 2. HEURES SUPPLÉMENTAIRES (HS)
-        $hs30 = $data['hs_30'] ?? 0; // Majorées à 30%
-        $hs50 = $data['hs_50'] ?? 0; // Majorées à 50%
-        $montantHS = $data['montant_hs'] ?? 0;
+        // Converties en montant à partir du taux horaire de l'employé (même formule que
+        // l'estimation affichée dans le reporting RH), et non plus un montant à saisir
+        // manuellement : jusqu'ici hs_30/hs_50 étaient reçues mais jamais utilisées, donc
+        // aucune heure supplémentaire n'était réellement payée.
+        $hs30 = $data['hs_30'] ?? 0; // Heures majorées à 30%
+        $hs50 = $data['hs_50'] ?? 0; // Heures majorées à 50%
+        $heuresContractJour = $data['heures_contractuelles'] ?? 8.0;
+        $heuresContractMois = $heuresContractJour * self::JOURS_OUVRES_PAR_MOIS;
+        $tauxHoraire = ($salaireBase > 0 && $heuresContractMois > 0) ? $salaireBase / $heuresContractMois : 0.0;
+        $montantHS = ($hs30 * $tauxHoraire * self::TAUX_MAJORATION_HS_30)
+            + ($hs50 * $tauxHoraire * self::TAUX_MAJORATION_HS_50);
 
         // 3. GAINS / ELEMENTS VARIABLES
-        $panierRepas = $data['panier_repas'] ?? 0;
-        $transport = $data['transport'] ?? 0;
-        $anciennete = $data['anciennete'] ?? 0;
+        // Panier repas et transport suivent la présence réelle du mois (5000 Ar/jour chacun,
+        // indépendamment l'un de l'autre) plutôt qu'un montant fixe : un employé absent ou
+        // présent moins de 5 jours dans la semaine touche donc mécaniquement moins que
+        // quelqu'un présent tous les jours.
+        $joursPresents = $data['jours_presents'] ?? 0;
+        $panierRepas = $joursPresents * self::PANIER_REPAS_PAR_JOUR;
+        $transport = $joursPresents * self::TRANSPORT_PAR_JOUR;
+
+        // Prime d'ancienneté : calculée à partir du même nombre d'années d'ancienneté que
+        // celui affiché dans le rapport RH "Bilan Social" (basé sur la date d'embauche),
+        // pour que les deux chiffres soient toujours cohérents entre eux.
+        $ancienneteAnnees = $data['anciennete_annees'] ?? 0;
+        $anciennete = $ancienneteAnnees * self::PRIME_ANCIENNETE_PAR_AN;
 
         // Salaire Brut Total
         $salaireBrut = $salaireDeBaseEffectif + $anciennete + $montantHS + $panierRepas + $transport;
@@ -59,8 +93,14 @@ class PaieCalculatorService
         }
         $irsaNet = max(0, $irsaNet);
 
-        // 7. SALAIRE NET
-        $salaireNet = $salaireBrut - $totalCotisations - $irsaNet;
+        // 7. AVANCES SUR SALAIRE
+        // Retenue des avances déjà versées à l'employé et pas encore remboursées, déduite
+        // après impôt (une avance n'est pas une charge fiscale, c'est un remboursement pur).
+        // Plafonnée pour ne jamais rendre le salaire net négatif.
+        $avanceADeduire = min($data['avance_a_deduire'] ?? 0, max(0, $salaireBrut - $totalCotisations - $irsaNet));
+
+        // 8. SALAIRE NET
+        $salaireNet = $salaireBrut - $totalCotisations - $irsaNet - $avanceADeduire;
 
         return [
             'salaire_brut' => $salaireBrut,
@@ -68,6 +108,8 @@ class PaieCalculatorService
             'ostie' => $ostieSal,
             'base_imposable' => $baseImposable,
             'irsa' => $irsaNet,
+            'montant_hs' => $montantHS,
+            'avance_deduite' => $avanceADeduire,
             'salaire_net' => $salaireNet,
         ];
     }
@@ -89,18 +131,18 @@ class PaieCalculatorService
         }
         if ($base > 500000) {
             // Tranche 4: 500 001 à 600 000 Ar (15%)
-            $tranche5 = min($base, 600000) - 500000;
-            $impot += $tranche5 * 0.15;
+            $tranche4 = min($base, 600000) - 500000;
+            $impot += $tranche4 * 0.15;
         }
         if ($base > 600000) {
             // Tranche 5: 600 001 à 4 000 000 Ar (20%)
-            $tranche6 = min($base, 4000000) - 600000;
-            $impot += $tranche6 * 0.20;
+            $tranche5 = min($base, 4000000) - 600000;
+            $impot += $tranche5 * 0.20;
         }
         if ($base > 4000000) {
             // Tranche 6: Au-delà de 4 000 000 Ar (25%)
-            $tranche7 = $base - 4000000;
-            $impot += $tranche7 * 0.25;
+            $tranche6 = $base - 4000000;
+            $impot += $tranche6 * 0.25;
         }
 
         return $impot;

@@ -14,8 +14,8 @@ class EntrepriseFixtures extends Fixture
         $faker = Factory::create('fr_FR');
 
         // Création de 3 entreprises fictives aux profils variés
-        $plans = ['standard', 'premium', 'entreprise'];
-        $statuses = ['actif', 'suspendu', 'essai'];
+        $plans = ['essai', 'premium', 'vip'];
+        $statuses = ['active', 'suspendu', 'trial'];
 
         for ($i = 1; $i <= 3; $i++) {
             $entreprise = new Entreprise();

@@ -11,9 +11,19 @@ class PlanningService
 {
     public function __construct(private EntityManagerInterface $em) {}
 
+    private function localNow(): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable('now');
+    }
+
+    private function localToday(): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable('today');
+    }
+
     public function getTodayData(User $user): array
     {
-        $today = new \DateTimeImmutable('today');
+        $today = $this->localToday();
         $entreprise = $user->getEntreprise();
         $weekStart = $this->getWeekStart($today);
         $dayName = $this->getFrenchDay($today);
@@ -23,20 +33,23 @@ class PlanningService
             'weekStart' => $weekStart,
             'dayOfWeek' => $dayName
         ]);
-
         $pointage = $this->getPointageForDay($user, $entreprise, $today);
-        $isOnPause = $pointage?->isOnPause() ?? false;
+        $isWorkDay = $planning?->isTravail() === true;
+        $hasEntry = $pointage?->getHeureEntree() !== null;
+        $tolerance = $entreprise?->getToleranceRetard() ?? 15;
+        $now = $this->localNow();
+        $nowMinutes = ((int) $now->format('H')) * 60 + (int) $now->format('i');
+        $startMinutes = $planning?->getHeureDebut() !== null ? $this->timeToMinutes($planning->getHeureDebut()) : null;
+        $deadlineMinutes = $startMinutes !== null ? $startMinutes + max(0, (int) $tolerance) : null;
+        $lateDeadlinePassed = $deadlineMinutes !== null && $nowMinutes > $deadlineMinutes;
 
         return [
             'planning' => $planning,
             'pointage' => $pointage,
-            'canPointerEntree' => $planning?->isTravail() && (!$pointage || !$pointage->getHeureEntree()),
-            'canPointerSortie' => $planning?->isTravail() && $pointage && $pointage->getHeureEntree() && !$pointage->getHeureSortie(),
-            'canDebutPause' => $planning?->isTravail() && $pointage && $pointage->getHeureEntree() && !$pointage->getHeureSortie() && !$isOnPause,
-            'canFinPause' => $planning?->isTravail() && $pointage && $isOnPause,
-            'isOnPause' => $isOnPause,
-            'pauseDuree' => $this->formatMinutes($this->getPauseDurationMinutes($pointage)),
-            'pauseSeconds' => $this->getPauseDurationSeconds($pointage),
+            'canPointerEntree' => $isWorkDay && !$hasEntry && !$lateDeadlinePassed,
+            'canPointerSortie' => $isWorkDay && $hasEntry && !$pointage->getHeureSortie(),
+            'lateDeadlinePassed' => $lateDeadlinePassed,
+            'heureLimitePointage' => $deadlineMinutes !== null ? sprintf('%02d:%02d', intdiv($deadlineMinutes, 60) % 24, $deadlineMinutes % 60) : null,
             'message' => $this->getMessageJour($planning),
             'retardMinutes' => $this->calculateRetard($planning, $pointage, $entreprise),
             'heuresTravaillees' => $this->formatMinutes($this->calculateMinutesTravail($pointage)),
@@ -64,7 +77,6 @@ class PlanningService
         }
 
         $minutesReelles = array_sum(array_map(fn(Pointage $p) => $this->calculateMinutesTravail($p), $pointages));
-        $minutesPause = array_sum(array_map(fn(Pointage $p) => $this->getPauseDurationMinutes($p), $pointages));
         $heuresSup = max(0, $minutesReelles - $stats['minutesPrevues']);
 
         return [
@@ -75,7 +87,6 @@ class PlanningService
             'joursFeries' => $stats['ferie'],
             'totalHeuresSemaine' => $this->formatMinutes($stats['minutesPrevues']),
             'totalHeuresReelles' => $this->formatMinutes($minutesReelles),
-            'totalPauseHeures' => $this->formatMinutes($minutesPause),
             'totalHeuresSup' => $this->formatMinutes($heuresSup),
             'historique' => $this->em->getRepository(Pointage::class)->findBy(['employee' => $user, 'entreprise' => $entreprise], ['date' => 'DESC'], 10),
         ];
@@ -83,54 +94,76 @@ class PlanningService
 
     public function pointerEntree(User $user): void
     {
-        $today = new \DateTimeImmutable('today');
-        $pointage = $this->em->getRepository(Pointage::class)->findOneBy(['employee' => $user, 'date' => $today]) ?? new Pointage();
+        $today = $this->localToday();
+        $entreprise = $user->getEntreprise();
+        $planning = $this->em->getRepository(Planning::class)->findOneBy([
+            'user' => $user,
+            'weekStart' => $this->getWeekStart($today),
+            'dayOfWeek' => $this->getFrenchDay($today)
+        ]);
 
+        if (!$planning || !$planning->isTravail()) {
+            throw new \RuntimeException('Aucun début de poste n’est prévu pour vous aujourd’hui.');
+        }
+
+        if (!$planning->getHeureDebut()) {
+            throw new \RuntimeException('L’heure de début n’est pas configurée dans votre planning.');
+        }
+
+        $tolerance = $entreprise?->getToleranceRetard() ?? 15;
+        $deadlineMinutes = $this->timeToMinutes($planning->getHeureDebut()) + max(0, (int) $tolerance);
+        $now = $this->localNow();
+        $nowMinutes = ((int) $now->format('H')) * 60 + (int) $now->format('i');
+        if ($nowMinutes > $deadlineMinutes) {
+            throw new \RuntimeException(sprintf(
+                'La tolérance de retard est dépassée. Le pointage d’entrée était possible jusqu’à %s.',
+                sprintf('%02d:%02d', intdiv($deadlineMinutes, 60) % 24, $deadlineMinutes % 60)
+            ));
+        }
+
+        $pointage = $this->getPointageForDay($user, $entreprise, $today) ?? new Pointage();
         if (!$pointage->getId()) {
             $pointage->setEmployee($user);
+            $pointage->setEntreprise($entreprise);
             $pointage->setDate($today);
-            if ($user->getEntreprise()) {
-                $pointage->setEntreprise($user->getEntreprise());
-            }
-
-            $planning = $this->em->getRepository(Planning::class)->findOneBy([
-                'user' => $user,
-                'weekStart' => $this->getWeekStart($today),
-                'dayOfWeek' => $this->getFrenchDay($today)
-            ]);
-
-            if ($planning) {
-                $pointage->setHeurePrevueDebut($planning->getHeureDebut());
-                $pointage->setHeurePrevueFin($planning->getHeureFin());
-                $pointage->setPausePrevueMinutes($planning->getPauseMinutes() ?? 0);
-            }
+        }
+        if ($pointage->getHeureEntree()) {
+            return;
         }
 
-        if (!$pointage->getHeureEntree()) {
-            $pointage->setHeureEntree(new \DateTimeImmutable('now'));
-            $pointage->setStatut('present');
-
-            $this->em->persist($pointage);
-            $this->em->flush();
-        }
+        $pointage->setHeurePrevueDebut($planning->getHeureDebut());
+        $pointage->setHeurePrevueFin($planning->getHeureFin());
+        $pointage->setHeureEntree($now);
+        $pointage->setStatut('present');
+        $this->em->persist($pointage);
+        $this->em->flush();
     }
 
     public function pointerSortie(User $user): void
     {
-        $pointage = $this->getPointageForDay($user, $user->getEntreprise(), new \DateTimeImmutable('today'));
+        $pointage = $this->getPointageForDay($user, $user->getEntreprise(), $this->localToday());
         if ($pointage && !$pointage->getHeureSortie()) {
-            $pointage->setHeureSortie(new \DateTimeImmutable());
+            $pointage->setHeureSortie($this->localNow());
             $this->em->flush();
         }
     }
 
-    private function getPointageForDay(User $u, Entreprise $e, \DateTimeInterface $d): ?Pointage
+    private function getPointageForDay(User $u, ?Entreprise $e, \DateTimeInterface $d): ?Pointage
     {
+
+        if (!$e) {
+            return null;
+        }
+
         return $this->em->getRepository(Pointage::class)->findOneBy(['employee' => $u, 'entreprise' => $e, 'date' => $d]);
     }
 
-    private function getWeekPointages(User $u, Entreprise $e, \DateTimeImmutable $weekStart): array
+    private function getWeekPointages(User $u, ?Entreprise $e, \DateTimeImmutable $weekStart): array
     {
+        if (!$e) {
+            return [];
+        }
+
         $weekEnd = (clone $weekStart)->modify('+6 days')->setTime(23, 59, 59);
         return $this->em->getRepository(Pointage::class)->createQueryBuilder('p')
             ->where('p.employee = :u')
@@ -146,7 +179,7 @@ class PlanningService
 
     private function getWeekStart(?\DateTimeImmutable $date = null): \DateTimeImmutable
     {
-        $date ??= new \DateTimeImmutable('today');
+        $date ??= $this->localToday();
         return $date->format('N') == 7 ? $date->modify('last monday')->setTime(0,0,0) : $date->modify('monday this week')->setTime(0,0,0);
     }
 
@@ -166,36 +199,20 @@ class PlanningService
         };
     }
 
-    private function calculateRetard(?Planning $p, ?Pointage $pt, Entreprise $e): int
+    private function timeToMinutes(\DateTimeInterface $time): int
     {
-        if (!$p?->getHeureDebut() || !$pt?->getHeureEntree()) return 0;
-        $tolerance = $e->getToleranceRetard() ?? 15;
-        $today = new \DateTimeImmutable('today');
+        return ((int) $time->format('H')) * 60 + (int) $time->format('i');
+    }
 
-        // Use DateTime instead of modifying date directly on immutable without reassignment
-        $heureDebutAuj = $p->getHeureDebut();
-        $heureDebutDateTime = (new \DateTimeImmutable())->setTime(
-            (int)$heureDebutAuj->format('H'),
-            (int)$heureDebutAuj->format('i'),
-            (int)$heureDebutAuj->format('s')
-        );
-        $heureLimite = $heureDebutDateTime->modify("+$tolerance minutes");
+    private function calculateRetard(?Planning $p, ?Pointage $pt, ?Entreprise $e): int
+    {
+        if (!$e || !$p?->getHeureDebut() || !$pt?->getHeureEntree()) return 0;
+        $tolerance = $e->getToleranceRetard() ?? 15;
+
+        $heureLimite = $p->getHeureDebut()->modify("+$tolerance minutes");
 
         return $pt->getHeureEntree() > $heureLimite ? (int)(($pt->getHeureEntree()->getTimestamp() - $heureLimite->getTimestamp()) / 60) : 0;
     }
-
-    //private function calculateMinutesTravail(?Pointage $p): float
-    //{
-    //    if (!$p || !$p->getHeureEntree()) {
-    //        return 0;
-    //    }
-    //
-    //    $sortie = $p->getHeureSortie() ?? new \DateTimeImmutable();
-     //   $workedMinutes = ($sortie->getTimestamp() - $p->getHeureEntree()->getTimestamp()) / 60;
-    //    $pauseMinutes = $this->getPauseDurationMinutes($p);
-
-    //    return max(0, $workedMinutes - $pauseMinutes);
-    //}
 
     private function calculateMinutesTravail(?Pointage $p): float
     {
@@ -203,90 +220,37 @@ class PlanningService
             return 0;
         }
 
-        $today = new \DateTimeImmutable('today');
+        $today = $this->localToday();
         $pointageDate = $p->getDate() ? $p->getDate()->setTime(0, 0, 0) : null;
 
-        // If there is no exit time:
         if (!$p->getHeureSortie()) {
-            // If the pointage is NOT from today (e.g. an old forgotten shift),
-            // do NOT use "now" as the exit time, otherwise it counts months of elapsed time!
             if ($pointageDate && $pointageDate < $today) {
                 return 0;
             }
 
-            // If it IS today, use current time for live tracking
-            $sortie = new \DateTimeImmutable();
+            $now = $this->localNow();
+            $sortie = $p->getHeureEntree()->setTime((int) $now->format('H'), (int) $now->format('i'), (int) $now->format('s'));
         } else {
             $sortie = $p->getHeureSortie();
         }
 
-        $workedMinutes = ($sortie->getTimestamp() - $p->getHeureEntree()->getTimestamp()) / 60;
+        $workedSeconds = $sortie->getTimestamp() - $p->getHeureEntree()->getTimestamp();
 
-        // Safety cap: A single normal work shift cannot exceed 24 hours (1440 minutes)
-        if ($workedMinutes > 1440 || $workedMinutes < 0) {
+        if ($workedSeconds < 0) {
+            $workedSeconds += 86400;
+        }
+
+        $workedMinutes = $workedSeconds / 60;
+
+        if ($workedMinutes > 1440) {
             return 0;
         }
 
-        $pauseMinutes = $this->getPauseDurationMinutes($p);
-
-        return max(0, $workedMinutes - $pauseMinutes);
-    }
-    private function getPauseDurationMinutes(?Pointage $p): int
-    {
-        if (!$p) {
-            return 0;
-        }
-
-        $pauseMinutes = $p->getPauseDurationMinutes() ?? 0;
-        if ($p->isOnPause() && $p->getHeureDebutPause()) {
-            $pauseMinutes += (int) floor(((new \DateTimeImmutable())->getTimestamp() - $p->getHeureDebutPause()->getTimestamp()) / 60);
-        }
-
-        return max(0, $pauseMinutes);
-    }
-
-    private function getPauseDurationSeconds(?Pointage $p): int
-    {
-        if (!$p) {
-            return 0;
-        }
-
-        $pauseSeconds = ($p->getPauseDurationMinutes() ?? 0) * 60;
-        if ($p->isOnPause() && $p->getHeureDebutPause()) {
-            $pauseSeconds += max(0, (int) ((new \DateTimeImmutable())->getTimestamp() - $p->getHeureDebutPause()->getTimestamp()));
-        }
-
-        return max(0, $pauseSeconds);
+        return max(0, $workedMinutes);
     }
 
     private function formatMinutes(float $minutes): string
     {
         return sprintf('%dh %02dmin', floor($minutes / 60), $minutes % 60);
-    }
-
-    public function pointerDebutPause(User $user): void
-    {
-        $today = new \DateTimeImmutable('today');
-        $pointage = $this->getPointageForDay($user, $user->getEntreprise(), $today);
-
-        if ($pointage && $pointage->getHeureEntree() && !$pointage->getHeureSortie() && $pointage->getHeureDebutPause() === null) {
-            $pointage->setHeureDebutPause(new \DateTimeImmutable('now'));
-            $this->em->flush();
-        }
-    }
-
-    public function pointerFinPause(User $user): void
-    {
-        $today = new \DateTimeImmutable('today');
-        $pointage = $this->getPointageForDay($user, $user->getEntreprise(), $today);
-
-        if ($pointage && $pointage->getHeureDebutPause() !== null && $pointage->getHeureFinPause() === null) {
-            $finPause = new \DateTimeImmutable('now');
-            $pauseMinutes = (int) floor(($finPause->getTimestamp() - $pointage->getHeureDebutPause()->getTimestamp()) / 60);
-            $pointage->setPauseDurationMinutes(($pointage->getPauseDurationMinutes() ?? 0) + max(0, $pauseMinutes));
-            $pointage->setHeureDebutPause(null);
-            $pointage->setHeureFinPause(null);
-            $this->em->flush();
-        }
     }
 }

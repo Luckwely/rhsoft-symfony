@@ -30,7 +30,7 @@ final class EntrepriseController extends AbstractController
             'stats' => [
                 'total' => $repo->countAll(),
                 'actifs' => $repo->countByStatus('active'),
-                'essai' => $repo->countByStatus('essai'),
+                'essai' => $repo->countByStatus('trial'),
                 'inactifs' => $repo->countByStatus('inactif')
             ]
         ]);

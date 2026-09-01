@@ -76,6 +76,21 @@ class Entreprise
     #[ORM\Column(type: 'integer', options: ['default' => 15])]
     private ?int $toleranceRetard = 15;
 
+    #[ORM\Column(type: 'integer', options: ['default' => 50])]
+    private ?int $plafondAvancePourcentage = 50;
+
+    #[ORM\Column(type: 'decimal', precision: 12, scale: 2, options: ['default' => 1000000])]
+    private ?float $salaireBaseAdmin = 1000000;
+
+    #[ORM\Column(type: 'decimal', precision: 12, scale: 2, options: ['default' => 800000])]
+    private ?float $salaireBaseRh = 800000;
+
+    #[ORM\Column(type: 'decimal', precision: 12, scale: 2, options: ['default' => 600000])]
+    private ?float $salaireBaseManager = 600000;
+
+    #[ORM\Column(type: 'decimal', precision: 12, scale: 2, options: ['default' => 400000])]
+    private ?float $salaireBaseEmploye = 400000;
+
     /**
      * @var Collection<int, Conge>
      */
@@ -104,6 +119,47 @@ class Entreprise
     {
         $this->toleranceRetard = $toleranceRetard;
         return $this;
+    }
+
+    public function getPlafondAvancePourcentage(): ?int
+    {
+        return $this->plafondAvancePourcentage;
+    }
+
+    public function setPlafondAvancePourcentage(?int $plafondAvancePourcentage): static
+    {
+        $this->plafondAvancePourcentage = $plafondAvancePourcentage;
+        return $this;
+    }
+
+    public function getSalaireBaseAdmin(): ?float { return $this->salaireBaseAdmin; }
+    public function setSalaireBaseAdmin(?float $salaireBaseAdmin): static { $this->salaireBaseAdmin = $salaireBaseAdmin; return $this; }
+
+    public function getSalaireBaseRh(): ?float { return $this->salaireBaseRh; }
+    public function setSalaireBaseRh(?float $salaireBaseRh): static { $this->salaireBaseRh = $salaireBaseRh; return $this; }
+
+    public function getSalaireBaseManager(): ?float { return $this->salaireBaseManager; }
+    public function setSalaireBaseManager(?float $salaireBaseManager): static { $this->salaireBaseManager = $salaireBaseManager; return $this; }
+
+    public function getSalaireBaseEmploye(): ?float { return $this->salaireBaseEmploye; }
+    public function setSalaireBaseEmploye(?float $salaireBaseEmploye): static { $this->salaireBaseEmploye = $salaireBaseEmploye; return $this; }
+
+    /**
+     * @param string[] $roles
+     */
+    public function getSalaireBaseForRoles(array $roles): float
+    {
+        if (in_array('ROLE_ADMIN', $roles, true)) {
+            return $this->salaireBaseAdmin ?? 1000000.0;
+        }
+        if (in_array('ROLE_RH', $roles, true)) {
+            return $this->salaireBaseRh ?? 800000.0;
+        }
+        if (in_array('ROLE_MANAGER', $roles, true)) {
+            return $this->salaireBaseManager ?? 600000.0;
+        }
+
+        return $this->salaireBaseEmploye ?? 400000.0;
     }
 
     public function isModulePaie(): bool {
@@ -317,7 +373,7 @@ class Entreprise
     public function removeUser(User $user): static
     {
         if ($this->users->removeElement($user)) {
-            // set the owning side to null (unless already changed)
+
             if ($user->getEntreprise() === $this) {
                 $user->setEntreprise(null);
             }
@@ -347,7 +403,7 @@ class Entreprise
     public function removeTypeConge(Conge $typeConge): static
     {
         if ($this->typeConge->removeElement($typeConge)) {
-            // set the owning side to null (unless already changed)
+
             if ($typeConge->getEntreprise() === $this) {
                 $typeConge->setEntreprise(null);
             }
@@ -377,7 +433,7 @@ class Entreprise
     public function removeOffre(Offre $offre): static
     {
         if ($this->offres->removeElement($offre)) {
-            // set the owning side to null (unless already changed)
+
             if ($offre->getEntreprise() === $this) {
                 $offre->setEntreprise(null);
             }

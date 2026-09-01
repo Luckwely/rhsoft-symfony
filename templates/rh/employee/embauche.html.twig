@@ -10,27 +10,30 @@
             Gestion des Employés
         </h3>
         <p class="text-muted mb-0">
-            <i class="bi bi-list-check me-1"></i>Gérez vos collaborateurs, embauches et sorties
+            Gérez vos collaborateurs, embauches et sorties
         </p>
     </div>
 
     <!-- NAVIGATION ONGLETS BOOTSTRAP -->
     <ul class="nav nav-tabs border-0 gap-2 mb-4">
         <li class="nav-item">
-            <a href="{{ path('app_rh_employee') }}" class="nav-link border-0 rounded-3 px-4"
+            <a href="{{ path('app_rh_employee') }}" class="nav-link border-0 rounded-3 px-4">
                 <i class="bi bi-list-ul me-2"></i>Liste des Employés
-                <span class="badge bg-primary ms-1">5</span>
             </a>
         </li>
         <li class="nav-item">
             <a href="{{ path('app_rh_employee_embauche') }}" class="nav-link active border-0 rounded-3 px-4">
-                <i class="bi bi-person-plus text-success me-2"></i>Embauches
+                <i class="bi bi-person-plus text-info me-2"></i>Embauches
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ path('app_rh_employee_import') }}" class="nav-link border-0 rounded-3 px-4">
+                <i class="bi bi-upload text-info me-2"></i>Importer (CSV)
             </a>
         </li>
         <li class="nav-item">
             <a href="{{ path('app_rh_employee_sortie') }}" class="nav-link border-0 rounded-3 px-4">
                 <i class="bi bi-person-x text-danger me-2"></i>Sorties
-                <span class="badge bg-danger ms-1">3</span>
             </a>
         </li>
     </ul>
@@ -75,6 +78,16 @@
                     {{ form_widget(form.adresse) }}
                     {{ form_errors(form.adresse) }}
                 </div>
+                <div class="col-md-3">
+                    {{ form_label(form.genre, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                    {{ form_widget(form.genre) }}
+                    {{ form_errors(form.genre) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_label(form.dateNaissance, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                    {{ form_widget(form.dateNaissance) }}
+                    {{ form_errors(form.dateNaissance) }}
+                </div>
                 <div class="col-md-6">
                     {{ form_label(form.dateEmbauche, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                     {{ form_widget(form.dateEmbauche) }}
@@ -86,9 +99,9 @@
                     {{ form_errors(form.soldeConge) }}
                 </div>
                 <div class="col-md-6">
-                    {{ form_label(form.salaireBase, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-                    {{ form_widget(form.salaireBase) }}
-                    {{ form_errors(form.salaireBase) }}
+                    <label class="form-label fw-semibold">Salaire de base (Ar)</label>
+                    <input type="text" class="form-control" value="Défini automatiquement selon le rôle choisi" disabled>
+                    <small class="text-muted">Configurable dans Paramètres &gt; Salaires.</small>
                 </div>
                 <div class="col-md-6">
                     {{ form_label(form.photo, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
@@ -99,6 +112,16 @@
                     {{ form_label(form.cv, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                     {{ form_widget(form.cv) }}
                     {{ form_errors(form.cv) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form.poste, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                    {{ form_widget(form.poste) }}
+                    {{ form_errors(form.poste) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form.service, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                    {{ form_widget(form.service) }}
+                    {{ form_errors(form.service) }}
                 </div>
 
                 <div class="col-12 mt-4">

@@ -4,11 +4,12 @@
 
 {% block body %}
 <style>
-.shape {
-	aspect-ratio: 1.491;
-	clip-path: shape(from 80.64% 10.91%,curve by -9.04% -10.76% with -1.74% -5.38%/-5.07% -9.91%,curve by -13.05% 7.98% with -4.82% -1.03%/-9.36% 3.26%,curve by -11.87% 12.27% with -3.69% 4.71%/-7.21% 10.15%,curve by -25.57% -4.53% with -8.31% 3.75%/-16.9% -4.47%,curve to 5.92% 25.66% with 15.44% 15.81%/9.81% 19.43%,curve by 16.45% 70.23% with -14.39% 23.09%/-0.04% 60.08%,curve by 40.89% -9.07% with 13.29% 8.22%/29.22% 3.57%,curve by 19.21% -53.55% with 11.1% -12.03%/17.95% -33.18%,curve by 0.2% -4.77% with 0.08% -1.63%/0.16% -3.2%,curve to 80.64% 10.91% with 82.75% 22.46%/82.38% 16.29%,close,close,move to 82.83% 72.62%,curve to 95.8% 62.95% with 85.26% 53.88%,curve to 93.77% 82.29% with 105.12% 71.41%,curve to 82.83% 72.62% with 81.21% 91.96%,close);
-    background: linear-gradient(60deg in hsl, #d75252, #852b4f);
-}
+    .shape {
+        aspect-ratio: 1.491;
+        clip-path: shape(from 80.64% 10.91%,curve by -9.04% -10.76% with -1.74% -5.38%/-5.07% -9.91%,curve by -13.05% 7.98% with -4.82% -1.03%/-9.36% 3.26%,curve by -11.87% 12.27% with -3.69% 4.71%/-7.21% 10.15%,curve by -25.57% -4.53% with -8.31% 3.75%/-16.9% -4.47%,curve to 5.92% 25.66% with 15.44% 15.81%/9.81% 19.43%,curve by 16.45% 70.23% with -14.39% 23.09%/-0.04% 60.08%,curve by 40.89% -9.07% with 13.29% 8.22%/29.22% 3.57%,curve by 19.21% -53.55% with 11.1% -12.03%/17.95% -33.18%,curve by 0.2% -4.77% with 0.08% -1.63%/0.16% -3.2%,curve to 80.64% 10.91% with 82.75% 22.46%/82.38% 16.29%,close,close,move to 82.83% 72.62%,curve to 95.8% 62.95% with 85.26% 53.88%,curve to 93.77% 82.29% with 105.12% 71.41%,curve to 82.83% 72.62% with 81.21% 91.96%,close);
+        background: linear-gradient(60deg in hsl, #d75252, #852b4f);
+    }
+
     .header {
          background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0)), url('../uploads/home/header-bg.jpg');
         background-size: cover;
@@ -144,18 +145,18 @@
             <div class="col-lg-6 text-center text-lg-start">
 
                 <h1 class="display-4 fw-bold text-white mb-4" style="animation: slideLeft 1s ease-out;">
-                    La Gestion RH Multi-Entreprise
+                    La Solution RH Moderne
                 </h1>
                 <p class="lead text-white-50 mb-4" style="animation: slideLeft 1s ease-out 0.3s both;">
                     Automatisez la gestion de vos ressources humaines, centralisez toutes vos données et optimisez la productivité de vos équipes en quelques clics.
                 </p>
-                <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start" style="animation: slideLeft 1s ease-out 0.6s both;">
-                    <a href="{{ path('app_pricing') }}" class="btn btn-light btn-lg px-4 fw-semibold position-relative overflow-hidden">
+                <div class="d-flex flex-wrap  justify-content-center justify-content-lg-start" style="animation: slideLeft 1s ease-out 0.6s both;">
+                    <a href="{{ path('app_pricing') }}" class="btn btn-light btn-lg px-4 fw-semibold position-relative overflow-hidden" style="border-radius:39% 61% 34% 66% / 97% 0% 100% 3% ">
                         <span class="position-absolute top-0 start-0 w-100 h-100 bg-primary bg-opacity-10"
                               style="transform: translateX(-100%); transition: transform 0.5s ease;"></span>
                         <i class="bi bi-tag-fill me-2"></i>Voir les Tarifs
                     </a>
-                    <a href="{{ path('app_login') }}" class="btn bg-primary text-white btn-lg px-4">
+                    <a href="{{ path('app_login') }}" class="btn bg-primary text-white btn-lg px-4" style="border-radius:39% 61% 34% 66% / 97% 0% 100% 3% ">
                         <i class="bi bi-box-arrow-in-right me-2"></i>Se Connecter
                     </a>
                 </div>
@@ -180,52 +181,6 @@
                            </video>
                         </div>
                     </div>
-
-                    <!-- Animated Overlay Stats (Moved outside overflow-hidden container to prevent clipping) -->
-                    <div class="position-absolute top-0 start-0 m-2 m-lg-4 rounded-3 p-2 px-3 shadow-lg"
-                         style="background: rgba(13, 110, 253, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); animation: floatStat 3s ease-in-out infinite; z-index: 2;">
-                        <div class="d-flex align-items-center gap-2 text-white">
-                            <i class="bi bi-person-check fs-5 text-info"></i>
-                            <div>
-                                <div class="fw-bold text-white text-nowrap" style="font-size: 13px;">+98% Suivi Effectif</div>
-                                <small class="opacity-75 text-white text-nowrap" style="font-size: 10px;">Collaborateurs Actifs Centralisés</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="position-absolute top-0 end-0 m-2 m-lg-4 rounded-3 p-2 px-3 shadow-lg"
-                         style="background: rgba(25, 135, 84, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); animation: floatStat 3.5s ease-in-out infinite reverse; z-index: 2;">
-                        <div class="d-flex align-items-center gap-2 text-white">
-                            <i class="bi bi-graph-up fs-5 text-success"></i>
-                            <div>
-                                <div class="fw-bold text-white text-nowrap" style="font-size: 13px;">Productivité +35%</div>
-                                <small class="opacity-75 text-white text-nowrap" style="font-size: 10px;">Performance & Automatisation</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="position-absolute bottom-0 start-0 m-2 m-lg-4 rounded-3 p-2 px-3 shadow-lg"
-                         style="background: rgba(255, 193, 7, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); animation: floatStat 4s ease-in-out infinite 1s; z-index: 2;">
-                        <div class="d-flex align-items-center gap-2 text-white">
-                            <i class="bi bi-calendar-check fs-5 text-warning"></i>
-                            <div>
-                                <div class="fw-bold text-white text-nowrap" style="font-size: 13px;">Gestion en Temps Réel</div>
-                                <small class="opacity-75 text-white text-nowrap" style="font-size: 10px;">Suivi Fluide des Congés</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="position-absolute bottom-0 end-0 m-2 m-lg-4 rounded-3 p-2 px-3 shadow-lg d-none d-md-block"
-                         style="background: rgba(13, 202, 240, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); animation: floatStat 4.5s ease-in-out infinite 2s; z-index: 2;">
-                        <div class="d-flex align-items-center gap-2 text-white">
-                            <i class="bi bi-clock fs-5 text-info"></i>
-                            <div>
-                                <div class="fw-bold text-white text-nowrap" style="font-size: 13px;">Zéro Saisie Double</div>
-                                <small class="opacity-75 text-white text-nowrap" style="font-size: 10px;">Assiduité & Paie Harmonisées</small>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
@@ -395,12 +350,12 @@
                         <h3 class="fw-bold">Starter</h3>
                         <div class="mb-3">
                             <span class="display-4 fw-bold text-primary">0€</span>
-                            <span class="text-muted">/14 jours</span>
+                            <span class="text-muted">/30 jours</span>
                         </div>
                         <p class="text-muted small">Idéal pour les petites équipes</p>
                         <ul class="list-unstyled text-start mb-4">
                             <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Accès limité</li>
-                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>1 Entreprise</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>1 Entreprise / 5 Utilisateurs</li>
                         </ul>
                     </div>
                 </div>
@@ -417,10 +372,10 @@
                             <span class="display-4 fw-bold text-primary">9,99€</span>
                             <span class="text-muted">/mois</span>
                         </div>
-                        <p class="text-muted small">Parfait pour les PME en croissance</p>
+                        <p class="text-muted small">Idéal pour les petites équipes</p>
                         <ul class="list-unstyled text-start mb-4">
                             <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Tout de Essai</li>
-                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>50 Utilisateurs</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>5 Utilisateurs</li>
                         </ul>
                     </div>
                 </div>
@@ -437,10 +392,10 @@
                             <span class="display-4 fw-bold text-primary">19,99€</span>
                             <span class="text-muted">/mois</span>
                         </div>
-                        <p class="text-muted small">Pour les grandes organisations</p>
+                        <p class="text-muted small">Parfait pour les PME en croissance</p>
                         <ul class="list-unstyled text-start mb-4">
                             <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Tout de Premium</li>
-                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>100 Utilisateurs</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Jusqu'à 20 Utilisateurs</li>
                         </ul>
                     </div>
                 </div>

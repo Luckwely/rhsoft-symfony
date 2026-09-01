@@ -11,29 +11,21 @@
                 Rapports & Analyses RH
             </h3>
             <p class="text-muted mb-0">
-                <i class="bi bi-calendar3 me-1"></i>Analyse annuelle {{ reportData.year }}
+                Analyse annuelle {{ reportData.year }}
             </p>
         </div>
-        <div class="d-flex gap-2 mt-3 mt-lg-0 flex-wrap">
-            <input type="number" min="2000" max="2100" class="form-control form-control-sm" value="{{ reportData.year }}" style="max-width: 120px;">
-            <button class="btn btn-outline-dark btn-sm">
-                <i class="bi bi-download me-1"></i>Exporter PDF
-            </button>
-            <button class="btn btn-outline-dark btn-sm">
-                <i class="bi bi-file-earmark-excel me-1"></i>Exporter Excel
-            </button>
-        </div>
+
     </div>
 
     <!-- 2. SECTION KPI CARDS 4 COLONNES -->
     <div class="row g-3 mb-4">
-        <div class="col-6 col-xl-3">
+        <div class="col-6 col-xl-4">
             <div class="card border-0 shadow-sm rounded-3 h-100">
                 <div class="card-body p-3 p-md-4">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <span class="text-muted small text-uppercase fw-semibold">Masse Salariale</span>
-                            <h2 class="fw-bold mb-0 mt-1">{{ reportData.payrollMass|number_format(0, ',', ' ') }} €</h2>
+                            <h2 class="fw-bold mb-0 mt-1">{{ reportData.payrollMass|number_format(0, ',', ' ') }} Ar</h2>
                         </div>
                         <div class="bg-info bg-opacity-10 rounded-3 p-3">
                             <i class="bi bi-currency-euro text-info fs-4"></i>
@@ -42,7 +34,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-6 col-xl-3">
+        <div class="col-6 col-xl-4">
             <div class="card border-0 shadow-sm rounded-3 h-100">
                 <div class="card-body p-3 p-md-4">
                     <div class="d-flex justify-content-between align-items-start">
@@ -51,28 +43,13 @@
                             <h2 class="fw-bold mb-0 mt-1">{{ reportData.absentRate }}%</h2>
                         </div>
                         <div class="bg-danger bg-opacity-10 rounded-3 p-3">
-                            <i class="bi bi-person-x text-danger fs-4"></i>
+                            <i class="bi bi-person-x  fs-4"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-6 col-xl-3">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body p-3 p-md-4">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <span class="text-muted small text-uppercase fw-semibold">Taux de Turnover</span>
-                            <h2 class="fw-bold mb-0 mt-1">{{ reportData.turnoverRate }}%</h2>
-                        </div>
-                        <div class="bg-warning bg-opacity-10 rounded-3 p-3">
-                            <i class="bi bi-arrow-left-right text-warning fs-4"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-xl-3">
+        <div class="col-6 col-xl-4">
             <div class="card border-0 shadow-sm rounded-3 h-100">
                 <div class="card-body p-3 p-md-4">
                     <div class="d-flex justify-content-between align-items-start">
@@ -97,11 +74,11 @@
                 <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
                     <div>
                         <h5 class="fw-bold mb-0">
-                            <i class="bi bi-people text-primary me-2"></i>Départs sur 6 mois
+                            Départs sur 6 mois
                         </h5>
                         <small class="text-muted">Tendance des départs au fil des mois</small>
                     </div>
-                    <span class="badge bg-primary bg-opacity-10 text-primary">{{ reportData.departures }} dépars cette année</span>
+
                 </div>
                 <div class="card-body">
                     <canvas id="chartEffectif" height="120"></canvas>
@@ -114,9 +91,9 @@
             <div class="card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-header bg-transparent border-0">
                     <h5 class="fw-bold mb-0">
-                        <i class="bi bi-pie-chart text-primary me-2"></i>Répartition par Service
+                        Répartition par Service
                     </h5>
-                    <small class="text-muted">142 employés au total</small>
+                    <small class="text-muted">{{ reportData.totalEmployees }} employés au total</small>
                 </div>
                 <div class="card-body d-flex align-items-center justify-content-center">
                     <canvas id="chartService" height="180"></canvas>
@@ -134,102 +111,14 @@
         </div>
     </div>
 
-    <!-- 4. SECTION TABLEAU "TOP 5 ABSENCES" -->
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
-        <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
-            <div>
-                <h5 class="fw-bold mb-0">
-                    <i class="bi bi-bar-chart text-primary me-2"></i>Motifs d'absence ce mois
-                </h5>
-                <small class="text-muted">Total: 57 jours d'absence</small>
-            </div>
-            <span class="badge bg-danger bg-opacity-10 text-danger">+12% vs mois dernier</span>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-borderless table-hover align-middle mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th style="width: 40%;">Motif</th>
-                            <th style="width: 15%;">Jours</th>
-                            <th style="width: 45%;">Répartition</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <span class="fw-semibold">Maladie</span>
-                                <span class="badge bg-danger-subtle text-danger ms-2">24j</span>
-                            </td>
-                            <td>24j</td>
-                            <td>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-danger" style="width: 45%;"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span class="fw-semibold">Congé Payé</span>
-                                <span class="badge bg-primary-subtle text-primary ms-2">18j</span>
-                            </td>
-                            <td>18j</td>
-                            <td>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-primary" style="width: 35%;"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span class="fw-semibold">RTT</span>
-                                <span class="badge bg-info-subtle text-info ms-2">10j</span>
-                            </td>
-                            <td>10j</td>
-                            <td>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-info" style="width: 20%;"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span class="fw-semibold">Sans Solde</span>
-                                <span class="badge bg-warning-subtle text-warning ms-2">3j</span>
-                            </td>
-                            <td>3j</td>
-                            <td>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-warning" style="width: 7%;"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span class="fw-semibold">Formation</span>
-                                <span class="badge bg-secondary-subtle text-secondary ms-2">2j</span>
-                            </td>
-                            <td>2j</td>
-                            <td>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-secondary" style="width: 5%;"></div>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
     <!-- 5. SECTION 2 TABLEAUX COTE A COTE -->
     <div class="row g-4 mb-4">
         <!-- Tableau 1: Coût par Service -->
-        <div class="col-lg-6">
+        <div class="col-lg-12">
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-header bg-transparent border-0">
-                    <h5 class="fw-bold mb-0">
-                        <i class="bi bi-wallet2 text-primary me-2"></i>Coût par Service
+                    <h5 class="fw-bold mb-1 ">
+                        Coût par Service
                     </h5>
                     <small class="text-muted">Masse salariale mensuelle</small>
                 </div>
@@ -245,37 +134,29 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="ps-3"><span class="fw-semibold">Tech</span></td>
-                                    <td class="text-center">45</td>
-                                    <td class="text-end">22 500 €</td>
-                                    <td class="text-end pe-3">500 €</td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3"><span class="fw-semibold">Commercial</span></td>
-                                    <td class="text-center">60</td>
-                                    <td class="text-end">30 000 €</td>
-                                    <td class="text-end pe-3">500 €</td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3"><span class="fw-semibold">RH</span></td>
-                                    <td class="text-center">12</td>
-                                    <td class="text-end">6 000 €</td>
-                                    <td class="text-end pe-3">500 €</td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3"><span class="fw-semibold">Compta</span></td>
-                                    <td class="text-center">25</td>
-                                    <td class="text-end">12 500 €</td>
-                                    <td class="text-end pe-3">500 €</td>
-                                </tr>
+                                {% set totalEmployeesCost = 0 %}
+                                {% set totalPayrollCost = 0 %}
+                                {% for row in reportData.serviceCosts %}
+                                    {% set totalEmployeesCost = totalEmployeesCost + row.employeeCount %}
+                                    {% set totalPayrollCost = totalPayrollCost + row.payrollMass %}
+                                    <tr>
+                                        <td class="ps-3"><span class="fw-semibold">{{ row.service ?: 'Non défini' }}</span></td>
+                                        <td class="text-center">{{ row.employeeCount }}</td>
+                                        <td class="text-end">{{ row.payrollMass|number_format(0, ',', ' ') }} Ar</td>
+                                        <td class="text-end pe-3">{{ row.employeeCount > 0 ? (row.payrollMass / row.employeeCount)|number_format(0, ',', ' ') : 0 }} Ar</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-3">Aucun service trouvé</td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                             <tfoot class="bg-light">
                                 <tr>
                                     <td class="ps-3 fw-bold">Total</td>
-                                    <td class="text-center fw-bold">142</td>
-                                    <td class="text-end fw-bold">71 000 €</td>
-                                    <td class="text-end pe-3 fw-bold">500 €</td>
+                                    <td class="text-center fw-bold">{{ reportData.totalEmployees }}</td>
+                                    <td class="text-end fw-bold">{{ reportData.payrollMass|number_format(0, ',', ' ') }} Ar</td>
+                                    <td class="text-end pe-3 fw-bold">{{ reportData.totalEmployees > 0 ? (reportData.payrollMass / reportData.totalEmployees)|number_format(0, ',', ' ') : 0 }} Ar</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -285,16 +166,16 @@
         </div>
 
         <!-- Tableau 2: Heures Supplémentaires -->
-        <div class="col-lg-6">
+        <div class="col-lg-12">
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="fw-bold mb-0">
-                            <i class="bi bi-clock text-primary me-2"></i>Heures Supplémentaires
+                        <h5 class="fw-bold mb-0 ">
+                            Heures Supplémentaires
                         </h5>
                         <small class="text-muted">Top 5 des heures sup</small>
                     </div>
-                    <span class="badge bg-warning bg-opacity-10 text-warning">Total: 48h</span>
+
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -308,61 +189,26 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 12px;">JD</div>
-                                            <span class="fw-semibold">Jean Dupont</span>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">Tech</td>
-                                    <td class="text-center"><span class="fw-semibold">12h</span></td>
-                                    <td class="text-end pe-3">300 €</td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 12px;">MM</div>
-                                            <span class="fw-semibold">Marie Martin</span>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">Commercial</td>
-                                    <td class="text-center"><span class="fw-semibold">10h</span></td>
-                                    <td class="text-end pe-3">250 €</td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-warning-subtle text-warning rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 12px;">TB</div>
-                                            <span class="fw-semibold">Thomas Bernard</span>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">Tech</td>
-                                    <td class="text-center"><span class="fw-semibold">8h</span></td>
-                                    <td class="text-end pe-3">200 €</td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-info-subtle text-info rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 12px;">JL</div>
-                                            <span class="fw-semibold">Julie Lefèvre</span>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">RH</td>
-                                    <td class="text-center"><span class="fw-semibold">6h</span></td>
-                                    <td class="text-end pe-3">150 €</td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-danger-subtle text-danger rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 12px;">PD</div>
-                                            <span class="fw-semibold">Paul Dubois</span>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">Compta</td>
-                                    <td class="text-center"><span class="fw-semibold">4h</span></td>
-                                    <td class="text-end pe-3">100 €</td>
-                                </tr>
+                                {% for item in reportData.overtimeList %}
+                                    {% set emp = item.employee %}
+                                    <tr>
+                                        <td class="ps-3">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 12px;">
+                                                    {{ ((emp.prenom|default('')|slice(0,1) ~ emp.nom|default('')|slice(0,1))|upper)|default('--') }}
+                                                </div>
+                                                <span class="fw-semibold">{{ emp.prenom ~ ' ' ~ emp.nom }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">{{ emp.service ?: 'N/A' }}</td>
+                                        <td class="text-center"><span class="fw-semibold">{{ item.hours }}h</span></td>
+                                        <td class="text-end pe-3">{{ item.cost|number_format(0, ',', ' ') }} Ar</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-3">Aucune heure supplémentaire enregistrée</td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -371,6 +217,7 @@
         </div>
     </div>
 </div>
+    {% include 'admin/_advanced_analytics.html.twig' with {'advancedAnalytics': reportData.advancedAnalytics} %}
 {% endblock %}
 
 {% block javascripts %}
@@ -423,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     padding: 12,
                     callbacks: {
                         label: function(context) {
-                            return 'Effectif: ' + context.parsed.y + ' employés';
+                            return 'Départs: ' + context.parsed.y;
                         }
                     }
                 }

@@ -10,7 +10,7 @@
         <div>
             <h3 class="fw-bold mb-1">Suivi des Pointages</h3>
             <p class="text-muted mb-0">
-                <i class="bi bi-calendar3 me-1"></i>Aujourd'hui: {{ "now"|date('d F Y') }}
+                Aujourd'hui: {{ "now"|date('d F Y') }}
                 {% if isValide %}
                 <span class="badge bg-success ms-2">
                     <i class="bi bi-lock-fill"></i> Validé
@@ -18,20 +18,26 @@
                 {% endif %}
             </p>
         </div>
-        <form method="GET" action="{{ path('app_admin_pointage') }}" class="d-flex gap-2 mt-3 mt-lg-0 flex-wrap">
-            <input type="date" name="date" class="form-control form-control-sm" value="{{ date|date('Y-m-d') }}" style="max-width: 160px;" onchange="this.form.submit()">
+        <div class="d-flex gap-2 mt-3 mt-lg-0 flex-wrap">
+            <form method="GET" action="{{ path('app_admin_pointage') }}" class="d-flex gap-2">
+                <input type="date" name="date" class="form-control form-control-sm" value="{{ date|date('Y-m-d') }}" style="max-width: 160px;" onchange="this.form.submit()">
+            </form>
+            <a href="{{ path('app_admin_pointage_export', {date: date|date('Y-m-d'), status: status, service: service, q: q}) }}" class="btn btn-outline-dark btn-sm">
+                <i class="bi bi-download me-1"></i>Exporter
+            </a>
             {% if not isValide %}
-                <button type="submit" form="genererForm" class="btn btn-success btn-sm">
-                    <i class="bi bi-magic me-1"></i>Générer
-                </button>
-                <a href="{{ path('app_admin_pointage_valider', {date: date|date('Y-m-d')}) }}" class="btn btn-primary btn-sm">
-                    <i class="bi bi-check2-circle me-1"></i>Valider
-                </a>
+                <form method="post" action="{{ path('app_admin_pointage_valider', {date: date|date('Y-m-d')}) }}" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin_pointage_valider_' ~ date|date('Y-m-d')) }}">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="bi bi-check2-circle me-1"></i>Valider
+                    </button>
+                </form>
             {% endif %}
-        </form>
+        </div>
     </div>
     <form id="genererForm" method="POST" action="{{ path('app_admin_pointage_generer') }}" class="d-none">
         <input type="hidden" name="date" value="{{ date|date('Y-m-d') }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('admin_pointage_generer') }}">
     </form>
 
     <!-- 2. CARDS STATS -->
@@ -166,7 +172,7 @@
                     </thead>
                     <tbody>
                     {% for pointage in pointages %}
-                    <tr class="{{ pointage.statut == 'absent' ? 'table-danger' : (pointage.statut == 'retard' ? 'table-warning' : '') }}">
+                    <tr class="{{ pointage.statutEffectif == 'absent' ? 'table-danger' : (pointage.statutEffectif == 'retard' ? 'table-warning' : '') }}">
                         <td class="ps-3"><span class="text-muted small">{{ loop.index }}</span></td>
                         <td>
                             <div class="d-flex align-items-center gap-3">
@@ -180,7 +186,7 @@
                             </div>
                         </td>
                         <td class="text-center">
-                            <span class="fw-semibold {{ pointage.statut == 'retard' ? 'text-warning' : '' }}">
+                            <span class="fw-semibold {{ pointage.statutEffectif == 'retard' ? 'text-warning' : '' }}">
                                 {{ pointage.heureEntree ? pointage.heureEntree|date('H:i') : '-' }}
                             </span>
                         </td>
@@ -200,8 +206,8 @@
                             </span>
                         </td>
                         <td class="text-center">
-                            <span class="badge bg-{{ pointage.statut == 'present' ? 'success' : (pointage.statut == 'retard' ? 'warning' : (pointage.statut == 'absent' ? 'danger' : 'info')) }}-subtle text-{{ pointage.statut == 'present' ? 'success' : (pointage.statut == 'retard' ? 'warning' : (pointage.statut == 'absent' ? 'danger' : 'info')) }} rounded-pill px-3 py-2">
-                                <i class="bi bi-{{ pointage.statut == 'present' ? 'check-circle-fill' : (pointage.statut == 'retard' ? 'clock-fill' : (pointage.statut == 'absent' ? 'x-circle-fill' : 'calendar-x-fill')) }} me-1"></i>{{ pointage.statutLabel }}
+                            <span class="badge bg-{{ pointage.statutEffectif == 'present' ? 'success' : (pointage.statutEffectif == 'retard' ? 'warning' : (pointage.statutEffectif == 'absent' ? 'danger' : 'info')) }}-subtle text-{{ pointage.statutEffectif == 'present' ? 'success' : (pointage.statutEffectif == 'retard' ? 'warning' : (pointage.statutEffectif == 'absent' ? 'danger' : 'info')) }} rounded-pill px-3 py-2">
+                                <i class="bi bi-{{ pointage.statutEffectif == 'present' ? 'check-circle-fill' : (pointage.statutEffectif == 'retard' ? 'clock-fill' : (pointage.statutEffectif == 'absent' ? 'x-circle-fill' : 'calendar-x-fill')) }} me-1"></i>{{ pointage.statutLabel }}
                             </span>
                         </td>
                         <td class="text-center pe-3">
@@ -251,7 +257,7 @@
                             </div>
                         </div>
                     </div>
-                    <span class="badge bg-{{ pointage.statut == 'present' ? 'success' : (pointage.statut == 'retard' ? 'warning' : (pointage.statut == 'absent' ? 'danger' : 'info')) }}-subtle text-{{ pointage.statut == 'present' ? 'success' : (pointage.statut == 'retard' ? 'warning' : (pointage.statut == 'absent' ? 'danger' : 'info')) }} rounded-pill px-3 py-2">
+                    <span class="badge bg-{{ pointage.statutEffectif == 'present' ? 'success' : (pointage.statutEffectif == 'retard' ? 'warning' : (pointage.statutEffectif == 'absent' ? 'danger' : 'info')) }}-subtle text-{{ pointage.statutEffectif == 'present' ? 'success' : (pointage.statutEffectif == 'retard' ? 'warning' : (pointage.statutEffectif == 'absent' ? 'danger' : 'info')) }} rounded-pill px-3 py-2">
                         {{ pointage.statutLabel }}
                     </span>
                 </div>
@@ -259,7 +265,7 @@
                 <div class="row text-center g-2">
                     <div class="col-3">
                         <span class="text-muted small d-block">Entrée</span>
-                        <span class="fw-semibold {{ pointage.statut == 'retard' ? 'text-warning' : '' }}">
+                        <span class="fw-semibold {{ pointage.statutEffectif == 'retard' ? 'text-warning' : '' }}">
                             {{ pointage.heureEntree ? pointage.heureEntree|date('H:i') : '-' }}
                         </span>
                     </div>
@@ -320,6 +326,7 @@
     <div class="modal fade" id="modal{{ pointage.id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <form method="POST" action="{{ path('app_admin_pointage_corriger', {id: pointage.id}) }}" class="modal-content border-0 rounded-4 shadow-lg">
+                <input type="hidden" name="_token" value="{{ csrf_token('admin_pointage_corriger_' ~ pointage.id) }}">
                 <div class="modal-header border-0">
                     <h5 class="modal-title fw-bold">
                         <i class="bi bi-pencil-square text-primary me-2"></i>

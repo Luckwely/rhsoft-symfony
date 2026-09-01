@@ -31,6 +31,8 @@
                 z-index: 1030;
                 background-color: #1e1f22;
                 transition: transform 0.3s ease-in-out;
+                overflow-y: auto;
+                overflow-x: hidden;
             }
 
             .sidebar .nav-link {
@@ -55,6 +57,24 @@
             .sidebar .nav-link i {
                 width: 20px;
                 font-size: 18px;
+            }
+
+            /* Shared responsive page spacing */
+            .page-shell {
+                width: 100%;
+                padding: 1rem 1rem 2rem;
+            }
+
+            @media (min-width: 768px) {
+                .page-shell {
+                    padding: 1.5rem 1.5rem 2.5rem;
+                }
+            }
+
+            @media (min-width: 1200px) {
+                .page-shell {
+                    padding: 2rem 2rem 3rem;
+                }
             }
 
             /* Main Content */

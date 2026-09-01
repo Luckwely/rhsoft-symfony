@@ -19,8 +19,9 @@ class PlanningFixtures extends Fixture implements DependentFixtureInterface
         $typesJour = [Planning::TYPE_TRAVAIL, Planning::TYPE_TRAVAIL, Planning::TYPE_TRAVAIL, Planning::TYPE_REPOS];
         $statuts = [Planning::STATUT_BROUILLON, Planning::STATUT_VALIDE];
 
-        // On suppose que vos UserFixtures ont généré 9 utilisateurs (index 1 à 9)
-        for ($userIndex = 1; $userIndex <= 9; $userIndex++) {
+        // UserFixtures génère désormais 5 utilisateurs par entreprise (admin, RH, manager,
+        // 2 employés) x 3 entreprises = 15 utilisateurs (index 1 à 15).
+        for ($userIndex = 1; $userIndex <= 15; $userIndex++) {
             /** @var User $user */
             $user = $this->getReference('user_' . $userIndex, User::class);
             $entreprise = $user->getEntreprise();
@@ -46,7 +47,7 @@ class PlanningFixtures extends Fixture implements DependentFixtureInterface
                 if ($typeJour === Planning::TYPE_TRAVAIL) {
                     $planning->setHeureDebut(new \DateTimeImmutable('08:00:00'));
                     $planning->setHeureFin(new \DateTimeImmutable('17:00:00'));
-                    $planning->setPauseMinutes(60);
+                    
                 }
 
                 if ($status === Planning::STATUT_VALIDE) {

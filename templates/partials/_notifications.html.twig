@@ -1,0 +1,38 @@
+{% set notifNonLuesCount = notifications_non_lues_count(app.user) %}
+{% set notifRecentes = notifications_recentes(app.user, 8) %}
+
+<div class="dropdown">
+    <button class="btn btn-link notification-btn p-2 rounded-circle" type="button"
+            data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifications">
+        <i class="bi bi-bell fs-5"></i>
+        {% if notifNonLuesCount > 0 %}
+            <span class="notification-badge">{{ notifNonLuesCount > 9 ? '9+' : notifNonLuesCount }}</span>
+        {% endif %}
+    </button>
+    <ul class="dropdown-menu dropdown-menu-custom dropdown-menu-end" style="width: 340px; max-width: 90vw;">
+        <li class="d-flex justify-content-between align-items-center px-3 py-1">
+            <span class="fw-bold small text-uppercase text-muted">Notifications</span>
+            {% if notifNonLuesCount > 0 %}
+                <form method="post" action="{{ path('app_notification_marquer_toutes_lues') }}" class="mb-0">
+                    <input type="hidden" name="redirect" value="{{ app.request.uri }}">
+                    <button type="submit" class="btn btn-link btn-sm p-0 small">Tout marquer lu</button>
+                </form>
+            {% endif %}
+        </li>
+        <li><hr class="dropdown-divider-custom"></li>
+        {% for notification in notifRecentes %}
+            <li>
+                <form method="post" action="{{ path('app_notification_marquer_lue', {id: notification.id}) }}" class="mb-0">
+                    <input type="hidden" name="redirect" value="{{ notification.lien|default(app.request.uri) }}">
+                    <button type="submit" class="dropdown-item text-wrap {{ notification.lue ? '' : 'fw-semibold' }}" style="white-space: normal;">
+                        <div class="small">{{ notification.titre }}</div>
+                        <div class="small text-muted">{{ notification.message }}</div>
+                        <div class="small text-muted">{{ notification.createdAt|date('d/m/Y H:i') }}</div>
+                    </button>
+                </form>
+            </li>
+        {% else %}
+            <li><span class="dropdown-item-text small text-muted">Aucune notification pour le moment.</span></li>
+        {% endfor %}
+    </ul>
+</div>

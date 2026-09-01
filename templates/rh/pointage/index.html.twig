@@ -5,12 +5,14 @@
 {% block body %}
 <div class="container-fluid px-4 py-3">
 
+    {% include 'rh/pointage/_mon_pointage.html.twig' %}
+
     <!-- 1. HEADER STICKY -->
     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4">
         <div>
             <h3 class="fw-bold mb-1">Suivi des Pointages</h3>
             <p class="text-muted mb-0">
-                <i class="bi bi-calendar3 me-1"></i>Aujourd'hui: {{ "now"|date('d F Y') }}
+                <i class="bi bi-calendar3 me-1"></i>Date sélectionnée : {{ date|date('d F Y') }}
                 {% if isValide %}
                 <span class="badge bg-success ms-2">
                     <i class="bi bi-lock-fill"></i> Validé
@@ -20,18 +22,25 @@
         </div>
         <form method="GET" action="{{ path('app_rh_pointage') }}" class="d-flex gap-2 mt-3 mt-lg-0 flex-wrap">
             <input type="date" name="date" class="form-control form-control-sm" value="{{ date|date('Y-m-d') }}" style="max-width: 160px;" onchange="this.form.submit()">
+            <a href="{{ path('app_rh_pointage_export', {date: date|date('Y-m-d'), status: status, service: service, q: q}) }}" class="btn btn-outline-dark btn-sm">
+                <i class="bi bi-download me-1"></i>Exporter
+            </a>
             {% if not isValide %}
                 <button type="submit" form="genererForm" class="btn btn-success btn-sm">
                     <i class="bi bi-magic me-1"></i>Générer
                 </button>
-                <a href="{{ path('app_rh_pointage_valider', {date: date|date('Y-m-d')}) }}" class="btn btn-primary btn-sm">
+                <button type="submit" form="validerJourneeForm" class="btn btn-primary btn-sm">
                     <i class="bi bi-check2-circle me-1"></i>Valider
-                </a>
+                </button>
             {% endif %}
         </form>
     </div>
     <form id="genererForm" method="POST" action="{{ path('app_rh_pointage_generer') }}" class="d-none">
+        <input type="hidden" name="token" value="{{ csrf_token('generer_pointage') }}">
         <input type="hidden" name="date" value="{{ date|date('Y-m-d') }}">
+    </form>
+    <form id="validerJourneeForm" method="POST" action="{{ path('app_rh_pointage_valider', {date: date|date('Y-m-d')}) }}" class="d-none">
+        <input type="hidden" name="token" value="{{ csrf_token('valider_pointage_' ~ date|date('Y-m-d')) }}">
     </form>
 
     <!-- 2. CARDS STATS -->
@@ -164,7 +173,7 @@
                     </thead>
                     <tbody>
                     {% for pointage in pointages %}
-                    <tr class="{{ pointage.statut == 'absent' ? 'table-danger' : (pointage.statut == 'retard' ? 'table-warning' : '') }}">
+                    <tr class="{{ pointage.statutEffectif == 'absent' ? 'table-danger' : (pointage.statutEffectif == 'retard' ? 'table-warning' : '') }}">
                         <td class="ps-3"><span class="text-muted small">{{ loop.index }}</span></td>
                         <td>
                             <div class="d-flex align-items-center gap-3">
@@ -178,14 +187,16 @@
                             </div>
                         </td>
                         <td class="text-center">
-                            <span class="fw-semibold {{ pointage.statut == 'retard' ? 'text-warning' : '' }}">
+                            <span class="fw-semibold {{ pointage.statutEffectif == 'retard' ? 'text-warning' : '' }}">
                                 {{ pointage.heureEntree ? pointage.heureEntree|date('H:i') : '-' }}
                             </span>
+                            <small class="d-block text-muted">Prévu : {{ pointage.heurePrevueDebut ? pointage.heurePrevueDebut|date('H:i') : '-' }}</small>
                         </td>
                         <td class="text-center">
                             <span class="fw-semibold">
                                 {{ pointage.heureSortie ? pointage.heureSortie|date('H:i') : '-' }}
                             </span>
+                            <small class="d-block text-muted">Prévu : {{ pointage.heurePrevueFin ? pointage.heurePrevueFin|date('H:i') : '-' }}</small>
                         </td>
                         <td class="text-center">
                             <span class="fw-semibold">
@@ -198,8 +209,8 @@
                             </span>
                         </td>
                         <td class="text-center">
-                            <span class="badge bg-{{ pointage.statut == 'present' ? 'success' : (pointage.statut == 'retard' ? 'warning' : (pointage.statut == 'absent' ? 'danger' : 'info')) }}-subtle text-{{ pointage.statut == 'present' ? 'success' : (pointage.statut == 'retard' ? 'warning' : (pointage.statut == 'absent' ? 'danger' : 'info')) }} rounded-pill px-3 py-2">
-                                <i class="bi bi-{{ pointage.statut == 'present' ? 'check-circle-fill' : (pointage.statut == 'retard' ? 'clock-fill' : (pointage.statut == 'absent' ? 'x-circle-fill' : 'calendar-x-fill')) }} me-1"></i>{{ pointage.statutLabel }}
+                            <span class="badge bg-{{ pointage.statutEffectif == 'present' ? 'success' : (pointage.statutEffectif == 'retard' ? 'warning' : (pointage.statutEffectif == 'absent' ? 'danger' : 'info')) }}-subtle text-{{ pointage.statutEffectif == 'present' ? 'success' : (pointage.statutEffectif == 'retard' ? 'warning' : (pointage.statutEffectif == 'absent' ? 'danger' : 'info')) }} rounded-pill px-3 py-2">
+                                <i class="bi bi-{{ pointage.statutEffectif == 'present' ? 'check-circle-fill' : (pointage.statutEffectif == 'retard' ? 'clock-fill' : (pointage.statutEffectif == 'absent' ? 'x-circle-fill' : 'calendar-x-fill')) }} me-1"></i>{{ pointage.statutLabel }}
                             </span>
                         </td>
                         <td class="text-center pe-3">
@@ -223,7 +234,7 @@
             <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center py-3">
                 <small class="text-muted">
                     <i class="bi bi-info-circle me-1"></i>
-                    Affichage de {{ pointages|length }} pointages
+                    Affichage de {{ pointages.getTotalItemCount }} pointage(s)
                 </small>
                 {{ knp_pagination_render(pointages) }}
             </div>
@@ -249,7 +260,7 @@
                             </div>
                         </div>
                     </div>
-                    <span class="badge bg-{{ pointage.statut == 'present' ? 'success' : (pointage.statut == 'retard' ? 'warning' : (pointage.statut == 'absent' ? 'danger' : 'info')) }}-subtle text-{{ pointage.statut == 'present' ? 'success' : (pointage.statut == 'retard' ? 'warning' : (pointage.statut == 'absent' ? 'danger' : 'info')) }} rounded-pill px-3 py-2">
+                    <span class="badge bg-{{ pointage.statutEffectif == 'present' ? 'success' : (pointage.statutEffectif == 'retard' ? 'warning' : (pointage.statutEffectif == 'absent' ? 'danger' : 'info')) }}-subtle text-{{ pointage.statutEffectif == 'present' ? 'success' : (pointage.statutEffectif == 'retard' ? 'warning' : (pointage.statutEffectif == 'absent' ? 'danger' : 'info')) }} rounded-pill px-3 py-2">
                         {{ pointage.statutLabel }}
                     </span>
                 </div>
@@ -257,19 +268,21 @@
                 <div class="row text-center g-2">
                     <div class="col-3">
                         <span class="text-muted small d-block">Entrée</span>
-                        <span class="fw-semibold {{ pointage.statut == 'retard' ? 'text-warning' : '' }}">
+                        <span class="fw-semibold {{ pointage.statutEffectif == 'retard' ? 'text-warning' : '' }}">
                             {{ pointage.heureEntree ? pointage.heureEntree|date('H:i') : '-' }}
                         </span>
+                        <small class="d-block text-muted">Prévu : {{ pointage.heurePrevueDebut ? pointage.heurePrevueDebut|date('H:i') : '-' }}</small>
                     </div>
 
                     <div class="col-3">
                         <span class="text-muted small d-block">
                             Sortie
                         </span>
-                        <span class="fw-semibold">
-                            {{ pointage.heureSortie ? pointage.heureSortie|date('H:i') : '-' }}
-                        </span>
-                    </div>
+                            <span class="fw-semibold">
+                                {{ pointage.heureSortie ? pointage.heureSortie|date('H:i') : '-' }}
+                            </span>
+                            <small class="d-block text-muted">Prévu : {{ pointage.heurePrevueFin ? pointage.heurePrevueFin|date('H:i') : '-' }}</small>
+                        </div>
 
                     <div class="col-3">
                         <span class="text-muted small d-block">
@@ -302,6 +315,10 @@
         {% endfor %}
     </div>
 
+    {% if pointages.pageCount > 1 %}
+    <div class="d-flex justify-content-center mt-3">{{ knp_pagination_render(pointages) }}</div>
+    {% endif %}
+
     <!-- 7. LEGENDE -->
     <div class="row mt-4"><div class="col-12">
         <div class="d-flex flex-wrap gap-3 align-items-center">
@@ -318,6 +335,7 @@
     <div class="modal fade" id="modal{{ pointage.id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <form method="POST" action="{{ path('app_rh_pointage_corriger', {id: pointage.id}) }}" class="modal-content border-0 rounded-4 shadow-lg">
+                <input type="hidden" name="token" value="{{ csrf_token('corriger_pointage_' ~ pointage.id) }}">
                 <div class="modal-header border-0">
                     <h5 class="modal-title fw-bold">
                         <i class="bi bi-pencil-square text-primary me-2"></i>

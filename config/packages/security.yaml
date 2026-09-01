@@ -49,6 +49,7 @@ security:
 
         - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/billing, roles: ROLE_USER }
+        - { path: ^/notifications, roles: ROLE_USER }
 
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/login, roles: PUBLIC_ACCESS }

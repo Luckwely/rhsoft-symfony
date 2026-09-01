@@ -77,6 +77,7 @@ class RecrutementController extends AbstractController
 
         return $this->redirectToRoute('app_rh_employee_embauche', [
             'nom' => $candidature->getNom(),
+            'prenom' => $candidature->getPrenom(),
             'email' => $candidature->getEmail(),
             'telephone' => $candidature->getTelephone(),
         ]);

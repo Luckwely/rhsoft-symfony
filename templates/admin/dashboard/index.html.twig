@@ -3,7 +3,7 @@
 {% block title %}Tableau de bord - Administration{% endblock %}
 
 {% block body %}
-<div class="container-fluid px-4">
+<div class="container-fluid page-shell">
     <!-- En-tête -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
         <div>
@@ -67,7 +67,7 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <span class="text-muted small text-uppercase fw-semibold">Masse Salariale</span>
-                            <h2 class="fw-bold mb-0 mt-1">{{ dashboard.payrollMass|default(0)|number_format(2, ',', ' ') }} €</h2>
+                            <h2 class="fw-bold mb-0 mt-1">{{ dashboard.payrollMass|default(0)|number_format(2, ',', ' ') }} Ar</h2>
                         </div>
                         <div class="bg-info bg-opacity-10 rounded-3 p-3">
                             <i class="bi bi-currency-euro text-info fs-4"></i>
@@ -81,12 +81,12 @@
     <!-- SECTION 2: 2 COLONNES -->
     <div class="row g-4 mb-4">
         <!-- Colonne Gauche: Activité Récente -->
-        <div class="col-lg-8">
+        <div class="col-lg-12">
             <div class="card border-0 shadow-sm rounded-3">
                 <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
                     <div>
                         <h5 class="fw-bold mb-0">
-                            <i class="bi bi-clock-history text-primary me-2"></i>Activité Récente
+                            Activité Récente
                         </h5>
                         <small class="text-muted">Dernières actions en temps réel</small>
                     </div>
@@ -94,134 +94,34 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 py-3">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                    <i class="bi bi-clock text-primary"></i>
+                        {% for activity in dashboard.recentActivity %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center border-0 py-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="{{ activity.iconBg }} bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                        <i class="bi bi-{{ activity.icon }} {{ activity.iconBg|replace({'bg-': 'text-'}) }}"></i>
+                                    </div>
+                                    <div>
+                                        <span class="fw-semibold">{{ activity.employee.prenom }} {{ activity.employee.nom }}</span>
+                                        <span class="text-muted small">{{ activity.message }}</span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <span class="fw-semibold">Jean Dupont</span>
-                                    <span class="text-muted small">a pointé à</span>
-                                    <span class="fw-semibold small">08:30</span>
-                                </div>
+                                <span class="badge {{ activity.badgeClass }}">{{ activity.badgeLabel }}</span>
                             </div>
-                            <span class="badge bg-success bg-opacity-10 text-success">À l'heure</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 py-3">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                    <i class="bi bi-check-circle text-success"></i>
-                                </div>
-                                <div>
-                                    <span class="fw-semibold">Marie Laurent</span>
-                                    <span class="text-muted small">demande de congé validée</span>
-                                </div>
+                        {% else %}
+                            <div class="list-group-item border-0 py-4 text-center text-muted">
+                                Aucune activité récente
                             </div>
-                            <span class="badge bg-success bg-opacity-10 text-success">Validé</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 py-3">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                    <i class="bi bi-person-add text-warning"></i>
-                                </div>
-                                <div>
-                                    <span class="fw-semibold">Sophie Bernard</span>
-                                    <span class="text-muted small">nouvelle arrivée (CDI)</span>
-                                </div>
-                            </div>
-                            <span class="badge bg-warning bg-opacity-10 text-warning">En cours</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 py-3">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                    <i class="bi bi-exclamation-triangle text-danger"></i>
-                                </div>
-                                <div>
-                                    <span class="fw-semibold">Thomas Girard</span>
-                                    <span class="text-muted small">retard de 15 min</span>
-                                </div>
-                            </div>
-                            <span class="badge bg-danger bg-opacity-10 text-danger">Retard</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 py-3">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                    <i class="bi bi-file-earmark-text text-info"></i>
-                                </div>
-                                <div>
-                                    <span class="fw-semibold">Céline Lefèvre</span>
-                                    <span class="text-muted small">a téléchargé sa fiche de paie</span>
-                                </div>
-                            </div>
-                            <span class="badge bg-info bg-opacity-10 text-info">Téléchargé</span>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
                 <div class="card-footer bg-transparent border-0 text-center">
-                    <button class="btn btn-outline-primary btn-sm">
+                    <a href="{{ path('app_admin_pointage') }}" class="btn btn-outline-primary btn-sm">
                         <i class="bi bi-arrow-right me-1"></i>Voir toutes les activités
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
 
-        <!-- Colonne Droite: Alertes RH -->
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm rounded-3">
-                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="fw-bold mb-0">
-                            <i class="bi bi-bell text-primary me-2"></i>Alertes RH
-                        </h5>
-                        <small class="text-muted">Actions requises</small>
-                    </div>
-                    <span class="badge bg-danger">3 urgentes</span>
-                </div>
-                <div class="card-body bg-light rounded-bottom">
-                    <div class="d-flex align-items-center gap-3 mb-3 p-3 bg-white rounded-3 shadow-sm">
-                        <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                            <i class="bi bi-file-earmark-check text-danger fs-5"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-semibold small">Contrats qui expirent</span>
-                                <span class="badge bg-danger">{{ dashboard.alertContractsExpiring|default(0) }}</span>
-                            </div>
-                            <small class="text-muted">Moins de 30 jours</small>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center gap-3 mb-3 p-3 bg-white rounded-3 shadow-sm">
-                        <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                            <i class="bi bi-clock-history text-warning fs-5"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-semibold small">Périodes d'essai</span>
-                                <span class="badge bg-warning text-dark">{{ dashboard.alertProbation|default(0) }}</span>
-                            </div>
-                            <small class="text-muted">Qui se terminent</small>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm">
-                        <div class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                            <i class="bi bi-person-plus text-info fs-5"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-semibold small">Entretiens annuels</span>
-                                <span class="badge bg-info">{{ dashboard.alertAnnualReviews|default(0) }}</span>
-                            </div>
-                            <small class="text-muted">À planifier</small>
-                        </div>
-                    </div>
-                    <div class="mt-3 text-center">
-                        <button class="btn btn-outline-primary btn-sm w-100">
-                            <i class="bi bi-eye me-1"></i>Voir tout
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- SECTION 3: PLEINE LARGEUR - Répartition par Service -->
@@ -257,13 +157,10 @@
                 <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
                     <div>
                         <h5 class="fw-bold mb-0">
-                            <i class="bi bi-clock text-primary me-2"></i>Derniers Pointages
+                            Derniers Pointages
                         </h5>
                         <small class="text-muted">Pointages du jour</small>
                     </div>
-                    <button class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-arrow-right me-1"></i>Voir tout
-                    </button>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -317,27 +214,14 @@
                     <small class="text-muted">
                         <i class="bi bi-info-circle me-1"></i>Affichage des 8 derniers pointages
                     </small>
-                    <nav aria-label="Pagination des pointages">
-                        <ul class="pagination mb-0">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
-                                    <i class="bi bi-chevron-left"></i>
-                                </a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">
-                                    <i class="bi bi-chevron-right"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+                    <a href="{{ path('app_admin_pointage') }}" class="btn btn-sm btn-outline-primary">
+                        Voir tous les pointages <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
+    {% include 'admin/_advanced_analytics.html.twig' with {'advancedAnalytics': dashboard.advancedAnalytics, 'lookbackDays': dashboard.advancedAnalyticsLookbackDays|default(90)} %}
 </div>
 {% endblock %}
 

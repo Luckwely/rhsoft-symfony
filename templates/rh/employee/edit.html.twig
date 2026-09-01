@@ -40,6 +40,15 @@
                     {{ form_label(form.adresse, 'Adresse') }}
                     {{ form_widget(form.adresse, {'attr': {'class': 'form-control', 'rows': 2}}) }}
                 </div>
+                {# GENRE + DATE NAISSANCE #}
+                <div class="col-md-3 mb-3">
+                    {{ form_label(form.genre, 'Genre') }}
+                    {{ form_widget(form.genre, {'attr': {'class': 'form-control'}}) }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    {{ form_label(form.dateNaissance, 'Date de naissance') }}
+                    {{ form_widget(form.dateNaissance, {'attr': {'class': 'form-control'}}) }}
+                </div>
                 {# ROLE #}
                 <div class="col-md-6 mb-3">
                     {{ form_label(form.roles, 'Roles', {'label_attr': {'class': 'form-label'}}) }}
@@ -54,6 +63,12 @@
                 <div class="col-md-6 mb-3">
                     {{ form_label(form.soldeConge, 'Solde Congé') }}
                     {{ form_widget(form.soldeConge, {'attr': {'class': 'form-control'}}) }}
+                </div>
+                {# SALAIRE DE BASE : défini automatiquement selon le rôle (Paramètres > Salaires), non modifiable ici #}
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Salaire de base (Ar)</label>
+                    <input type="text" class="form-control" value="{{ employee.salaireBase|number_format(0, ',', ' ') }} Ar" disabled>
+                    <small class="text-muted">Recalculé automatiquement selon le rôle à chaque enregistrement.</small>
                 </div>
                 {# PHOTO #}
                 <div class="col-md-6 mb-3">

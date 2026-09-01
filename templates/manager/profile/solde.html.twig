@@ -11,17 +11,8 @@
                 Mon Profil
             </h3>
             <p class="text-muted mb-0">
-                <i class="bi bi-gear me-1"></i>Gérez vos informations et documents
+                Gérez vos informations et documents
             </p>
-        </div>
-        <div class="d-flex gap-2 mt-3 mt-md-0">
-            <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 44px; height: 44px; font-size: 16px;">
-                {{ user.prenom|first }}{{ user.nom|first }}
-            </div>
-            <div class="d-flex flex-column justify-content-center">
-                <span class="fw-semibold">{{ user.prenom }} {{ user.nom }}</span>
-                <small class="text-muted">{{ user.poste ?? 'Manager' }}</small>
-            </div>
         </div>
     </div>
 
@@ -99,7 +90,7 @@
                 <h5 class="fw-bold mb-0">
                     <i class="bi bi-clock-history text-primary me-2"></i>Historique des congés pris
                 </h5>
-                <a href="{{ path('app_manager_conge_new') }}" class="btn btn-primary btn-sm">
+                <a href="{{ path('app_manager_conge') }}" class="btn btn-primary btn-sm">
                     <i class="bi bi-plus-lg me-1"></i>Demander un congé
                 </a>
             </div>
@@ -125,11 +116,11 @@
                                     <td>{{ conge.dateDebut|date('d/m/Y') }} au {{ conge.dateFin|date('d/m/Y') }}</td>
                                     <td class="text-center"><span class="fw-semibold">{{ conge.duree }} jours</span></td>
                                     <td class="text-center pe-3">
-                                        {% if conge.statut == 'Approuvé' %}
+                                        {% if conge.statut == constant('App\\Entity\\Conge::STATUS_VALIDE') %}
                                             <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
                                                 <i class="bi bi-check-circle-fill me-1"></i>Approuvé
                                             </span>
-                                        {% elseif conge.statut == 'Refusé' %}
+                                        {% elseif conge.statut == constant('App\\Entity\\Conge::STATUS_REFUSE') %}
                                             <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
                                                 <i class="bi bi-x-circle-fill me-1"></i>Refusé
                                             </span>

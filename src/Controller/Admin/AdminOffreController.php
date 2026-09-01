@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use App\Repository\CandidatureRepository;
 
 #[Route('/admin/offres')]
 #[IsGranted('ROLE_ADMIN')]
@@ -18,16 +20,22 @@ class AdminOffreController extends AbstractController
 {
     #[Route('/', name: 'app_admin_offre')]
     public function index(
+        Request $request,
         OffreRepository $offreRepository,
-        Security $security
+        Security $security,
+        PaginatorInterface $paginator
     ): Response
     {
         $entreprise = $security->getUser()->getEntreprise();
+        $offres = $paginator->paginate(
+            $offreRepository->findBy(['entreprise' => $entreprise], ['id' => 'DESC']),
+            $request->query->getInt('page', 1),
+            10
+        );
+
         return $this->render('admin/admin_offre/index.html.twig', [
-            'offres' => $offreRepository->findBy(
-                ['entreprise' => $entreprise],
-                ['id' => 'DESC']
-            ),
+            'offres' => $offres,
+            'pagination' => $offres,
         ]);
     }
 
@@ -63,21 +71,26 @@ class AdminOffreController extends AbstractController
     #[Route('/{id}/candidatures', name: 'app_admin_offre_candidatures')]
     public function candidatures(
         Offre $offre,
-        Security $security
+        Security $security,
+        Request $request,
+        CandidatureRepository $candidatureRepository,
+        PaginatorInterface $paginator
     ): Response
     {
         if ($offre->getEntreprise() !== $security->getUser()->getEntreprise()) {
             throw $this->createAccessDeniedException('Accès refusé.');
         }
 
-        // FILTRER: les candidatures en attente
-        $candidaturesEnAttente = $offre->getCandidatures()->filter(
-            fn(Candidature $c) => $c->getStatut() === 'en_attente'
+        $candidaturesEnAttente = $paginator->paginate(
+            $candidatureRepository->createPendingByOfferQuery($offre),
+            $request->query->getInt('page', 1),
+            10
         );
 
         return $this->render('admin/admin_offre/candidatures.html.twig', [
             'offre' => $offre,
             'candidatures' => $candidaturesEnAttente,
+            'pagination' => $candidaturesEnAttente,
         ]);
     }
 
@@ -97,6 +110,7 @@ class AdminOffreController extends AbstractController
 
         return $this->redirectToRoute('app_admin_employee_new', [
             'nom' => $candidature->getNom(),
+            'prenom' => $candidature->getPrenom(),
             'email' => $candidature->getEmail(),
             'telephone' => $candidature->getTelephone(),
         ]);

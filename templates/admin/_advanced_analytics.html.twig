@@ -1,0 +1,70 @@
+{% set analytics = advancedAnalytics|default({roles: [], services: [], posts: [], late: [], absent: [], advances: [], highestSalary: null, lowestSalary: null}) %}
+<div class="row g-4 mt-1" id="advanced-analytics">
+    <div class="col-12">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div>
+                <h4 class="fw-bold mb-1">Analyses avancées</h4>
+                <p class="text-muted small mb-0">Répartition de l’effectif et alertes calculées sur les {{ lookbackDays|default(90) }} derniers jours.</p>
+            </div>
+            <span class="badge rounded-pill text-bg-light border">Données en temps réel</span>
+        </div>
+    </div>
+    {% for group in [{title: 'Par rôle', icon: 'people', color: 'primary', rows: analytics.roles}, {title: 'Par service', icon: 'diagram-3', color: 'success', rows: analytics.services}, {title: 'Par poste', icon: 'briefcase', color: 'info', rows: analytics.posts}] %}
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3"><i class="bi bi-{{ group.icon }} text-{{ group.color }} me-2"></i>{{ group.title }}</h6>
+                    {% for row in group.rows %}
+                        {% set max = group.rows|length > 0 ? group.rows[0].total : 1 %}
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small mb-1"><span>{{ row.label }}</span><strong>{{ row.total }}</strong></div>
+                            <div class="progress" style="height: 7px"><div class="progress-bar bg-{{ group.color }}" style="width: {{ max > 0 ? (row.total / max * 100) : 0 }}%"></div></div>
+                        </div>
+                    {% else %}<p class="text-muted small mb-0">Aucune donnée disponible.</p>{% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3"><i class="bi bi-cash-stack text-warning me-2"></i>Extrêmes de salaire</h6>
+                {% for item in [analytics.highestSalary, analytics.lowestSalary] %}
+                    {% set label = loop.first ? 'Salaire le plus élevé' : 'Salaire le plus bas' %}
+                    {% set color = loop.first ? 'success' : 'danger' %}
+                    {% set icon = loop.first ? 'arrow-up-right' : 'arrow-down-right' %}
+                    {% if item %}
+                        <div class="d-flex align-items-center justify-content-between p-2 rounded-3 bg-light mb-2">
+                            <div><div class="small text-muted"><i class="bi bi-{{ icon }} text-{{ color }} me-1"></i>{{ label }}</div><strong>{{ item.employee.prenom }} {{ item.employee.nom }}</strong></div>
+                            <span class="fw-bold text-{{ color }} text-nowrap">{{ item.amount|number_format(0, ',', ' ') }} Ar</span>
+                        </div>
+                    {% endif %}
+                {% else %}<p class="text-muted small mb-0">Aucun salaire renseigné.</p>{% endfor %}
+            </div>
+        </div>
+    </div>
+    {% for ranking in [{list: analytics.late, title: 'Plus en retard', icon: 'clock-history', color: 'warning', suffix: 'retards'}, {list: analytics.absent, title: 'Plus absents', icon: 'person-x', color: 'danger', suffix: 'absences'}] %}
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3"><i class="bi bi-{{ ranking.icon }} text-{{ ranking.color }} me-2"></i>{{ ranking.title }}</h6>
+                    {% for row in ranking.list %}
+                        <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+                            <span class="text-truncate me-2">{{ row.employee.prenom }} {{ row.employee.nom }}</span><span class="badge text-bg-{{ ranking.color }}">{{ row.total }} {{ ranking.suffix }}</span>
+                        </div>
+                    {% else %}<p class="text-muted small mb-0">Aucun enregistrement.</p>{% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3"><i class="bi bi-wallet2 text-primary me-2"></i>Avances prises</h6>
+                {% for row in analytics.advances %}
+                    <div class="d-flex align-items-center justify-content-between py-2 border-bottom"><span class="text-truncate me-2">{{ row.employee.prenom }} {{ row.employee.nom }}</span><span class="fw-semibold text-primary text-nowrap">{{ row.total|number_format(0, ',', ' ') }} Ar</span></div>
+                {% else %}<p class="text-muted small mb-0">Aucune avance enregistrée.</p>{% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

@@ -10,6 +10,7 @@ parameters:
     logos_directory: '%kernel.project_dir%/public/uploads/logos'
     upload_dir: '%kernel.project_dir%/public/uploads/employees'
     cv_directory: '%kernel.project_dir%/public/uploads/cv'
+    lettre_motivation_directory: '%kernel.project_dir%/public/uploads/lettre_motivation'
     employees_directory: '%kernel.project_dir%/public/uploads/employees'
 
 services:

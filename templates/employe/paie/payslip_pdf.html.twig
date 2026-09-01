@@ -58,15 +58,27 @@
         <tbody>
             <tr>
                 <td>Salaire brut</td>
-                <td class="number">{{ payslip.salaireBrut }} €</td>
+                <td class="number">{{ payslip.salaireBrut }} Ar</td>
             </tr>
+            {% if payslip.montantHeuresSupplementaires > 0 %}
+            <tr>
+                <td>&nbsp;&nbsp;dont heures supplémentaires</td>
+                <td class="number">{{ payslip.montantHeuresSupplementaires }} Ar</td>
+            </tr>
+            {% endif %}
             <tr>
                 <td>Cotisations</td>
-                <td class="number">- {{ payslip.cotisations }} €</td>
+                <td class="number">- {{ payslip.cotisations }} Ar</td>
             </tr>
+            {% if payslip.montantAvanceDeduite > 0 %}
+            <tr>
+                <td>Avance sur salaire déduite</td>
+                <td class="number">- {{ payslip.montantAvanceDeduite }} Ar</td>
+            </tr>
+            {% endif %}
             <tr class="net-row">
                 <td>Salaire net à payer</td>
-                <td class="number">{{ payslip.salaireNet }} €</td>
+                <td class="number">{{ payslip.salaireNet }} Ar</td>
             </tr>
         </tbody>
     </table>

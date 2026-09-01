@@ -23,7 +23,7 @@ class EntrepriseRepository extends ServiceEntityRepository
             ->leftJoin('App\Entity\User', 'u', 'WITH', 'u.entreprise = e.id')
             ->leftJoin('App\Entity\User', 'a', 'WITH', 'a.entreprise = e.id AND a.roles LIKE :roleAdmin')
             ->setParameter('roleAdmin', '%ROLE_ADMIN%')
-            ->groupBy('e.id')
+            ->groupBy('e.id', 'a.id')
             ->orderBy('e.nom', 'ASC');
 
         if ($search) {
@@ -142,5 +142,30 @@ class EntrepriseRepository extends ServiceEntityRepository
 
         return $total > 0 ? round(($actifs / $total) * 100) . '%' : '0%';
     }
+
+    /**
+     * @return Entreprise[]
+     */
+    public function findLatest(int $limit = 5): array
+    {
+        return $this->createQueryBuilder('e')
+            ->orderBy('e.created_at', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getMonthlyRecurringRevenue(): float
+    {
+        $result = $this->createQueryBuilder('e')
+            ->select('COALESCE(SUM(e.prixMois), 0)')
+            ->where('e.status = :status')
+            ->setParameter('status', 'active')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return (float) $result;
+    }
+
 
 }

@@ -8,15 +8,12 @@
     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4">
         <div>
             <h3 class="fw-bold mb-1">
-                <i class="bi bi-clipboard-check text-primary me-2"></i>Gestion des Demandes
+                Gestion des Demandes
             </h3>
             <p class="text-muted mb-0">
-                <i class="bi bi-list-check me-1"></i>Validez les demandes de vos équipes
+                Validez les demandes de vos équipes
             </p>
         </div>
-        <button class="btn btn-outline-dark btn-sm mt-3 mt-lg-0">
-            <i class="bi bi-download me-1"></i>Exporter
-        </button>
     </div>
 
     <!-- ONGLET 1: CONGES A VALIDER -->
@@ -65,9 +62,10 @@
                             <td><span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">{{ conge.typeConge.nom }}</span></td>
                             <td>{{ conge.dateDebut|date('d/m/Y') }} au {{ conge.dateFin|date('d/m/Y') }}</td>
                             <td class="text-center"><span class="fw-semibold">{{ conge.nbJours }} jours</span></td>
-                            <td class="text-center"><span class="fw-semibold">{{ conge.employee.soldeConge ?? 'N/A' }} jours</span></td>
+                            <td class="text-center"><span class="fw-semibold">{{ conge_solde(conge.employee) }} jours</span></td>
                             <td class="text-center pe-3">
-                                <form method="post" action="{{ path('app_rh_conge_valider', {id: conge.id}) }}" class="d-inline">
+                                <form method="post" action="{{ path('app_manager_conge_valider', {id: conge.id}) }}" class="d-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('manager_conge_valider_' ~ conge.id) }}">
                                     <button class="btn btn-sm btn-success"><i class="bi bi-check-lg me-1"></i>Valider</button>
                                 </form>
                                 <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#refusModal{{ conge.id }}">
@@ -79,7 +77,8 @@
                         <!-- Modal Refus -->
                         <div class="modal fade" id="refusModal{{ conge.id }}" tabindex="-1">
                         <div class="modal-dialog">
-                            <form method="post" action="{{ path('app_rh_conge_refuser', {id: conge.id}) }}">
+                            <form method="post" action="{{ path('app_manager_conge_refuser', {id: conge.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('manager_conge_refuser_' ~ conge.id) }}">
                             <div class="modal-content">
                                 <div class="modal-header"><h5>Refuser le congé</h5></div>
                                 <div class="modal-body">
@@ -101,18 +100,13 @@
                 </table>
             </div>
         </div>
-        <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center py-3">
+        <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center py-3 flex-wrap gap-2">
             <small class="text-muted">
-                <i class="bi bi-info-circle me-1"></i>6 demandes en attente de validation
+                <i class="bi bi-info-circle me-1"></i>{{ demandes.getTotalItemCount }} demande(s) en attente de validation
             </small>
-            <nav aria-label="Pagination">
-                <ul class="pagination mb-0">
-                    <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
-                </ul>
-            </nav>
+            {% if demandes.getPageCount > 1 %}
+                {{ knp_pagination_render(demandes) }}
+            {% endif %}
         </div>
     </div>
 </div>

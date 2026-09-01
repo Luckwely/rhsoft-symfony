@@ -6,10 +6,10 @@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
         <div>
             <h3 class="fw-bold mb-1">
-                <i class="bi bi-people text-primary me-2"></i>Mon Equipes
+                Mon Equipes
             </h3>
             <p class="text-muted mb-0">
-                <i class="bi bi-person-check me-1"></i>Gérez équipe et suivez leur activité
+                Gérez équipe et suivez leur activité
             </p>
         </div>
     </div>
@@ -28,7 +28,7 @@
                     <button class="btn btn-primary flex-grow-1" type="submit">
                         <i class="bi bi-search me-1"></i>Rechercher
                     </button>
-                    <a href="{{ path('app_admin_employee') }}" class="btn btn-outline-secondary" title="Réinitialiser">
+                    <a href="{{ path('app_manager_monEquipe') }}" class="btn btn-outline-secondary" title="Réinitialiser">
                         <i class="bi bi-arrow-clockwise"></i>
                     </a>
                 </div>
@@ -37,9 +37,7 @@
     </div>
 
     <!-- TABLEAU PRINCIPAL -->
-    <form method="post" action="{{ path('app_admin_employee_bulk_delete') }}" id="bulk-form">
-        <input type="hidden" name="_token" value="{{ csrf_token('bulk-delete') }}">
-
+    <div>
         <div class="card border-0 shadow-sm rounded-4">
             <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center py-3">
                 <div>
@@ -176,7 +174,7 @@
                                                         <i class="bi bi-calendar-check text-primary"></i>
                                                         <div>
                                                             <small class="text-muted d-block">Solde Congé</small>
-                                                            <span class="fw-semibold">{{ employee.soldeConge ?? '25' }} jours</span>
+                                                            <span class="fw-semibold">{{ conge_solde(employee) }} jours</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -206,7 +204,7 @@
                                                             <strong>Planning Semaine {{ "now"|date('W') }}</strong>
                                                             <span class="text-muted small ms-2">({{ "now"|date('d/m/Y') }} - {{ "now"|date_modify("+6 days")|date('d/m/Y') }})</span>
                                                         </div>
-                                                        <a href="{{ path('app_admin_planning', {id: employee.id}) }}" class="btn btn-sm btn-outline-success">
+                                                        <a href="{{ path('app_manager_planning') }}" class="btn btn-sm btn-outline-success">
                                                             <i class="bi bi-pencil-square me-1"></i>Modifier
                                                         </a>
                                                     </div>
@@ -216,8 +214,7 @@
                                                                 <tr>
                                                                     <th>Jour</th>
                                                                     <th>Shift</th>
-                                                                    <th>Pause</th>
-                                                                    <th>Pausette</th>
+
                                                                     <th>Statut</th>
                                                                 </tr>
                                                             </thead>
@@ -260,7 +257,7 @@
                                                                             <span class="text-primary">{{ p.heureDebut|date('H:i') }} - {{ p.heureFin|date('H:i') }}</span>
                                                                         {% endif %}
                                                                     </td>
-                                                                    <td>{{ p.pauseMinutes ? p.pauseMinutes ~ ' min' : '-' }}</td>
+
                                                                     <td>
                                                                         {% if p.isDayOff %}
                                                                             <span class="badge bg-secondary-subtle text-secondary rounded-pill">Repos</span>
@@ -272,27 +269,11 @@
                                                                 {% endfor %}
 
                                                             {% else %}
-                                                                {# DONNEES FACTICES #}
-                                                                {% for day in days %}
                                                                 <tr>
-                                                                    <td><span class="fw-semibold">{{ day|capitalize }}</span></td>
-                                                                    <td>
-                                                                        {% if day in ['samedi', 'dimanche'] %}
-                                                                            <span class="badge bg-warning-subtle text-warning rounded-pill"><i class="bi bi-calendar-x me-1"></i>Repos</span>
-                                                                        {% else %}
-                                                                            <span class="text-primary">09:00 - 17:00</span>
-                                                                        {% endif %}
-                                                                    </td>
-                                                                    <td>{{ day in ['samedi', 'dimanche'] ? '-' : '60 min' }}</td>
-                                                                    <td>
-                                                                        {% if day in ['samedi', 'dimanche'] %}
-                                                                            <span class="badge bg-secondary-subtle text-secondary rounded-pill">Repos</span>
-                                                                        {% else %}
-                                                                            <span class="badge bg-success-subtle text-success rounded-pill">Présent</span>
-                                                                        {% endif %}
+                                                                    <td colspan="3" class="text-center text-muted py-3">
+                                                                        <i class="bi bi-calendar-x me-1"></i>Aucun planning configuré pour cette semaine.
                                                                     </td>
                                                                 </tr>
-                                                                {% endfor %}
                                                             {% endif %}
                                                             </tbody>
                                                         </table>
@@ -332,66 +313,14 @@
                 </div>
             </div>
         </div>
-    </form>
-</div>
-
-<!-- MODAL DE CONFIRMATION MODERNISE -->
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4 shadow-lg">
-            <div class="modal-header border-0">
-                <h5 class="modal-title fw-bold">
-                    <i class="bi bi-exclamation-triangle text-danger me-2"></i>Confirmation
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center py-4">
-                <div class="bg-danger-subtle rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
-                    <i class="bi bi-trash3 text-danger fs-2"></i>
-                </div>
-                <p class="fw-semibold mb-0">Êtes-vous sûr de vouloir supprimer le/les employé(s) sélectionné(s) ?</p>
-                <p class="text-muted small">Cette action est irréversible.</p>
-            </div>
-            <div class="modal-footer border-0 justify-content-center gap-2">
-                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Annuler</button>
-                <button type="submit" form="bulk-form" class="btn btn-danger px-4">
-                    <i class="bi bi-trash3 me-1"></i>Oui, Supprimer
-                </button>
-            </div>
-        </div>
     </div>
 </div>
 
-<!-- SCRIPTS -->
+<!-- SCRIPT : ouverture des fiches détaillées -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Select All
-    const selectAll = document.getElementById('selectAll');
-    const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
-    const btnBulkDelete = document.getElementById('btnBulkDelete');
-
-    if (selectAll) {
-        selectAll.addEventListener('change', function() {
-            rowCheckboxes.forEach(cb => cb.checked = this.checked);
-            updateBulkButton();
-        });
-    }
-
-    rowCheckboxes.forEach(cb => {
-        cb.addEventListener('change', updateBulkButton);
-    });
-
-    function updateBulkButton() {
-        const checked = document.querySelectorAll('.rowCheckbox:checked').length;
-        btnBulkDelete.disabled = checked === 0;
-    }
-
-    // Initial state
-    updateBulkButton();
-
-    // Collapse toggle - change icon on button
-    document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(btn => {
-        btn.addEventListener('click', function() {
+    document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function(button) {
+        button.addEventListener('click', function() {
             const icon = this.querySelector('.bi-eye, .bi-eye-slash');
             if (icon) {
                 icon.classList.toggle('bi-eye');
@@ -399,33 +328,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
-    // Modal delete - single employee
-    const confirmDeleteModal = document.getElementById('confirmDeleteModal');
-    if (confirmDeleteModal) {
-        confirmDeleteModal.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
-            if (button && button.getAttribute('data-id')) {
-                // Single delete - we need to submit the form with the specific ID
-                const employeeId = button.getAttribute('data-id');
-                this.querySelector('.modal-footer .btn-danger').addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const form = document.getElementById('bulk-form');
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'ids[]';
-                    input.value = employeeId;
-                    form.appendChild(input);
-                    form.submit();
-                });
-            } else {
-                // Bulk delete - form already handles it
-                this.querySelector('.modal-footer .btn-danger').onclick = function() {
-                    document.getElementById('bulk-form').submit();
-                };
-            }
-        });
-    }
 });
 </script>
 {% endblock %}

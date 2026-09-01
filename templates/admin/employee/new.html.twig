@@ -15,42 +15,60 @@
                 <div class="col-md-6 mb-3">
                     {{ form_label(form.prenom, 'Prénom *', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.prenom, {'attr': {'class': 'form-control' ~ (form.prenom.vars.errors|length > 0 ? ' is-invalid' : '')}}) }}
-                    {{ form_errors(form.prenom) }}
+                    <span class="text-danger">{{ form_errors(form.prenom) }}</span>
+
                 </div>
 
                 {# NOM #}
                 <div class="col-md-6 mb-3">
                     {{ form_label(form.nom, 'Nom *', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.nom, {'attr': {'class': 'form-control' ~ (form.nom.vars.errors|length > 0 ? ' is-invalid' : '')}}) }}
-                    {{ form_errors(form.nom) }}
+                    <span class="text-danger">{{ form_errors(form.nom) }}</span>
+
                 </div>
 
                 {# EMAIL #}
                 <div class="col-md-6 mb-3">
                     {{ form_label(form.email, 'Email *', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.email, {'attr': {'class': 'form-control' ~ (form.email.vars.errors|length > 0 ? ' is-invalid' : '')}}) }}
-                    {{ form_errors(form.email) }}
+                    <span class="text-danger">{{ form_errors(form.email) }}</span>
+
                 </div>
 
                 {# TELEPHONE #}
                 <div class="col-md-6 mb-3">
                     {{ form_label(form.telephone, 'Téléphone', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.telephone, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.telephone) }}
+                    <span class="text-danger">{{ form_errors(form.telephone) }}</span>
+
                 </div>
 
                 {# ADRESSE #}
                 <div class="col-md-6 mb-3">
                     {{ form_label(form.adresse, 'Adresse', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.adresse, {'attr': {'class': 'form-control', 'rows': 2}}) }}
-                    {{ form_errors(form.adresse) }}
+                    <span class="text-danger">{{ form_errors(form.adresse) }}</span>
+
+                </div>
+
+                {# GENRE + DATE NAISSANCE #}
+                <div class="col-md-3 mb-3">
+                    {{ form_label(form.genre, 'Genre', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.genre, {'attr': {'class': 'form-control'}}) }}
+                    <span class="text-danger">{{ form_errors(form.genre) }}</span>
+                </div>
+                <div class="col-md-3 mb-3">
+                    {{ form_label(form.dateNaissance, 'Date de naissance', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.dateNaissance, {'attr': {'class': 'form-control', 'type': 'date'}}) }}
+                    <span class="text-danger">{{ form_errors(form.dateNaissance) }}</span>
                 </div>
 
                 {# ROLE #}
                 <div class="col-md-6 mb-3">
                     {{ form_label(form.roles, 'Roles', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.roles, {'attr': {'class': 'form-control', 'rows': 2}}) }}
-                    {{ form_errors(form.roles) }}
+                    <span class="text-danger">{{ form_errors(form.roles) }}</span>
+
                 </div>
 
                 {# PHOTO #}
@@ -58,7 +76,8 @@
                     {{ form_label(form.photo, 'Photo Profil', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.photo, {'attr': {'class': 'form-control'}}) }}
                     <small class="form-text text-muted">JPG, PNG. Max 2M</small>
-                    {{ form_errors(form.photo) }}
+                    <span class="text-danger">{{ form_errors(form.photo) }}</span>
+
                 </div>
 
                 {# CV #}
@@ -66,7 +85,24 @@
                     {{ form_label(form.cv, 'CV PDF', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.cv, {'attr': {'class': 'form-control'}}) }}
                     <small class="form-text text-muted">PDF. Max 5M</small>
-                    {{ form_errors(form.cv) }}
+                    <span class="text-danger">{{ form_errors(form.cv) }}</span>
+
+                </div>
+
+                {# POSTE #}
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.poste, 'Poste', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.poste, {'attr': {'class': 'form-control'}}) }}
+                    <span class="text-danger">{{ form_errors(form.poste) }}</span>
+
+                </div>
+
+                {# SERVICE #}
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.service, 'Service', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.service, {'attr': {'class': 'form-control'}}) }}
+                    <span class="text-danger">{{ form_errors(form.service) }}</span>
+
                 </div>
 
                 {# DATE EMBAUCHE #}
@@ -79,6 +115,13 @@
                 <div class="col-md-6 mb-3">
                     {{ form_label(form.soldeConge, 'Solde Congé', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.soldeConge, {'attr': {'class': 'form-control'}}) }}
+                </div>
+
+                {# SALAIRE DE BASE : défini automatiquement selon le rôle choisi (Paramètres > Salaires) #}
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Salaire de base (Ar)</label>
+                    <input type="text" class="form-control" value="Défini automatiquement selon le rôle choisi" disabled>
+                    <small class="text-muted">Configurable dans Paramètres &gt; Salaires.</small>
                 </div>
             </div>
 

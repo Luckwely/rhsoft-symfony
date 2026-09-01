@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titre }}</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f6f9; font-family: Arial, Helvetica, sans-serif; color:#212529;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f9; padding: 24px 0;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:600px; background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+
+                    <!-- HEADER -->
+                    <tr>
+                        <td style="background-color:#{{ couleur|default('0d6efd') }}; padding: 28px 32px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="left" valign="middle">
+                                        <span style="color:#ffffff; font-size:20px; font-weight:bold; letter-spacing:0.5px;">{{ entreprise.nom|default('RhSoft') }}</span>
+                                    </td>
+                                    <td align="right" valign="middle">
+                                        <span style="color:#ffffff; font-size:13px; opacity:0.9;">Avance sur salaire</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- BODY -->
+                    <tr>
+                        <td style="padding: 32px;">
+                            <h2 style="margin:0 0 16px; font-size:20px; color:#212529;">Bonjour {{ destinataire.prenom }},</h2>
+
+                            <p style="margin:0 0 24px; font-size:15px; line-height:1.6; color:#495057;">
+                                {{ message }}
+                            </p>
+
+                            <!-- SUMMARY CARD -->
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f9fa; border-radius:10px; margin-bottom:24px;">
+                                <tr>
+                                    <td style="padding: 20px 24px;">
+                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;">
+                                            <tr>
+                                                <td style="padding: 6px 0; color:#6c757d;">Demandeur</td>
+                                                <td align="right" style="padding: 6px 0; font-weight:bold; color:#212529;">{{ avance.employee.prenom }} {{ avance.employee.nom }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px 0; color:#6c757d;">Montant</td>
+                                                <td align="right" style="padding: 6px 0; font-weight:bold; color:#212529;">{{ avance.montant|number_format(0, ',', ' ') }} Ar</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px 0; color:#6c757d;">Motif</td>
+                                                <td align="right" style="padding: 6px 0; color:#212529;">{{ avance.motif }}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            {% if lienAbsolu %}
+                            <table role="presentation" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="border-radius:8px; background-color:#0d6efd;">
+                                        <a href="{{ lienAbsolu }}" target="_blank" style="display:inline-block; padding:12px 24px; font-size:14px; font-weight:600; color:#ffffff; text-decoration:none;">
+                                            Voir la demande
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <!-- FOOTER -->
+                    <tr>
+                        <td style="background-color:#f8f9fa; padding: 18px 32px; border-top:1px solid #eef0f2;">
+                            <p style="margin:0; font-size:12px; color:#adb5bd; text-align:center;">
+                                Email généré automatiquement par RhSoft pour le compte de {{ entreprise.nom|default('votre entreprise') }} — merci de ne pas répondre à ce message.
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

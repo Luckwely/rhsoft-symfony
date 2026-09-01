@@ -20,7 +20,7 @@
             Paramètres
         </h3>
         <p class="text-muted mb-0">
-            <i class="bi bi-sliders me-1"></i>Gérez la configuration de votre espace RH
+            Gérez la configuration de votre espace RH
         </p>
     </div>
 
@@ -39,8 +39,8 @@
                     <a href="#pointage" class="list-group-item list-group-item-action border-0" data-bs-toggle="list">
                         <i class="bi bi-clock-history me-2"></i>Pointage & Horaires
                     </a>
-                    <a href="#conges" class="list-group-item list-group-item-action border-0" data-bs-toggle="list">
-                        <i class="bi bi-calendar-check me-2"></i>Congés & Absences
+                    <a href="#salaires" class="list-group-item list-group-item-action border-0" data-bs-toggle="list">
+                        <i class="bi bi-cash-coin me-2"></i>Salaires
                     </a>
                 </div>
             </div>
@@ -55,7 +55,7 @@
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-header bg-transparent border-0">
                             <h5 class="fw-bold mb-0">
-                                <i class="bi bi-building text-primary me-2"></i>Informations Entreprise
+                                Informations Entreprise
                             </h5>
                             <small class="text-muted">Modifiez les informations de votre entreprise</small>
                         </div>
@@ -103,7 +103,7 @@
                         <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
                             <div>
                                 <h5 class="fw-bold mb-0">
-                                    <i class="bi bi-people text-primary me-2"></i>Utilisateurs
+                                    Utilisateurs
                                 </h5>
                                 <small class="text-muted">Gérez les accès et les statuts des comptes</small>
                             </div>
@@ -195,7 +195,7 @@
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-header bg-transparent border-0">
                             <h5 class="fw-bold mb-0">
-                                <i class="bi bi-clock-history text-primary me-2"></i>Règles de Pointage
+                                Règles de Pointage
                             </h5>
                             <small class="text-muted">Configurez les horaires et règles de pointage</small>
                         </div>
@@ -218,31 +218,46 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- ONGLET 4: CONGES -->
-                <div class="tab-pane fade" id="conges">
+                <!-- ONGLET 4: SALAIRES -->
+                <div class="tab-pane fade" id="salaires">
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-header bg-transparent border-0">
                             <h5 class="fw-bold mb-0">
-                                <i class="bi bi-calendar-check text-primary me-2"></i>Règles de Congés
+                                Salaires de base par rôle
                             </h5>
-                            <small class="text-muted">Configurez les types de congés associés</small>
+                            <small class="text-muted">Ces montants sont attribués automatiquement à chaque employé selon son rôle, à l'embauche et à chaque modification de fiche employé.</small>
                         </div>
                         <div class="card-body">
-                            <p class="text-muted mb-3">Les types de congés de votre entreprise sont gérés dynamiquement via le module dédié.</p>
-                            <ul class="list-group">
-                                {% for typeConge in typesConge %}
-                                    <li class="list-group-item border-0 bg-light mb-2 rounded-3">
-                                        <i class="bi bi-check-circle text-success me-2"></i>{{ typeConge.nom }}
-                                    </li>
-                                {% else %}
-                                    <li class="list-group-item border-0 text-muted">Aucun type de congé configuré pour le moment.</li>
-                                {% endfor %}
-                            </ul>
+                            <form method="POST" class="row g-3">
+                                <input type="hidden" name="action_type" value="salaires">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Admin (Ar / mois)</label>
+                                    <input type="number" step="0.01" min="0" name="salaire_base_admin" class="form-control" value="{{ entreprise.salaireBaseAdmin }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">RH (Ar / mois)</label>
+                                    <input type="number" step="0.01" min="0" name="salaire_base_rh" class="form-control" value="{{ entreprise.salaireBaseRh }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Manager (Ar / mois)</label>
+                                    <input type="number" step="0.01" min="0" name="salaire_base_manager" class="form-control" value="{{ entreprise.salaireBaseManager }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Employé (Ar / mois)</label>
+                                    <input type="number" step="0.01" min="0" name="salaire_base_employe" class="form-control" value="{{ entreprise.salaireBaseEmploye }}">
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check2 me-1"></i>Enregistrer
+                                    </button>
+                                    <small class="text-muted d-block mt-2">
+                                        <i class="bi bi-info-circle me-1"></i>Un changement ici ne modifie pas rétroactivement le salaire des employés existants — il s'applique à la prochaine embauche, ou dès qu'une fiche employé est enregistrée à nouveau.
+                                    </small>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

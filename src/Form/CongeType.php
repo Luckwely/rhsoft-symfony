@@ -10,6 +10,10 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class CongeType extends AbstractType
 {
@@ -26,18 +30,42 @@ class CongeType extends AbstractType
                 'widget' => 'single_text',
                 'input' => 'datetime_immutable',
                 'label' => 'Date de début',
-                'attr' => ['class' => 'form-control'],
+                'attr' => [
+                    'class' => 'form-control',
+                    'min' => (new \DateTimeImmutable('today'))->format('Y-m-d'),
+                ],
+                'constraints' => [
+                    new GreaterThanOrEqual(
+                        value: 'today',
+                        message: 'La date de début ne peut pas être antérieure à aujourd\'hui'
+                    ),
+                ],
             ])
             ->add('dateFin', DateType::class, [
                 'widget' => 'single_text',
                 'input' => 'datetime_immutable',
                 'label' => 'Date de fin',
-                'attr' => ['class' => 'form-control'],
+                'attr' => [
+                    'class' => 'form-control',
+                    'min' => (new \DateTimeImmutable('today'))->format('Y-m-d'),
+                ],
+                'constraints' => [
+                    new GreaterThanOrEqual(
+                        value: 'today',
+                        message: 'La date de fin ne peut pas être antérieure à aujourd\'hui'
+                    ),
+                ],
             ])
             ->add('motif', TextareaType::class, [
                 'required' => false,
                 'label' => 'Motif / Commentaire',
                 'attr' => ['class' => 'form-control', 'rows' => 3],
+                'constraints' => [
+                    new Length(
+                        max: 500,
+                        maxMessage: 'Le motif ne doit pas dépasser {{ limit }} caractères'
+                    ),
+                ],
             ])
         ;
     }
@@ -46,6 +74,19 @@ class CongeType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Conge::class,
+            'constraints' => [
+                new Callback(function (?Conge $conge, ExecutionContextInterface $context): void {
+                    if ($conge === null || $conge->getDateDebut() === null || $conge->getDateFin() === null) {
+                        return;
+                    }
+
+                    if ($conge->getDateFin() < $conge->getDateDebut()) {
+                        $context->buildViolation('La date de fin doit être postérieure ou égale à la date de début.')
+                            ->atPath('dateFin')
+                            ->addViolation();
+                    }
+                }),
+            ],
         ]);
     }
 }

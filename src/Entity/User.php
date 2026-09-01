@@ -57,10 +57,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $telephone = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $photo = null; // on stocke juste le nom du fichier
+    private ?string $photo = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $cv = null; // pdf
+    private ?string $cv = null;
 
     #[ORM\Column(type: 'datetime_immutable')]
     private \DateTimeImmutable $createdAt;
@@ -99,7 +99,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeInterface $dateEmbauche = null;
 
     #[ORM\Column(type: 'float', nullable: true)]
-    private ?float $soldeConge = 25;
+    private ?float $soldeConge = 2.5;
 
     /**
      * @var Collection<int, Pointage>
@@ -161,6 +161,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'integer', options: ['default' => 0])]
     private ?int $personnesACharge = 0;
 
+    #[ORM\Column(length: 1, nullable: true)]
+    private ?string $genre = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dateNaissance = null;
+
     public function getSalaireBase(): ?float { return $this->salaireBase; }
     public function setSalaireBase(?float $salaireBase): static { $this->salaireBase = $salaireBase; return $this; }
 
@@ -173,10 +179,40 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getAnciennete(): ?float { return $this->anciennete; }
     public function setAnciennete(?float $anciennete): static { $this->anciennete = $anciennete; return $this; }
 
+    public function getAncienneteAnnees(): ?float
+    {
+        if (!$this->dateEmbauche) {
+            return null;
+        }
+
+        $today = new \DateTimeImmutable('today');
+        $embauche = \DateTimeImmutable::createFromInterface($this->dateEmbauche);
+
+        if ($embauche > $today) {
+            return 0.0;
+        }
+
+        return round($today->diff($embauche)->days / 365.25, 1);
+    }
+
     public function getPersonnesACharge(): ?int { return $this->personnesACharge; }
     public function setPersonnesACharge(?int $personnesACharge): static { $this->personnesACharge = $personnesACharge; return $this; }
 
-    // GETTERS SETTERS
+    public function getGenre(): ?string { return $this->genre; }
+    public function setGenre(?string $genre): static { $this->genre = $genre; return $this; }
+
+    public function getDateNaissance(): ?\DateTimeInterface { return $this->dateNaissance; }
+    public function setDateNaissance(?\DateTimeInterface $dateNaissance): static { $this->dateNaissance = $dateNaissance; return $this; }
+
+    public function getAge(): ?int
+    {
+        if (!$this->dateNaissance) {
+            return null;
+        }
+
+        return (new \DateTimeImmutable('today'))->diff($this->dateNaissance)->y;
+    }
+
     public function getPoste(): ?string { return $this->poste; }
     public function setPoste(?string $poste): static { $this->poste = $poste; return $this; }
 
@@ -195,6 +231,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->conges = new ArrayCollection();
         $this->demissions = new ArrayCollection();
         $this->paies = new ArrayCollection();
+        $this->soldeConge = 2.5;
     }
 
 
@@ -289,8 +326,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * A visual identifier that represents this user.
-     *
      * @see UserInterface
      */
     public function getUserIdentifier(): string
@@ -316,7 +351,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
             $roles = $this->roles;
-            // guarantee every user at least has ROLE_USER
             $roles[] = 'ROLE_USER';
 
             return array_unique($roles);
@@ -337,9 +371,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
-     */
+
     public function __serialize(): array
     {
         $data = (array) $this;
@@ -538,7 +570,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removePointage(Pointage $pointage): static
     {
         if ($this->pointages->removeElement($pointage)) {
-            // set the owning side to null (unless already changed)
+
             if ($pointage->getEmployee() === $this) {
                 $pointage->setEmployee(null);
             }
@@ -595,7 +627,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeConge(Conge $conge): static
     {
         if ($this->conges->removeElement($conge)) {
-            // set the owning side to null (unless already changed)
+
             if ($conge->getEmployee() === $this) {
                 $conge->setEmployee(null);
             }

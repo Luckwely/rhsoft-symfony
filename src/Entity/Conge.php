@@ -60,7 +60,6 @@ class Conge
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    // --- Alias pour que Twig puisse utiliser `conge.duree` sans créer de colonne inutile en BDD ---
     public function getDuree(): ?float
     {
         return $this->nbJours;
@@ -71,7 +70,6 @@ class Conge
         $this->nbJours = $duree;
         return $this;
     }
-    // -----------------------------------------------------------------------------------------
 
     public function getId(): ?int { return $this->id; }
     public function getEmployee(): ?User { return $this->employee; }

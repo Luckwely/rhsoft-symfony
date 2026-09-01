@@ -3,7 +3,7 @@
 {% block title %}Dashboard Global SuperAdmin{% endblock %}
 
 {% block body %}
-<div class="container-fluid px-4">
+<div class="container-fluid page-shell">
     <!-- En-tête -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
         <div>
@@ -16,22 +16,21 @@
             <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 d-flex align-items-center">
                 <i class="bi bi-calendar3 me-2"></i>{{ "now"|date("d/m/Y") }}
             </span>
-            <button class="btn btn-primary">
-                <i class="bi bi-download me-2"></i>Exporter Rapport
-            </button>
         </div>
     </div>
 
-    <!-- Row 1: 3 Cards Stat -->
+    <!-- Row 1: 4 Cards Stat -->
     <div class="row g-4 mb-4">
         <!-- Card 1: CA du Mois -->
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <span class="text-muted small text-uppercase fw-semibold">CA du Mois</span>
-                            <h2 class="display-6 fw-bold mb-0">{{ dashboard.caMonth|default(0)|number_format(0, ',', ' ') }} €</h2>
+                            <h2 class="display-6 fw-bold mb-0">
+                                {{ dashboard.caMonth|default(0)|number_format(2, ',', ' ') }} €
+                            </h2>
 
                         </div>
                         <div class="bg-success bg-opacity-10 rounded-3 p-3">
@@ -43,7 +42,7 @@
         </div>
 
         <!-- Card 2: Entreprises Actives -->
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-start">
@@ -60,7 +59,7 @@
         </div>
 
         <!-- Card 3: Utilisateurs Actifs -->
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-start">
@@ -70,6 +69,23 @@
                         </div>
                         <div class="bg-info bg-opacity-10 rounded-3 p-3">
                             <i class="bi bi-people text-info fs-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Vues du site vitrine -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-semibold">Vues du site</span>
+                            <h2 class="display-6 fw-bold mb-0">{{ dashboard.totalPageViews|default(0) }}</h2>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 rounded-3 p-3">
+                            <i class="bi bi-eye text-warning fs-2"></i>
                         </div>
                     </div>
                 </div>
@@ -125,96 +141,49 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold" style="width: 32px; height: 32px; font-size: 12px;">T</div>
-                                            <div>
-                                                <div class="fw-semibold small">TechInnovate</div>
-                                                <div class="text-muted small">contact@techinnovate.com</div>
+                                {% for company in dashboard.recentCompanies %}
+                                    {% set firstLetter = company.nom ? company.nom|slice(0, 1)|upper : 'E' %}
+                                    <tr>
+                                        <td class="ps-3">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold" style="width: 32px; height: 32px; font-size: 12px;">
+                                                    {{ firstLetter }}
+                                                </div>
+                                                <div>
+                                                    <div class="fw-semibold small">{{ company.nom }}</div>
+                                                    <div class="text-muted small">{{ company.email }}</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge bg-primary bg-opacity-10 text-primary">Pro</span></td>
-                                    <td><span class="small">15/07/2026</span></td>
-                                    <td class="text-center">
-                                        <span class="badge bg-success bg-opacity-10 text-success">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Actif
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-success fw-bold" style="width: 32px; height: 32px; font-size: 12px;">S</div>
-                                            <div>
-                                                <div class="fw-semibold small">SmartRH Solutions</div>
-                                                <div class="text-muted small">info@smartrh.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge bg-warning bg-opacity-10 text-warning">Essai</span></td>
-                                    <td><span class="small">14/07/2026</span></td>
-                                    <td class="text-center">
-                                        <span class="badge bg-success bg-opacity-10 text-success">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Actif
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-info fw-bold" style="width: 32px; height: 32px; font-size: 12px;">G</div>
-                                            <div>
-                                                <div class="fw-semibold small">Global HR Tech</div>
-                                                <div class="text-muted small">contact@globalhr.tech</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge bg-primary bg-opacity-10 text-primary">Enterprise</span></td>
-                                    <td><span class="small">12/07/2026</span></td>
-                                    <td class="text-center">
-                                        <span class="badge bg-success bg-opacity-10 text-success">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Actif
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-warning fw-bold" style="width: 32px; height: 32px; font-size: 12px;">C</div>
-                                            <div>
-                                                <div class="fw-semibold small">Consulting Pro</div>
-                                                <div class="text-muted small">admin@consultingpro.fr</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge bg-secondary bg-opacity-10 text-secondary">Starter</span></td>
-                                    <td><span class="small">10/07/2026</span></td>
-                                    <td class="text-center">
-                                        <span class="badge bg-secondary bg-opacity-10 text-secondary">
-                                            <i class="bi bi-pause-circle-fill me-1"></i>Inactif
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-danger fw-bold" style="width: 32px; height: 32px; font-size: 12px;">D</div>
-                                            <div>
-                                                <div class="fw-semibold small">Digital RH</div>
-                                                <div class="text-muted small">contact@digitalrh.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge bg-primary bg-opacity-10 text-primary">Pro</span></td>
-                                    <td><span class="small">09/07/2026</span></td>
-                                    <td class="text-center">
-                                        <span class="badge bg-success bg-opacity-10 text-success">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Actif
-                                        </span>
-                                    </td>
-                                </tr>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary bg-opacity-10 text-primary text-uppercase">
+                                                {{ company.plan|default('Standard') }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="small">{{ company.createdAt ? company.createdAt|date('d/m/Y') : '-' }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            {% if company.status == 'active' %}
+                                                <span class="badge bg-success bg-opacity-10 text-success">
+                                                    <i class="bi bi-check-circle-fill me-1"></i>Actif
+                                                </span>
+                                            {% elseif company.status == 'trial' %}
+                                                <span class="badge bg-warning bg-opacity-10 text-warning">
+                                                    <i class="bi bi-clock-fill me-1"></i>Essai
+                                                </span>
+                                           {% else %}
+                                                <span class="badge bg-secondary bg-opacity-10 text-secondary text-capitalize">
+                                                    <i class="bi bi-pause-circle-fill me-1"></i>{{ company.status }}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">Aucune entreprise enregistrée pour le moment.</td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -223,7 +192,7 @@
                     <small class="text-muted">
                         <i class="bi bi-info-circle me-1"></i>Affichage des 5 dernières inscriptions
                     </small>
-                    <a href="#" class="btn btn-link text-decoration-none p-0">
+                    <a href="{{ path('app_super_admin_entreprise') }}" class="btn btn-link text-decoration-none p-0">
                         Voir tout <i class="bi bi-arrow-right ms-1"></i>
                     </a>
                 </div>

@@ -48,8 +48,18 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         if (!$user) {
             throw new UserNotFoundException();
         }
+        // The company status applies to every linked user, even when the user account is active.
+        $entreprise = $user->getEntreprise();
+        if ($entreprise && !in_array($entreprise->getStatus(), ['active', 'trial'], true)) {
+            throw new CustomUserMessageAuthenticationException('Votre entreprise est suspendue ou inactive. Merci de contacter votre administrateur ou notre support.');
+        }
+
         if (!$user->isActive()) {
-            throw new CustomUserMessageAuthenticationException('Veuillez confirmer votre email avant de vous connecter.');
+            if ($user->getEmailVerifiedAt() === null) {
+                throw new CustomUserMessageAuthenticationException('Veuillez confirmer votre email avant de vous connecter.');
+            }
+
+            throw new CustomUserMessageAuthenticationException('Votre compte a été désactivé. Merci de contacter votre administrateur.');
         }
         return $user;
     }
